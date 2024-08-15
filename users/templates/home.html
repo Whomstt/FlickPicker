@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Django Google Sign In</title>
+    <title>FlickPicker</title>
 </head>
 <body>
+    <h1>Welcome {{google_given_name}} </h1>
+    <h2>Ready to find a Film?</h2>
     {% load socialaccount %}
-    <h2>Google Login</h2>
-    <a href="{% provider_login_url 'google' %}?next=/">Login With Google</a>
-
+    <h3>Google Login</h3>
+    <a href="{% provider_login_url 'google' %}">Login With Google</a>
     {% if user.is_authenticated %}
-    <p>You are signed in as {{user.email}}</p>
+    <br>
     <a href="logout">Logout</a>
     {%endif%}
 </body>

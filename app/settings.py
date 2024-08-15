@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -49,13 +55,12 @@ INSTALLED_APPS = [
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
+        "CLIENT_ID": os.environ.get("GOOGLE_CLIENT_ID"),
+        "SECRET:": os.environ.get("GOOGLE_CLIENT_SECRET"),
         "SCOPE": [
             "profile",
-            "email"
+            "email",
         ],
-        "AUTH_PARAMS": {
-            "access_type": "online"
-        }
     }
 }
 
@@ -67,7 +72,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'allauth.account.middleware.AccountMiddleware',
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "app.urls"
@@ -145,8 +150,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend"
+    "allauth.account.auth_backends.AuthenticationBackend",
 )
 
-LOGIN_DIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
