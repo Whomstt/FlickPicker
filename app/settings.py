@@ -38,6 +38,8 @@ ALLOWED_HOSTS = ["18.201.123.42", "localhost", "127.0.0.1"]
 
 SITE_ID = 2
 
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -46,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "users",
+    "film",
     "django.contrib.sites",
     "allauth",
     "allauth.account",

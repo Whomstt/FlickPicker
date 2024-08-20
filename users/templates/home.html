@@ -7,14 +7,19 @@
     <title>FlickPicker</title>
 </head>
 <body>
-    <h1>Welcome {{google_given_name}} </h1>
-    <h2>Ready to find a Film?</h2>
     {% load socialaccount %}
+    {% if not user.is_authenticated %}
+    <h1>Welcome To FlickPicker</h1>
+    <h2>To Use FlickPicker Please Login</h2>
     <h3>Google Login</h3>
     <a href="{% provider_login_url 'google' %}">Login With Google</a>
+    {% endif %}
     {% if user.is_authenticated %}
-    <br>
+    <h1>Welcome To FlickPicker {{google_given_name}}</h1>
+    <img src = "{{google_picture}}" alt = "Google Profile Picture">
+    <h2>Ready To Find A Film?</h2>
     <a href="logout">Logout</a>
-    {%endif%}
+    <a href="{% url 'film_list' %}" class="button">See Film List</a>
+    {% endif %}
 </body>
 </html>

@@ -1,0 +1,20 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlickPicker</title>
+</head>
+<body>
+<h2>List Of Films</h2>
+    <ul>
+        {% if films %}
+            {% for film in films %}
+                <li>{{ film.title }} - Directed by {{ film.director }} ({{ film.release_date }})</li>
+            {% endfor %}
+        {% else %}
+            <li>No films available.</li>
+        {% endif %}
+    </ul>
+</body>
+</html>
