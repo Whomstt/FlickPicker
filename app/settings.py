@@ -31,7 +31,7 @@ SECRET_KEY = "django-insecure-##@z-0=g1&$cq!9bj&3hi%w2sau9!38kwq9@3ugjtr@$i-ushd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["18.201.123.42", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["flickpicker.site", "localhost", "127.0.0.1"]
 
 
 # Application definition
