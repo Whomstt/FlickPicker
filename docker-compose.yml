@@ -11,11 +11,12 @@ services:
       DATABASE_URL: postgres://root:root@db:5432/db
     depends_on:
       - db
+    restart: unless-stopped
 
   db:
     container_name: postgres_container
     image: postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
@@ -26,7 +27,7 @@ services:
   pgadmin:
     container_name: pgadmin4_container
     image: dpage/pgadmin4
-    restart: always
+    restart: unless-stopped
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: root
