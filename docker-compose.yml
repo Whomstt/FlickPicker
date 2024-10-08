@@ -12,6 +12,8 @@ services:
     depends_on:
       - db
     restart: unless-stopped
+    networks:
+      - app_network
 
   db:
     container_name: postgres_container
@@ -23,6 +25,10 @@ services:
       POSTGRES_DB: db
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
 
   pgadmin:
     container_name: pgadmin4_container
@@ -33,6 +39,52 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
     ports:
       - "5050:80"
+    networks:
+      - app_network
+
+  # Use command "run ollama llama3.2" in this container to start model
+  ollama:
+    container_name: ollama
+    restart: unless-stopped
+    image: ollama/ollama:latest
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - "./ollamadata:/root/.ollama"
+    ports:
+      - 11434:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ollama list || exit 1
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
+    networks:
+      - app_network
+
+  ollama-models-pull:
+    container_name: ollama-models-pull
+    image: curlimages/curl:latest
+    command: >
+      http://ollama:11434/api/pull -d '{"name":"llama3.2"}'
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
 
 volumes:
   postgres_data:
+  ollamadata:

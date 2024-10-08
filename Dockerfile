@@ -10,6 +10,7 @@ WORKDIR /code
 
 # Install dependencies
 COPY requirements.txt /code/
+RUN apt-get update && apt-get install git -y && apt-get install curl -y
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
