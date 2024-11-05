@@ -42,7 +42,7 @@ services:
     networks:
       - app_network
 
-  # Use command "run ollama llama3.2" in this container to start model
+  # Use command "ollama run llama3.2" in this container to start model
   ollama:
     container_name: ollama
     restart: unless-stopped

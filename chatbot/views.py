@@ -1,20 +1,32 @@
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+import requests
+from django.views import View
 import json
+from django.shortcuts import render
 
 
-@csrf_exempt  # Use only if you want to bypass CSRF verification for testing
-def chat_view(request):
-    if request.method == "POST":
-        # Parse the JSON body
-        data = json.loads(request.body)
+class OllamaRequestView(View):
+    def get(self, request):
+        return render(request, "chat.html")
 
-        # Process the data (this is just an example)
-        response_data = {
-            "received_data": data,
-            "message": "Data received successfully!",
-        }
+    def post(self, request):
+        data = {"model": "llama3.2", "prompt": "Why do you smell so bad?"}
+        response = self.send_post_request_to_ollama(data)
+        return render(request, "chat.html", {"response": response})
 
-        return JsonResponse(response_data, status=200)
-
-    return JsonResponse({"error": "Invalid request method."}, status=400)
+    def send_post_request_to_ollama(self, data):
+        url = "http://ollama:11434/api/generate"
+        full_response = ""
+        try:
+            response = requests.post(url, json=data, stream=True)
+            response.raise_for_status()
+            for line in response.iter_lines(decode_unicode=True):
+                if line:
+                    response_data = json.loads(line)
+                    full_response += response_data.get("response", "")
+                    if response_data.get("done", False):
+                        break
+            return full_response.strip()
+        except requests.exceptions.RequestException as e:
+            return {"error": str(e)}
+        except ValueError as json_error:
+            return {"error": "Invalid JSON response: {}".format(json_error)}
