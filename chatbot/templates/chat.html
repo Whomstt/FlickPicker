@@ -1,28 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat with Ollama</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
-</head>
-<body>
-    <section class="section">
-        <div class="container">
-            <h1 class="title">Chat with Ollama</h1>
-            <form method="POST" action="">
-                {% csrf_token %}
-                <div class="control">
-                    <button class="button is-link" type="submit">Send Request</button>
-                </div>
-            </form>
-            {% if response %}
-                <hr>
-                <h2 class="subtitle">Response from Ollama:</h2>
-                <pre>{{ response }}</pre>
-            {% endif %}
+{% extends "base.html" %}
+
+{% block title %}Chat with Ollama{% endblock %}
+
+{% block content %}
+    <h2 class="text-center mb-4">Chat with Ollama</h2>
+    
+    <form method="POST" class="mb-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="prompt" class="form-label">Enter your prompt:</label>
+            <textarea id="prompt" name="prompt" rows="4" class="form-control" placeholder="Type your question or prompt here..."></textarea>
         </div>
-    </section>
-</body>
-</html>
+        <button type="submit" class="btn btn-primary w-100">Submit</button>
+    </form>
+
+    {% if response %}
+        <div class="response-container bg-light p-3 rounded border">
+            <h2>Response:</h2>
+            <p>{{ response }}</p>
+        </div>
+    {% endif %}
+{% endblock %}

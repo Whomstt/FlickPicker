@@ -1,32 +1,34 @@
-<!DOCTYPE htmL>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlickPicker</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/film_list.css' %}">
-</head>
-<body>
-<h2>List Of Films</h2>
-    {% if films %}
-        <table>
-            <tr>
-                <th>Title</th>
-                <th>Genre</th>
-                <th>Director</th>
-                <th>Release Date</th>
-            </tr>
-            {% for film in films %}
-            <tr>
-                <td>{{film.title}}</td>
-                <td>{{film.genre}}</td>
-                <td>{{film.director}}</td>
-                <td>{{film.release_date}}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    {% endif %}
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}List of Films{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2 class="text-center my-4">List Of Films</h2>
+
+        {% if films %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Genre</th>
+                        <th>Director</th>
+                        <th>Release Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for film in films %}
+                    <tr>
+                        <td>{{ film.title }}</td>
+                        <td>{{ film.genre }}</td>
+                        <td>{{ film.director }}</td>
+                        <td>{{ film.release_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No films available.</p>
+        {% endif %}
+    </div>
+{% endblock %}

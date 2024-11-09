@@ -9,7 +9,8 @@ class OllamaRequestView(View):
         return render(request, "chat.html")
 
     def post(self, request):
-        data = {"model": "llama3.2", "prompt": "Why do you smell so bad?"}
+        prompt = request.POST.get("prompt", "")
+        data = {"model": "llama3.2", "prompt": prompt}
         response = self.send_post_request_to_ollama(data)
         return render(request, "chat.html", {"response": response})
 
