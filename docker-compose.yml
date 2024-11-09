@@ -1,3 +1,5 @@
+version: '3.9'
+
 services:
   web:
     build: .
@@ -7,13 +9,19 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DEBUG: 'True'  # Set to 'False' in production
+      DEBUG: 'True'
       DATABASE_URL: postgres://root:root@db:5432/db
     depends_on:
       - db
     restart: unless-stopped
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
 
   db:
     container_name: postgres_container
@@ -29,6 +37,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "root"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
 
   pgadmin:
     container_name: pgadmin4_container
@@ -41,8 +55,9 @@ services:
       - "5050:80"
     networks:
       - app_network
+    depends_on:
+      - db
 
-  # Use command "ollama run llama3.2" in this container to start model
   ollama:
     container_name: ollama
     restart: unless-stopped
@@ -62,19 +77,27 @@ services:
               count: all
               capabilities: [gpu]
     healthcheck:
-      test: ollama list || exit 1
+      test: ["CMD", "ollama", "list"]
       interval: 10s
       timeout: 30s
       retries: 5
       start_period: 10s
+    depends_on:
+      web:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+      ollama-models-pull:
+        condition: service_started
     networks:
       - app_network
+    entrypoint: ["/bin/bash", "-c", "until ollama list; do sleep 5; done && ollama run llama3.2"]
 
   ollama-models-pull:
     container_name: ollama-models-pull
     image: curlimages/curl:latest
     command: >
-      http://ollama:11434/api/pull -d '{"name":"llama3.2"}'
+      curl -X POST http://ollama:11434/api/pull -d '{"name":"llama3.2"}'
     depends_on:
       ollama:
         condition: service_healthy
