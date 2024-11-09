@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "users",
-    "film",
     "chatbot",
     "django.contrib.sites",
     "allauth",
