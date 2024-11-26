@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   web:
     build: .
@@ -98,9 +96,6 @@ services:
     image: curlimages/curl:latest
     command: >
       curl -X POST http://ollama:11434/api/pull -d '{"name":"llama3.2"}'
-    depends_on:
-      ollama:
-        condition: service_healthy
     networks:
       - app_network
 
