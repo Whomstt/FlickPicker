@@ -75,29 +75,24 @@ services:
               count: all
               capabilities: [gpu]
     healthcheck:
-      test: ["CMD", "ollama", "list"]
-      interval: 10s
+      test: ["CMD-SHELL", "curl -f http://localhost:11434/ || exit 1"]
+      interval: 30s
       timeout: 30s
-      retries: 5
-      start_period: 10s
+      retries: 3
+      start_period: 60s
     depends_on:
       web:
         condition: service_healthy
       db:
         condition: service_healthy
-      ollama-models-pull:
-        condition: service_started
     networks:
       - app_network
-    entrypoint: ["/bin/bash", "-c", "until ollama list; do sleep 5; done && ollama run llama3.2"]
-
-  ollama-models-pull:
-    container_name: ollama-models-pull
-    image: curlimages/curl:latest
-    command: >
-      curl -X POST http://ollama:11434/api/pull -d '{"name":"llama3.2"}'
-    networks:
-      - app_network
+    entrypoint: ["/bin/bash", "-c"]
+    command: |
+      "
+      ollama pull llama3.2
+      ollama serve
+      "
 
 networks:
   app_network:
