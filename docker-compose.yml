@@ -1,5 +1,6 @@
 services:
   web:
+    container_name: web
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
@@ -22,7 +23,7 @@ services:
       start_period: 10s
 
   db:
-    container_name: postgres_container
+    container_name: postgres
     image: postgres:latest
     restart: unless-stopped
     environment:
@@ -44,7 +45,7 @@ services:
       start_period: 10s
 
   pgadmin:
-    container_name: pgadmin4_container
+    container_name: pgadmin4
     image: dpage/pgadmin4
     restart: unless-stopped
     environment:
