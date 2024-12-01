@@ -60,44 +60,54 @@ class MovieRecommendationView(View):
 
     # Load existing embeddings for films or generate new ones
     def load_or_generate_embeddings(self):
+        # Load cache if available
         data, embeddings, index = self.load_cache()
+        # If cache is not available, generate new embeddings
         if data is None:
             try:
+                # Load movies data from disk
                 with open(MOVIES_DATA_PATH, "r", encoding="utf-8") as f:
                     data = json.load(f)
             except FileNotFoundError:
                 raise ValueError("Movies data file not found")
             except json.JSONDecodeError:
                 raise ValueError("Invalid JSON in movies data file")
-
+            # Convert JSON data to text for embedding
             data_texts = [self.json_to_text(item) for item in data]
+            # Generate embeddings for the data
             embeddings = self.generate_embeddings(data_texts)
+            # Create a FAISS index for the embeddings (Euclidean distance)
             index = faiss.IndexFlatL2(EMBEDDING_DIM)
+            # Add the embeddings to the index
             index.add(embeddings)
+            # Save the cache to disk
             self.save_cache(data, embeddings, index)
-
         return data, embeddings, index
 
-    # Generate embedding for prompt
+    # Generate embeddings for a given text
     def fetch_embedding(self, text):
         try:
+            # Request the embedding from the OLLAMA service
             response = requests.post(
                 f"{OLLAMA_URL}/embeddings",
                 json={"model": OLLAMA_EMBEDDING_MODEL, "prompt": text},
             )
             response.raise_for_status()
+            # Extract the embedding from the response
             embedding = response.json().get("embedding")
             if embedding is None:
                 raise ValueError("Embedding not found in response")
             return np.array(embedding, dtype="float32")
         except requests.exceptions.RequestException as e:
+            # Dimension mismatch
             logger.error(f"Embedding request error: {e}")
             return np.zeros(EMBEDDING_DIM, dtype="float32")
 
-    # Generate embeddings for all films
+    # Generate embeddings for a list of texts in parallel
     def generate_embeddings(self, data_texts):
         with ThreadPoolExecutor() as executor:
             embeddings = list(executor.map(self.fetch_embedding, data_texts))
+        # Return the embeddings as a NumPy array for FAISS
         return np.array(embeddings, dtype="float32")
 
     # Prepare top matches for display
@@ -136,6 +146,13 @@ class MovieRecommendationView(View):
             ("Overview", "overview"),
             ("Director", "director"),
             ("Main Actors", "main_actors"),
+            ("Runtime", "runtime"),
+            ("Release Date", "release_date"),
+            ("Country", "country_of_production"),
+            ("Languages", "spoken_languages"),
+            ("Tagline", "tagline"),
+            ("Budget", "budget"),
+            ("Revenue", "revenue"),
         ]
         for label, key in key_fields:
             value = item.get(key, [])
