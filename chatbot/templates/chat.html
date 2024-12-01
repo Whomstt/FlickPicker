@@ -1,23 +1,58 @@
 {% extends "base.html" %}
-
 {% block title %}Chat with Ollama{% endblock %}
-
 {% block content %}
-    <h2 class="text-center mb-4">Chat with Ollama</h2>
-    
-    <form method="POST" class="mb-4">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="prompt" class="form-label">Enter your prompt:</label>
-            <textarea id="prompt" name="prompt" rows="4" class="form-control" placeholder="Type your question or prompt here..."></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary w-100">Submit</button>
-    </form>
+    <div class="container">
+        <h2 class="text-center mb-4">Movie Recommendation Assistant</h2>
+        <form method="POST" class="mb-4">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="prompt" class="form-label">Enter your movie preferences or query:</label>
+                <textarea id="prompt" name="prompt" rows="4" class="form-control" placeholder="I want a sci-fi movie about space exploration..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Get Recommendations</button>
+        </form>
 
-    {% if response %}
-        <div class="response-container bg-light p-3 rounded border">
-            <h2>Response:</h2>
-            <p>{{ response }}</p>
-        </div>
-    {% endif %}
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        {% if response %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Recommendation Explanation</h3>
+                </div>
+                <div class="card-body">
+                    <p>{{ response }}</p>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if matches %}
+            <div class="card">
+                <div class="card-header">
+                    <h3>Top Matched Movies</h3>
+                </div>
+                <div class="card-body">
+                    {% for match in matches %}
+                        <div class="mb-3 p-3 border rounded">
+                            <h4>{{ match.title }}</h4>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <p><strong>Genres:</strong> {{ match.genres|join:", " }}</p>
+                                    <p><strong>Overview:</strong> {{ match.overview }}</p>
+                                    <p><strong>Director:</strong> {{ match.director }}</p>
+                                    <p><strong>Main Actors:</strong> {{ match.main_actors|join:", " }}</p>
+                                    <p class="text-muted">
+                                        <small>Similarity Score: {{ match.similarity_distance|floatformat:4 }}</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

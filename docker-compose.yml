@@ -82,17 +82,13 @@ services:
       timeout: 30s
       retries: 3
       start_period: 60s
-    depends_on:
-      web:
-        condition: service_healthy
-      db:
-        condition: service_healthy
     networks:
       - app_network
     entrypoint: ["/bin/bash", "-c"]
     command: |
       "
       ollama pull llama3.2
+      ollama pull nomic-embed-text
       ollama serve
       "
 
