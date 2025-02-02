@@ -15,12 +15,6 @@ services:
     restart: unless-stopped
     networks:
       - app_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000"]
-      interval: 10s
-      timeout: 30s
-      retries: 5
-      start_period: 10s
 
   db:
     container_name: postgres
@@ -37,12 +31,6 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app_network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U root -d db"]
-      interval: 10s
-      timeout: 30s
-      retries: 5
-      start_period: 10s
 
   pgadmin:
     container_name: pgadmin4
@@ -76,21 +64,14 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:11434/ || exit 1"]
-      interval: 30s
-      timeout: 30s
-      retries: 3
-      start_period: 60s
     networks:
       - app_network
     entrypoint: ["/bin/bash", "-c"]
     command: |
-      "
-      ollama pull llama3.2
-      ollama pull nomic-embed-text
-      ollama serve
-      "
+      "ollama serve && \
+      ollama pull llama3.2 && \
+      ollama pull nomic-embed-text"
+      
 
 networks:
   app_network:
