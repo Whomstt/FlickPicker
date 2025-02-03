@@ -2,5 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("", views.MovieRecommendationView.as_view(), name="chat"),
+    path("film-recommendations/", views.FilmRecommendationsView.as_view(), name="film_recommendations"),
+    path("generate-original-embeddings/", views.GenerateOriginalEmbeddingsView.as_view(), name="generate_original_embeddings"),
 ]

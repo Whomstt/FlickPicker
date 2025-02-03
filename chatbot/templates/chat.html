@@ -2,12 +2,12 @@
 {% block title %}Chat with Ollama{% endblock %}
 {% block content %}
     <div class="container">
-        <h2 class="text-center mb-4">Movie Recommendation Assistant</h2>
+        <h2 class="text-center mb-4">Film Recommendation Assistant</h2>
         <form method="POST" class="mb-4">
             {% csrf_token %}
             <div class="mb-3">
-                <label for="prompt" class="form-label">Enter your movie preferences or query:</label>
-                <textarea id="prompt" name="prompt" rows="4" class="form-control" placeholder="I want a sci-fi movie about space exploration..."></textarea>
+                <label for="prompt" class="form-label">Enter your film preferences or query:</label>
+                <textarea id="prompt" name="prompt" rows="4" class="form-control" placeholder="I want a sci-fi film about space exploration..."></textarea>
             </div>
             <button type="submit" class="btn btn-primary w-100">Get Recommendations</button>
         </form>
@@ -32,7 +32,7 @@
         {% if matches %}
             <div class="card">
                 <div class="card-header">
-                    <h3>Top Matched Movies</h3>
+                    <h3>Top Matching Films</h3>
                 </div>
                 <div class="card-body">
                     {% for match in matches %}
@@ -54,5 +54,8 @@
                 </div>
             </div>
         {% endif %}
+        <form action="{% url 'generate_original_embeddings' %}" method="GET">
+            <button type="submit" class="btn btn-success w-100">Generate Embeddings</button>
+        </form>
     </div>
 {% endblock %}
