@@ -22,38 +22,30 @@ OLLAMA_URL = "http://ollama:11434/api"
 
 
 class BaseEmbeddingView(View):
-    async def fetch_embedding(self, text, session):
-        """
-        Asynchronously fetch an embedding from the Ollama API using aiohttp.
-        """
+    async def send_request(self, url, payload, session):
         try:
-            async with session.post(
-                f"{OLLAMA_URL}/embeddings",
-                json={"model": OLLAMA_EMBEDDING_MODEL, "prompt": text},
-            ) as response:
+            async with session.post(url, json=payload) as response:
                 response.raise_for_status()
-                data = await response.json()
-                embedding = data.get("embedding")
-                if embedding is None:
-                    raise ValueError("Embedding not found in response")
-                return np.array(embedding, dtype="float32")
+                return await response.json()
         except Exception as e:
-            logger.error(f"Embedding request error: {e}")
-            return np.zeros(EMBEDDING_DIM, dtype="float32")
+            logger.error(f"Request error to {url}: {e}")
+            return None
+
+    async def fetch_embedding(self, text, session):
+        url = f"{OLLAMA_URL}/embeddings"
+        payload = {"model": OLLAMA_EMBEDDING_MODEL, "prompt": text}
+        response = await self.send_request(url, payload, session)
+        if response and "embedding" in response:
+            return np.array(response["embedding"], dtype="float32")
+        return np.zeros(EMBEDDING_DIM, dtype="float32")
 
     async def generate_embeddings(self, data_texts):
-        """
-        Asynchronously generate embeddings concurrently for a list of texts.
-        """
         async with aiohttp.ClientSession() as session:
             tasks = [self.fetch_embedding(text, session) for text in data_texts]
             embeddings = await asyncio.gather(*tasks)
         return np.array(embeddings, dtype="float32")
 
     def save_cache(self, data, embeddings, index):
-        """
-        Save film data, embeddings, and the FAISS index to disk.
-        """
         os.makedirs(CACHE_DIR, exist_ok=True)
         with open(os.path.join(CACHE_DIR, "film_data.json"), "w") as f:
             json.dump(data, f)
@@ -61,9 +53,6 @@ class BaseEmbeddingView(View):
         faiss.write_index(index, FAISS_INDEX_PATH)
 
     def load_cache(self):
-        """
-        Load cached film data, embeddings, and FAISS index from disk.
-        """
         data_path = os.path.join(CACHE_DIR, "film_data.json")
         embeddings_path = os.path.join(CACHE_DIR, "film_embeddings.npy")
 
@@ -79,9 +68,6 @@ class BaseEmbeddingView(View):
         return data, embeddings, index
 
     def json_to_text(self, item):
-        """
-        Convert a film record dictionary to a formatted string.
-        """
         keys = [
             ("Title", "title"),
             ("Genres", "genres"),
@@ -104,43 +90,12 @@ class BaseEmbeddingView(View):
             parts.append(f"{label}: {value}")
         return "\n".join(parts)
 
-    async def generate_recommendation_explanation(self, prompt, top_matches):
-        """
-        Asynchronously generate a recommendation explanation based on the prompt and top film matches.
-        """
-        try:
-            full_prompt = f"Query: {prompt}\n\n"
-            full_prompt += "\n\n".join(self.json_to_text(item) for item in top_matches)
-            full_prompt += "\n\nProvide a detailed film recommendation explanation."
-
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    f"{OLLAMA_URL}/generate",
-                    json={
-                        "model": OLLAMA_GENERATION_MODEL,
-                        "prompt": full_prompt,
-                        "stream": False,
-                    },
-                ) as response:
-                    response.raise_for_status()
-                    data = await response.json()
-                    return data.get("response", "No explanation available.")
-        except Exception as e:
-            logger.error(f"Recommendation generation error: {e}")
-            return "Error generating recommendation explanation."
-
 
 class FilmRecommendationsView(BaseEmbeddingView):
     async def get(self, request, *args, **kwargs):
-        """
-        Render the chat interface.
-        """
         return render(request, "chat.html")
 
     async def post(self, request, *args, **kwargs):
-        """
-        Process the user's prompt, perform an embedding lookup, and generate a recommendation explanation.
-        """
         try:
             prompt = request.POST.get("prompt", "").strip()
             if not prompt:
@@ -157,7 +112,6 @@ class FilmRecommendationsView(BaseEmbeddingView):
             if isinstance(index, faiss.IndexIVFFlat):
                 index.nprobe = 10
 
-            # Use a dedicated session to get the prompt embedding
             async with aiohttp.ClientSession() as session:
                 prompt_embedding = await self.fetch_embedding(prompt, session)
             prompt_embedding = prompt_embedding.reshape(1, -1)
@@ -175,21 +129,40 @@ class FilmRecommendationsView(BaseEmbeddingView):
             return render(request, "chat.html", {"error": str(e)})
 
     def prepare_top_matches(self, data, distances, indices):
-        # Combine distances and indices into a list of tuples
         results = [(dist, idx) for dist, idx in zip(distances[0], indices[0])]
-        # Sort by distance in descending order (lower distance means more similarity)
         results.sort(key=lambda x: x[0], reverse=True)
-        # Return the top matches sorted by similarity score
         return [
             {**data[idx], "similarity_distance": float(dist)} for dist, idx in results
         ]
 
+    async def generate_recommendation_explanation(self, prompt, top_matches):
+        try:
+            full_prompt = f"Query: {prompt}\n\n"
+            full_prompt += "\n\n".join(self.json_to_text(item) for item in top_matches)
+            full_prompt += "\n\nProvide a detailed film recommendation explanation."
+
+            async with aiohttp.ClientSession() as session:
+                response = await self.send_request(
+                    f"{OLLAMA_URL}/generate",
+                    {
+                        "model": OLLAMA_GENERATION_MODEL,
+                        "prompt": full_prompt,
+                        "stream": False,
+                    },
+                    session,
+                )
+                return (
+                    response.get("response", "No explanation available.")
+                    if response
+                    else "No explanation available."
+                )
+        except Exception as e:
+            logger.error(f"Recommendation generation error: {e}")
+            return "Error generating recommendation explanation."
+
 
 class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
     async def get(self, request, *args, **kwargs):
-        """
-        Generate embeddings from the original film data, create the IVF index, and cache the results.
-        """
         try:
             data, embeddings, index = await self.generate_original_embeddings()
             self.save_cache(data, embeddings, index)
@@ -199,9 +172,6 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
             return HttpResponseServerError(f"Error: {str(e)}")
 
     async def generate_original_embeddings(self):
-        """
-        Load film data from JSON, generate embeddings asynchronously, and build the FAISS IVF index.
-        """
         try:
             with open(FILM_DATA_PATH, "r", encoding="utf-8") as f:
                 data = json.load(f)
@@ -214,7 +184,7 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
         embeddings = await self.generate_embeddings(data_texts)
 
         quantizer = faiss.IndexFlatL2(EMBEDDING_DIM)
-        nlist = 100  # Number of IVF clusters
+        nlist = 100
         index = faiss.IndexIVFFlat(quantizer, EMBEDDING_DIM, nlist, faiss.METRIC_L2)
         index.train(embeddings)
         index.add(embeddings)
