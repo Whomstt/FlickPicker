@@ -3,6 +3,15 @@
 {% block content %}
     <div class="container">
         <h2 class="text-center mb-4">Film Recommendation Assistant</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
         <form method="POST" class="mb-4">
             {% csrf_token %}
             <div class="mb-3">
@@ -11,12 +20,6 @@
             </div>
             <button type="submit" class="btn btn-primary w-100">Get Recommendations</button>
         </form>
-
-        {% if error %}
-            <div class="alert alert-danger" role="alert">
-                {{ error }}
-            </div>
-        {% endif %}
 
         {% if response %}
             <div class="card mb-4">
@@ -54,8 +57,9 @@
                 </div>
             </div>
         {% endif %}
+
         <form action="{% url 'generate_original_embeddings' %}" method="GET">
-            <button type="submit" class="btn btn-success w-100">Generate Embeddings</button>
+            <button type="submit" class="btn btn-success w-100">Generate Original Embeddings</button>
         </form>
     </div>
 {% endblock %}
