@@ -7,7 +7,7 @@ import os
 load_dotenv()
 API_KEY = os.getenv("TMDB_API_KEY")
 
-BASE_URL = "https://api.thefilmdb.org/3"
+BASE_URL = "https://api.themoviedb.org/3"
 
 
 # Function to get top films
@@ -15,7 +15,7 @@ def get_top_films(api_key, num_films=100):
     films = []
     page = 1
     while len(films) < num_films:
-        url = f"{BASE_URL}/discover/film"
+        url = f"{BASE_URL}/discover/movie"
         params = {
             "api_key": api_key,
             "sort_by": "popularity.desc",
@@ -31,7 +31,7 @@ def get_top_films(api_key, num_films=100):
 
 # Get detailed film info
 def get_film_details(api_key, film_id):
-    url = f"{BASE_URL}/film/{film_id}"
+    url = f"{BASE_URL}/movie/{film_id}"
     params = {"api_key": api_key}
     response = requests.get(url, params=params)
     response.raise_for_status()
@@ -40,11 +40,20 @@ def get_film_details(api_key, film_id):
 
 # Get cast and crew information
 def get_film_credits(api_key, film_id):
-    url = f"{BASE_URL}/film/{film_id}/credits"
+    url = f"{BASE_URL}/movie/{film_id}/credits"
     params = {"api_key": api_key}
     response = requests.get(url, params=params)
     response.raise_for_status()
     return response.json()
+
+
+# Get keywords for a film
+def get_film_keywords(api_key, film_id):
+    url = f"{BASE_URL}/movie/{film_id}/keywords"
+    params = {"api_key": api_key}
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    return [kw["name"] for kw in response.json().get("keywords", [])]
 
 
 # Fetch and save the data
@@ -60,6 +69,7 @@ def fetch_and_save_films(api_key, output_file):
         try:
             details = get_film_details(api_key, film_id)
             credits = get_film_credits(api_key, film_id)
+            keywords = get_film_keywords(api_key, film_id)
 
             # Extract key information
             main_actors = [
@@ -76,7 +86,7 @@ def fetch_and_save_films(api_key, output_file):
 
             film_data = {
                 "title": details["title"],
-                "genres": [genre["name"] for genre in details["genres"]],
+                "genres": [genre["name"] for genre in details.get("genres", [])],
                 "runtime": details.get("runtime"),
                 "release_date": details.get("release_date"),
                 "overview": details.get("overview"),
@@ -92,6 +102,7 @@ def fetch_and_save_films(api_key, output_file):
                 "tagline": details.get("tagline"),
                 "budget": details.get("budget"),
                 "revenue": details.get("revenue"),
+                "keywords": keywords,
             }
 
             films_data.append(film_data)
@@ -109,5 +120,5 @@ def fetch_and_save_films(api_key, output_file):
 
 # Execute the script
 if __name__ == "__main__":
-    OUTPUT_FILE = "film_data.json"
+    OUTPUT_FILE = "original_film_data.json"
     fetch_and_save_films(API_KEY, OUTPUT_FILE)

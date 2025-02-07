@@ -9,13 +9,19 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 from django.contrib import messages
 
+# Constants
 CACHE_DIR = os.path.join(settings.BASE_DIR, "cache")
 FAISS_INDEX_PATH = os.path.join(CACHE_DIR, "faiss_index")
 ORIGINAL_FILM_DATA_PATH = os.path.join(settings.BASE_DIR, "original_film_data.json")
-EMBEDDING_DIM = 768
+OLLAMA_URL = "http://ollama:11434/api"
+
+# Parameters
 OLLAMA_EMBEDDING_MODEL = "nomic-embed-text"
 OLLAMA_GENERATION_MODEL = "llama3.2"
-OLLAMA_URL = "http://ollama:11434/api"
+EMBEDDING_DIM = 768
+NPROBE = 10  # Number of clusters to be searched
+NLIST = 100  # Number of clusters to be stored
+N_TOP_MATCHES = 5  # Number of top matches to return
 
 
 class BaseEmbeddingView(View):
@@ -28,33 +34,36 @@ class BaseEmbeddingView(View):
         """
         Send a POST request to the OLLAMA API.
         """
-        async with session.post(url, json=payload) as response:
-            response.raise_for_status()
-            return await response.json()
+        try:
+            async with session.post(url, json=payload) as response:
+                response.raise_for_status()
+                return await response.json()
+        except aiohttp.ClientError as e:
+            print(f"Error sending request to {url}: {e}")
+            return {}
 
     async def fetch_embedding(self, text, session):
         """
-        Fetch embedding for a given text.
+        Fetch embedding for a given text and normalize it.
         """
         payload = {"model": OLLAMA_EMBEDDING_MODEL, "prompt": text, "keep_alive": -1}
         response = await self.send_request(f"{OLLAMA_URL}/embeddings", payload, session)
+        embedding = np.array(response.get("embedding", []), dtype="float32")
         return (
-            np.array(response["embedding"], dtype="float32")
-            if response and "embedding" in response
+            embedding / np.linalg.norm(embedding)
+            if embedding.size > 0
             else np.zeros(EMBEDDING_DIM, dtype="float32")
         )
 
     async def generate_embeddings(self, data_texts):
         """
-        Generate embeddings for a list of texts.
+        Generate normalized embeddings for a list of texts.
         """
         async with aiohttp.ClientSession() as session:
-            return np.array(
-                await asyncio.gather(
-                    *[self.fetch_embedding(text, session) for text in data_texts]
-                ),
-                dtype="float32",
+            embeddings = await asyncio.gather(
+                *[self.fetch_embedding(text, session) for text in data_texts]
             )
+        return np.array(embeddings, dtype="float32")
 
     def save_cache(self, data, embeddings, index):
         """
@@ -86,7 +95,7 @@ class BaseEmbeddingView(View):
 
     def json_to_text(self, item):
         """
-        Convert Film data JSON to text.
+        Convert Film data JSON to enriched text.
         """
         fields = [
             ("Title", "title"),
@@ -99,6 +108,7 @@ class BaseEmbeddingView(View):
             ("Tagline", "tagline"),
             ("Country of Production", "country_of_production"),
             ("Spoken Languages", "spoken_languages"),
+            ("Keywords", "keywords"),
             ("Budget", "budget"),
             ("Revenue", "revenue"),
         ]
@@ -134,12 +144,14 @@ class FilmRecommendationsView(BaseEmbeddingView):
             return redirect("film_recommendations")
 
         if isinstance(index, faiss.IndexIVFFlat):
-            index.nprobe = 10
+            index.nprobe = NPROBE
 
         async with aiohttp.ClientSession() as session:
             prompt_embedding = await self.fetch_embedding(prompt, session)
 
-        distances, indices = index.search(prompt_embedding.reshape(1, -1), 3)
+        distances, indices = index.search(
+            prompt_embedding.reshape(1, -1), N_TOP_MATCHES
+        )
         top_matches = self.prepare_top_matches(data, distances, indices)
         explanation = await self.generate_recommendation_explanation(
             prompt, top_matches
@@ -162,26 +174,22 @@ class FilmRecommendationsView(BaseEmbeddingView):
         """
         Generate a detailed explanation for the film recommendations.
         """
-        full_prompt = f"Query: {prompt}\n\n"
-        full_prompt += "\n\n".join(self.json_to_text(item) for item in top_matches)
-        full_prompt += "\n\nProvide a detailed film recommendation explanation."
+        SYSTEM_PROMPT = f"Query: {prompt}\n\n"
+        SYSTEM_PROMPT += "\n\n".join(self.json_to_text(item) for item in top_matches)
+        SYSTEM_PROMPT += "\n\nProvide a detailed film recommendation explanation."
 
         async with aiohttp.ClientSession() as session:
             response = await self.send_request(
                 f"{OLLAMA_URL}/generate",
                 {
                     "model": OLLAMA_GENERATION_MODEL,
-                    "prompt": full_prompt,
+                    "prompt": SYSTEM_PROMPT,
                     "keep_alive": -1,
                     "stream": False,
                 },
                 session,
             )
-            return (
-                response.get("response", "No explanation available.")
-                if response
-                else "No explanation available."
-            )
+            return response.get("response", "No explanation available.")
 
 
 class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
@@ -200,7 +208,8 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
 
     async def generate_original_embeddings(self):
         """
-        Generate embeddings for the original film data."""
+        Generate embeddings for the original film data.
+        """
         with open(ORIGINAL_FILM_DATA_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
 
@@ -208,7 +217,9 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
         embeddings = await self.generate_embeddings(data_texts)
 
         quantizer = faiss.IndexFlatL2(EMBEDDING_DIM)
-        index = faiss.IndexIVFFlat(quantizer, EMBEDDING_DIM, 100, faiss.METRIC_L2)
+        index = faiss.IndexIVFFlat(
+            quantizer, EMBEDDING_DIM, NLIST, faiss.METRIC_INNER_PRODUCT
+        )
         index.train(embeddings)
         index.add(embeddings)
 
