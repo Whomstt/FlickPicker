@@ -197,14 +197,14 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
     View for generating embeddings for the original film data.
     """
 
-    async def get(self, request, *args, **kwargs):
+    async def post(self, request, *args, **kwargs):
         """
         Generate embeddings for the original film data.
         """
         data, embeddings, index = await self.generate_original_embeddings()
         self.save_cache(data, embeddings, index)
-        messages.success(request, "Embeddings and index generated successfully!")
-        return redirect("film_recommendations")
+        message = "Embeddings and index generated successfully!"
+        return render(request, "admin.html", {"message": message})
 
     async def generate_original_embeddings(self):
         """

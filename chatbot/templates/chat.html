@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Chat with Ollama{% endblock %}
+{% block title %}Chatbot{% endblock %}
 {% block content %}
     <div class="container">
         <h2 class="text-center mb-4">Film Recommendation Assistant</h2>
@@ -57,9 +57,5 @@
                 </div>
             </div>
         {% endif %}
-
-        <form action="{% url 'generate_original_embeddings' %}" method="GET">
-            <button type="submit" class="btn btn-success w-100">Generate Original Embeddings</button>
-        </form>
     </div>
 {% endblock %}

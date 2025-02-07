@@ -33,7 +33,7 @@ def logout_view(request):
     return redirect("/")
 
 
-class AdminView(View):
+class FetchFilmsView(View):
     def get(self, request):
         context = {
             "message": "",

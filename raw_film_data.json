@@ -1415,10 +1415,10 @@
             "United States of America"
         ],
         "spoken_languages": [
-            "普通话",
             "English",
-            "Deutsch",
-            "Español"
+            "普通话",
+            "Español",
+            "Deutsch"
         ],
         "tagline": "Find someone made just for you.",
         "budget": 10000000,
@@ -3213,47 +3213,6 @@
         ]
     },
     {
-        "title": "Fast X",
-        "genres": [
-            "Action",
-            "Crime",
-            "Thriller"
-        ],
-        "runtime": 142,
-        "release_date": "2023-05-17",
-        "overview": "Over many missions and against impossible odds, Dom Toretto and his family have outsmarted, out-nerved and outdriven every foe in their path. Now, they confront the most lethal opponent they've ever faced: A terrifying threat emerging from the shadows of the past who's fueled by blood revenge, and who is determined to shatter this family and destroy everything—and everyone—that Dom loves, forever.",
-        "director": "Louis Leterrier",
-        "main_actors": [
-            "Vin Diesel",
-            "Michelle Rodriguez",
-            "Tyrese Gibson",
-            "Ludacris",
-            "John Cena"
-        ],
-        "country_of_production": [
-            "United States of America"
-        ],
-        "spoken_languages": [
-            "English",
-            "Español"
-        ],
-        "tagline": "The end of the road begins.",
-        "budget": 340000000,
-        "revenue": 704709660,
-        "keywords": [
-            "sequel",
-            "revenge",
-            "betrayal",
-            "racing",
-            "family",
-            "cliffhanger",
-            "shocking",
-            "cars",
-            "dramatic",
-            "ominous"
-        ]
-    },
-    {
         "title": "Conclave",
         "genres": [
             "Drama",
@@ -3299,104 +3258,22 @@
         ]
     },
     {
-        "title": "Pleasure",
-        "genres": [
-            "Drama"
-        ],
-        "runtime": 108,
-        "release_date": "2021-10-08",
-        "overview": "19 year old Linnéa leaves her small town in Sweden and heads for Los Angeles with the aim of becoming the world's next big porn star, but the road to her goal turns out to be bumpier than she imagined.",
-        "director": "Ninja Thyberg",
-        "main_actors": [
-            "Sofia Kappel",
-            "Zelda Morrison",
-            "Tee Reel",
-            "Evelyn Claire",
-            "Chris Cock"
-        ],
-        "country_of_production": [
-            "France",
-            "Netherlands",
-            "Sweden"
-        ],
-        "spoken_languages": [
-            "English",
-            "svenska"
-        ],
-        "tagline": "In the pursuit of fame, she discovers the price of pleasure.",
-        "budget": 1800000,
-        "revenue": 393824,
-        "keywords": [
-            "pornography",
-            "female friendship",
-            "porn star",
-            "female protagonist",
-            "los angeles, california",
-            "porn industry",
-            "porn actress",
-            "woman director",
-            "intimate",
-            "absurd",
-            "disgusted"
-        ]
-    },
-    {
-        "title": "365 Days: This Day",
-        "genres": [
-            "Romance",
-            "Drama"
-        ],
-        "runtime": 111,
-        "release_date": "2022-04-26",
-        "overview": "Laura and Massimo are back and hotter than ever. But the reunited couple's new beginning is complicated by Massimo’s family ties and a mysterious man who enters Laura’s life to win her heart and trust, at any cost.",
-        "director": "Barbara Białowąs",
-        "main_actors": [
-            "Anna-Maria Sieklucka",
-            "Michele Morrone",
-            "Simone Susinna",
-            "Magdalena Lamparska",
-            "Otar Saralidze"
-        ],
-        "country_of_production": [
-            "Poland"
-        ],
-        "spoken_languages": [
-            "English",
-            "Français",
-            "Italiano",
-            "Polski",
-            "Español"
-        ],
-        "tagline": "Oh Yes.",
-        "budget": 0,
-        "revenue": 0,
-        "keywords": [
-            "gangster",
-            "sequel",
-            "bdsm",
-            "rich man poor woman",
-            "sex",
-            "erotique"
-        ]
-    },
-    {
-        "title": "Armor",
+        "title": "Godzilla x Kong: The New Empire",
         "genres": [
             "Action",
-            "Crime",
-            "Thriller",
-            "Drama"
+            "Adventure",
+            "Science Fiction"
         ],
-        "runtime": 89,
-        "release_date": "2024-10-30",
-        "overview": "Armored truck security guard James Brody is working with his son Casey transporting millions of dollars between banks when a team of thieves led by Rook orchestrate a takeover of their truck to seize the riches. Following a violent car chase, Rook soon has the armored truck surrounded and James and Casey find themselves cornered onto a decrepit bridge.",
-        "director": "Justin Routt",
+        "runtime": 115,
+        "release_date": "2024-03-27",
+        "overview": "Following their explosive showdown, Godzilla and Kong must reunite against a colossal undiscovered threat hidden within our world, challenging their very existence – and our own.",
+        "director": "Adam Wingard",
         "main_actors": [
-            "Sylvester Stallone",
-            "Jason Patric",
-            "Josh Wiggins",
-            "Dash Mihok",
-            "Erin Ownbey"
+            "Rebecca Hall",
+            "Brian Tyree Henry",
+            "Dan Stevens",
+            "Kaylee Hottle",
+            "Alex Ferns"
         ],
         "country_of_production": [
             "United States of America"
@@ -3404,11 +3281,20 @@
         "spoken_languages": [
             "English"
         ],
-        "tagline": "On the bridge of death.",
-        "budget": 11500000,
-        "revenue": 0,
+        "tagline": "Rise together or fall alone.",
+        "budget": 150000000,
+        "revenue": 571750016,
         "keywords": [
-            "armored truck"
+            "giant monster",
+            "sequel",
+            "dinosaur",
+            "monkey",
+            "kaiju",
+            "fantasy world",
+            "giant ape",
+            "langue française",
+            "godzilla",
+            "king kong"
         ]
     },
     {
@@ -3441,6 +3327,84 @@
             "lgbt",
             "sexy",
             "bl"
+        ]
+    },
+    {
+        "title": "The Count of Monte Cristo",
+        "genres": [
+            "Action",
+            "Adventure",
+            "Drama"
+        ],
+        "runtime": 178,
+        "release_date": "2024-06-28",
+        "overview": "Edmond Dantes becomes the target of a sinister plot and is arrested on his wedding day for a crime he did not commit. After 14 years in the island prison of Château d’If, he manages a daring escape. Now rich beyond his dreams, he assumes the identity of the Count of Monte-Cristo and exacts his revenge on the three men who betrayed him.",
+        "director": "Alexandre de La Patellière",
+        "main_actors": [
+            "Pierre Niney",
+            "Bastien Bouillon",
+            "Anaïs Demoustier",
+            "Anamaria Vartolomei",
+            "Laurent Lafitte"
+        ],
+        "country_of_production": [
+            "France"
+        ],
+        "spoken_languages": [
+            "Français",
+            "English",
+            "Italiano",
+            "Română"
+        ],
+        "tagline": "This is not vengeance, this is justice.",
+        "budget": 46000000,
+        "revenue": 75360860,
+        "keywords": [
+            "based on novel or book",
+            "count",
+            "revenge",
+            "wrongful conviction"
+        ]
+    },
+    {
+        "title": "Paprika",
+        "genres": [
+            "Drama"
+        ],
+        "runtime": 116,
+        "release_date": "1991-02-13",
+        "overview": "Mimma starts working in Madame Colette’s brothel to help her boyfriend financially. There she is rechristened “Paprika,” and falls in love with her first client, naval officer Franco. Despite this attraction, she begins her climb through the sex trade, residing in Italy’s most illustrious brothels.",
+        "director": "Tinto Brass",
+        "main_actors": [
+            "Debora Caprioglio",
+            "Stéphane Ferrara",
+            "Martine Brochard",
+            "Stéphane Bonnet",
+            "Rossana Gavinel"
+        ],
+        "country_of_production": [
+            "Italy"
+        ],
+        "spoken_languages": [
+            "Italiano"
+        ],
+        "tagline": "Tinto Brass re-opens the closed houses!",
+        "budget": 0,
+        "revenue": 0,
+        "keywords": [
+            "prostitute",
+            "based on novel or book",
+            "self sacrifice",
+            "rome, italy",
+            "italy",
+            "brothel",
+            "pimp",
+            "marriage",
+            "train",
+            "prostitution",
+            "suburb",
+            "softcore",
+            "erotic movie"
         ]
     },
     {
@@ -3492,46 +3456,187 @@
         ]
     },
     {
-        "title": "Avengers: Infinity War",
+        "title": "Wallace & Gromit: Vengeance Most Fowl",
         "genres": [
-            "Adventure",
-            "Action",
-            "Science Fiction"
+            "Animation",
+            "Comedy",
+            "Family",
+            "Adventure"
         ],
-        "runtime": 149,
-        "release_date": "2018-04-25",
-        "overview": "As the Avengers and their allies have continued to protect the world from threats too large for any one hero to handle, a new danger has emerged from the cosmic shadows: Thanos. A despot of intergalactic infamy, his goal is to collect all six Infinity Stones, artifacts of unimaginable power, and use them to inflict his twisted will on all of reality. Everything the Avengers have fought for has led up to this moment - the fate of Earth and existence itself has never been more uncertain.",
-        "director": "Joe Russo",
+        "runtime": 79,
+        "release_date": "2024-12-18",
+        "overview": "Gromit’s concern that Wallace is becoming too dependent on his inventions proves justified, when Wallace invents a “smart” gnome that seems to develop a mind of its own. When it emerges that a vengeful figure from the past might be masterminding things, it falls to Gromit to battle sinister forces and save his master… or Wallace may never be able to invent again!",
+        "director": "Nick Park",
         "main_actors": [
-            "Robert Downey Jr.",
-            "Chris Evans",
-            "Chris Hemsworth",
-            "Josh Brolin",
-            "Mark Ruffalo"
+            "Ben Whitehead",
+            "Peter Kay",
+            "Lauren Patel",
+            "Reece Shearsmith",
+            "Diane Morgan"
+        ],
+        "country_of_production": [
+            "United Kingdom"
+        ],
+        "spoken_languages": [
+            "English"
+        ],
+        "tagline": "New friends. Old enemies.",
+        "budget": 0,
+        "revenue": 191452,
+        "keywords": [
+            "inventor",
+            "human animal relationship",
+            "penguin",
+            "anthropomorphism",
+            "revenge",
+            "stop motion",
+            "robot",
+            "dog",
+            "jewel heist",
+            "gnome"
+        ]
+    },
+    {
+        "title": "Kung Fu Panda 4",
+        "genres": [
+            "Animation",
+            "Family",
+            "Fantasy",
+            "Action"
+        ],
+        "runtime": 94,
+        "release_date": "2024-03-02",
+        "overview": "Po is gearing up to become the spiritual leader of his Valley of Peace, but also needs someone to take his place as Dragon Warrior. As such, he will train a new kung fu practitioner for the spot and will encounter a villain called the Chameleon who conjures villains from the past.",
+        "director": "Mike Mitchell",
+        "main_actors": [
+            "Jack Black",
+            "Awkwafina",
+            "Viola Davis",
+            "Dustin Hoffman",
+            "Bryan Cranston"
         ],
         "country_of_production": [
             "United States of America"
         ],
         "spoken_languages": [
-            "English",
+            "English"
+        ],
+        "tagline": "",
+        "budget": 80000000,
+        "revenue": 548040835,
+        "keywords": [
+            "martial arts",
+            "kung fu",
+            "china",
+            "villain",
+            "sequel",
+            "panda",
+            "anthropomorphism",
+            "chameleon",
+            "female villain",
+            "disheartening",
+            "pretentious"
+        ]
+    },
+    {
+        "title": "Armor",
+        "genres": [
+            "Action",
+            "Crime",
+            "Thriller",
+            "Drama"
+        ],
+        "runtime": 89,
+        "release_date": "2024-10-30",
+        "overview": "Armored truck security guard James Brody is working with his son Casey transporting millions of dollars between banks when a team of thieves led by Rook orchestrate a takeover of their truck to seize the riches. Following a violent car chase, Rook soon has the armored truck surrounded and James and Casey find themselves cornered onto a decrepit bridge.",
+        "director": "Justin Routt",
+        "main_actors": [
+            "Sylvester Stallone",
+            "Jason Patric",
+            "Josh Wiggins",
+            "Dash Mihok",
+            "Erin Ownbey"
+        ],
+        "country_of_production": [
+            "United States of America"
+        ],
+        "spoken_languages": [
+            "English"
+        ],
+        "tagline": "On the bridge of death.",
+        "budget": 11500000,
+        "revenue": 0,
+        "keywords": [
+            "armored truck"
+        ]
+    },
+    {
+        "title": "Dog Man",
+        "genres": [
+            "Family",
+            "Animation",
+            "Comedy",
+            "Action"
+        ],
+        "runtime": 89,
+        "release_date": "2025-01-24",
+        "overview": "When a faithful police dog and his human police officer owner are injured together on the job, a harebrained but life-saving surgery fuses the two of them together and Dog Man is born. Dog Man is sworn to protect and serve—and fetch, sit and roll over. As Dog Man embraces his new identity and strives to impress his Chief, he must stop the pretty evil plots of feline supervillain Petey the Cat.",
+        "director": "Peter Hastings",
+        "main_actors": [
+            "Peter Hastings",
+            "Pete Davidson",
+            "Lil Rel Howery",
+            "Isla Fisher",
+            "Lucas Hopkins Calderon"
+        ],
+        "country_of_production": [
+            "United States of America"
+        ],
+        "spoken_languages": [
+            "English"
+        ],
+        "tagline": "Part dog. Part man. All hero.",
+        "budget": 40000000,
+        "revenue": 40592000,
+        "keywords": [
+            "villain",
+            "based on children's book",
+            "police dog",
+            "human animal hybrid"
+        ]
+    },
+    {
+        "title": "Tatsulok: Tatlo Magkasalo",
+        "genres": [
+            "Drama",
+            "Romance"
+        ],
+        "runtime": 61,
+        "release_date": "2024-10-11",
+        "overview": "Story about a happily married couple visited by an old friend, who ends up stirring the pot by becoming sexually involved with both the husband and the wife.",
+        "director": "Jojo Nadela",
+        "main_actors": [
+            "Mariane Saint",
+            "Marlon Marcia",
+            "Skye Gonzaga",
+            "Daniela Carolino",
+            "Mianne Agualada"
+        ],
+        "country_of_production": [
+            "Philippines"
+        ],
+        "spoken_languages": [
             ""
         ],
-        "tagline": "An entire universe. Once and for all.",
-        "budget": 300000000,
-        "revenue": 2052415039,
+        "tagline": "",
+        "budget": 0,
+        "revenue": 0,
         "keywords": [
-            "sacrifice",
-            "magic",
-            "superhero",
-            "based on comic",
-            "space",
-            "battlefield",
-            "genocide",
-            "magical object",
-            "super power",
-            "aftercreditsstinger",
-            "marvel cinematic universe (mcu)",
-            "cosmic"
+            "softcore",
+            "lgbt",
+            "lesbian",
+            "girls love",
+            "sexy"
         ]
     },
     {
@@ -3591,157 +3696,286 @@
         ]
     },
     {
-        "title": "Dog Man",
+        "title": "Avengers: Endgame",
         "genres": [
-            "Family",
-            "Animation",
-            "Comedy",
+            "Adventure",
+            "Science Fiction",
             "Action"
         ],
-        "runtime": 89,
-        "release_date": "2025-01-24",
-        "overview": "When a faithful police dog and his human police officer owner are injured together on the job, a harebrained but life-saving surgery fuses the two of them together and Dog Man is born. Dog Man is sworn to protect and serve—and fetch, sit and roll over. As Dog Man embraces his new identity and strives to impress his Chief, he must stop the pretty evil plots of feline supervillain Petey the Cat.",
-        "director": "Peter Hastings",
+        "runtime": 181,
+        "release_date": "2019-04-24",
+        "overview": "After the devastating events of Avengers: Infinity War, the universe is in ruins due to the efforts of the Mad Titan, Thanos. With the help of remaining allies, the Avengers must assemble once more in order to undo Thanos' actions and restore order to the universe once and for all, no matter what consequences may be in store.",
+        "director": "Anthony Russo",
         "main_actors": [
-            "Peter Hastings",
-            "Pete Davidson",
-            "Lil Rel Howery",
-            "Isla Fisher",
-            "Lucas Hopkins Calderon"
+            "Robert Downey Jr.",
+            "Chris Evans",
+            "Mark Ruffalo",
+            "Chris Hemsworth",
+            "Scarlett Johansson"
         ],
         "country_of_production": [
             "United States of America"
         ],
         "spoken_languages": [
-            "English"
+            "English",
+            "日本語",
+            ""
         ],
-        "tagline": "Part dog. Part man. All hero.",
-        "budget": 40000000,
-        "revenue": 40592000,
+        "tagline": "Avenge the fallen.",
+        "budget": 356000000,
+        "revenue": 2799439100,
         "keywords": [
-            "villain",
-            "based on children's book",
-            "police dog",
-            "human animal hybrid"
-        ]
-    },
-    {
-        "title": "Kung Fu Panda 4",
-        "genres": [
-            "Animation",
-            "Family",
-            "Fantasy",
-            "Action"
-        ],
-        "runtime": 94,
-        "release_date": "2024-03-02",
-        "overview": "Po is gearing up to become the spiritual leader of his Valley of Peace, but also needs someone to take his place as Dragon Warrior. As such, he will train a new kung fu practitioner for the spot and will encounter a villain called the Chameleon who conjures villains from the past.",
-        "director": "Mike Mitchell",
-        "main_actors": [
-            "Jack Black",
-            "Awkwafina",
-            "Viola Davis",
-            "Dustin Hoffman",
-            "Bryan Cranston"
-        ],
-        "country_of_production": [
-            "United States of America"
-        ],
-        "spoken_languages": [
-            "English"
-        ],
-        "tagline": "",
-        "budget": 80000000,
-        "revenue": 548040835,
-        "keywords": [
-            "martial arts",
-            "kung fu",
-            "china",
-            "villain",
+            "superhero",
+            "time travel",
+            "space travel",
+            "time machine",
+            "based on comic",
             "sequel",
-            "panda",
-            "anthropomorphism",
-            "chameleon",
-            "female villain",
-            "disheartening",
-            "pretentious"
+            "alien invasion",
+            "superhero team",
+            "marvel cinematic universe (mcu)",
+            "alternate timeline",
+            "father daughter relationship",
+            "sister sister relationship",
+            "grand",
+            "powerful"
         ]
     },
     {
-        "title": "Lembayung",
+        "title": "Avengers: Infinity War",
         "genres": [
-            "Horror",
+            "Adventure",
+            "Action",
+            "Science Fiction"
+        ],
+        "runtime": 149,
+        "release_date": "2018-04-25",
+        "overview": "As the Avengers and their allies have continued to protect the world from threats too large for any one hero to handle, a new danger has emerged from the cosmic shadows: Thanos. A despot of intergalactic infamy, his goal is to collect all six Infinity Stones, artifacts of unimaginable power, and use them to inflict his twisted will on all of reality. Everything the Avengers have fought for has led up to this moment - the fate of Earth and existence itself has never been more uncertain.",
+        "director": "Joe Russo",
+        "main_actors": [
+            "Robert Downey Jr.",
+            "Chris Evans",
+            "Chris Hemsworth",
+            "Josh Brolin",
+            "Mark Ruffalo"
+        ],
+        "country_of_production": [
+            "United States of America"
+        ],
+        "spoken_languages": [
+            "English",
+            ""
+        ],
+        "tagline": "An entire universe. Once and for all.",
+        "budget": 300000000,
+        "revenue": 2052415039,
+        "keywords": [
+            "sacrifice",
+            "magic",
+            "superhero",
+            "based on comic",
+            "space",
+            "battlefield",
+            "genocide",
+            "magical object",
+            "super power",
+            "aftercreditsstinger",
+            "marvel cinematic universe (mcu)",
+            "cosmic"
+        ]
+    },
+    {
+        "title": "The Price of Money: A Largo Winch Adventure",
+        "genres": [
+            "Action",
+            "Adventure",
             "Thriller"
         ],
-        "runtime": 123,
-        "release_date": "2024-09-19",
-        "overview": "Arum and Pica, who wanted to complete their internship at Lembayung hospital, had to face mysterious terror from a woman satan who was suspected of hanged herself in the bathroom. The situation became even more tense after they asked others for help to the point where they threatened their own lives and those closest to them.",
-        "director": "Baim Wong",
+        "runtime": 100,
+        "release_date": "2024-07-31",
+        "overview": "Largo Winch, devastated by the kidnapping of his son, realizes that if he finds those responsible for his bankruptcy, maybe he'll see his son again.",
+        "director": "Olivier Masset-Depasse",
         "main_actors": [
-            "Taskya Namya",
-            "Yasamin Jasem",
-            "Arya Saloka",
-            "Anna Jobling",
-            "Daffa Wardhana"
+            "Tomer Sisley",
+            "James Franco",
+            "Clotilde Hesme",
+            "Elise Tilloloy",
+            "Denis O'Hare"
         ],
         "country_of_production": [
-            "Indonesia"
+            "Belgium",
+            "France"
         ],
         "spoken_languages": [
-            "Bahasa indonesia"
+            "English",
+            "Français"
         ],
         "tagline": "",
+        "budget": 17000000,
+        "revenue": 0,
+        "keywords": [
+            "kidnapping",
+            "sequel"
+        ]
+    },
+    {
+        "title": "Jurassic World Rebirth",
+        "genres": [
+            "Science Fiction",
+            "Adventure",
+            "Thriller"
+        ],
+        "runtime": 0,
+        "release_date": "2025-07-02",
+        "overview": "Five years after the events of Jurassic World Dominion, covert operations expert Zora Bennett is contracted to lead a skilled team on a top-secret mission to secure genetic material from the world's three most massive dinosaurs. When Zora's operation intersects with a civilian family whose boating expedition was capsized, they all find themselves stranded on an island where they come face-to-face with a sinister, shocking discovery that's been hidden from the world for decades.",
+        "director": "Gareth Edwards",
+        "main_actors": [
+            "Scarlett Johansson",
+            "Jonathan Bailey",
+            "Mahershala Ali",
+            "Rupert Friend",
+            "Manuel Garcia-Rulfo"
+        ],
+        "country_of_production": [
+            "United States of America"
+        ],
+        "spoken_languages": [
+            "English"
+        ],
+        "tagline": "A new era is born.",
         "budget": 0,
         "revenue": 0,
         "keywords": [
-            "based on novel or book",
-            "haunting",
-            "female protagonist",
-            "hospital",
-            "ghost",
-            "haunted hospital",
-            "terror",
-            "based on twitter thread"
+            "island",
+            "secret mission",
+            "stranded",
+            "dinosaur",
+            "capsized ship"
         ]
     },
     {
-        "title": "Detective Chinatown 1900",
+        "title": "Jurassic World Dominion",
         "genres": [
-            "Comedy",
-            "Mystery",
-            "Action"
+            "Adventure",
+            "Action",
+            "Science Fiction"
         ],
-        "runtime": 135,
-        "release_date": "2025-01-29",
-        "overview": "In 1900s San Francisco, a white woman is murdered in Chinatown and the suspect is a Chinese man. The murder causes a social shock and the public calls for Chinatown to be outlawed. Chinese medicine practitioner Qin Fu and Chinese man Ghost are involved in the case, and they race against time to find the murderer amidst a battle of wits and courage.",
-        "director": "Chen Sicheng",
+        "runtime": 147,
+        "release_date": "2022-06-01",
+        "overview": "Four years after Isla Nublar was destroyed, dinosaurs now live—and hunt—alongside humans all over the world. This fragile balance will reshape the future and determine, once and for all, whether human beings are to remain the apex predators on a planet they now share with history's most fearsome creatures.",
+        "director": "Colin Trevorrow",
         "main_actors": [
-            "Wang Baoqiang",
-            "Liu Haoran",
-            "Chow Yun-Fat",
-            "White-K",
-            "Zhang Xincheng"
+            "Chris Pratt",
+            "Bryce Dallas Howard",
+            "Laura Dern",
+            "Sam Neill",
+            "Jeff Goldblum"
         ],
         "country_of_production": [
-            "China",
-            "Hong Kong"
+            "United States of America"
         ],
         "spoken_languages": [
-            "普通话",
             "English"
         ],
-        "tagline": "",
-        "budget": 0,
-        "revenue": 251200000,
+        "tagline": "The epic conclusion of the Jurassic era.",
+        "budget": 165000000,
+        "revenue": 1001978080,
         "keywords": [
-            "chinatown",
-            "prequel",
-            "murder",
-            "buddy comedy",
-            "1900s",
-            "action comedy",
-            "20th century",
-            "san francisco"
+            "paleontology",
+            "giant monster",
+            "sequel",
+            "survival",
+            "dinosaur",
+            "scientist",
+            "child kidnapping",
+            "jurassic",
+            "animal sanctuary",
+            "science goes awry"
+        ]
+    },
+    {
+        "title": "Ne Zha 2",
+        "genres": [
+            "Animation",
+            "Fantasy",
+            "Adventure"
+        ],
+        "runtime": 144,
+        "release_date": "2025-01-29",
+        "overview": "After the tribulation, although the souls of Ne Zha and Ao Bing were preserved, their physical bodies would soon be completely destroyed.Tai Yi Zhen Ren plans to use the Seven Colored Lotus to reshape their physical bodies. But in the process of reshaping their physical bodies, they encountered numerous difficulties. Where will the fate of Ne Zha and Ao Bing go?",
+        "director": "Yang Yu",
+        "main_actors": [
+            "Lü Yanting",
+            "Joseph",
+            "Han Mo",
+            "Chen Hao",
+            "Lü Qi"
+        ],
+        "country_of_production": [
+            "China"
+        ],
+        "spoken_languages": [
+            "普通话"
+        ],
+        "tagline": "",
+        "budget": 80000000,
+        "revenue": 547320000,
+        "keywords": [
+            "based on novel or book",
+            "sequel",
+            "based on myths, legends or folklore",
+            "3d animation",
+            "nezha character",
+            "nezha",
+            "chinese mythology",
+            "donghua",
+            "admiring"
+        ]
+    },
+    {
+        "title": "The Shawshank Redemption",
+        "genres": [
+            "Drama",
+            "Crime"
+        ],
+        "runtime": 142,
+        "release_date": "1994-09-23",
+        "overview": "Imprisoned in the 1940s for the double murder of his wife and her lover, upstanding banker Andy Dufresne begins a new life at the Shawshank prison, where he puts his accounting skills to work for an amoral warden. During his long stretch in prison, Dufresne comes to be admired by the other inmates -- including an older prisoner named Red -- for his integrity and unquenchable sense of hope.",
+        "director": "Frank Darabont",
+        "main_actors": [
+            "Tim Robbins",
+            "Morgan Freeman",
+            "Bob Gunton",
+            "William Sadler",
+            "Clancy Brown"
+        ],
+        "country_of_production": [
+            "United States of America"
+        ],
+        "spoken_languages": [
+            "English"
+        ],
+        "tagline": "Fear can hold you prisoner. Hope can set you free.",
+        "budget": 25000000,
+        "revenue": 28341469,
+        "keywords": [
+            "prison",
+            "friendship",
+            "police brutality",
+            "corruption",
+            "based on novel or book",
+            "freedom",
+            "hope",
+            "prison cell",
+            "delinquent",
+            "redemption",
+            "parole board",
+            "prison escape",
+            "wrongful imprisonment",
+            "interracial friendship",
+            "framed for murder",
+            "1940s",
+            "voiceover"
         ]
     },
     {
@@ -3790,255 +4024,5 @@
             "owl",
             "wizarding world"
         ]
-    },
-    {
-        "title": "Dune: Part Two",
-        "genres": [
-            "Science Fiction",
-            "Adventure"
-        ],
-        "runtime": 167,
-        "release_date": "2024-02-27",
-        "overview": "Follow the mythic journey of Paul Atreides as he unites with Chani and the Fremen while on a path of revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the known universe, Paul endeavors to prevent a terrible future only he can foresee.",
-        "director": "Denis Villeneuve",
-        "main_actors": [
-            "Timothée Chalamet",
-            "Zendaya",
-            "Rebecca Ferguson",
-            "Javier Bardem",
-            "Josh Brolin"
-        ],
-        "country_of_production": [
-            "United States of America"
-        ],
-        "spoken_languages": [
-            "English"
-        ],
-        "tagline": "Long live the fighters.",
-        "budget": 190000000,
-        "revenue": 714444358,
-        "keywords": [
-            "epic",
-            "based on novel or book",
-            "fight",
-            "politics",
-            "sandstorm",
-            "sand",
-            "spice",
-            "chosen one",
-            "cult",
-            "sequel",
-            "romance",
-            "tragedy",
-            "distant future",
-            "tragic hero",
-            "creature",
-            "planet",
-            "desert",
-            "destiny",
-            "giant worm",
-            "space opera",
-            "sand dune",
-            "allegorical",
-            "messiah",
-            "fall from grace",
-            "shocking",
-            "domineering",
-            "vengeance",
-            "vindictive",
-            "cautionary",
-            "religious allegory",
-            "giant creature",
-            "power",
-            "violence",
-            "suspenseful",
-            "antagonistic",
-            "audacious",
-            "awestruck",
-            "exuberant",
-            "foreboding",
-            "melodramatic"
-        ]
-    },
-    {
-        "title": "The Garfield Movie",
-        "genres": [
-            "Animation",
-            "Comedy",
-            "Family",
-            "Adventure"
-        ],
-        "runtime": 100,
-        "release_date": "2024-04-30",
-        "overview": "Garfield, the world-famous, Monday-hating, lasagna-loving indoor cat, is about to have a wild outdoor adventure! After an unexpected reunion with his long-lost father – scruffy street cat Vic – Garfield and his canine friend Odie are forced from their perfectly pampered life into joining Vic in a hilarious, high-stakes heist.",
-        "director": "Mark Dindal",
-        "main_actors": [
-            "Chris Pratt",
-            "Samuel L. Jackson",
-            "Hannah Waddingham",
-            "Ving Rhames",
-            "Nicholas Hoult"
-        ],
-        "country_of_production": [
-            "Hong Kong",
-            "United Kingdom",
-            "United States of America"
-        ],
-        "spoken_languages": [
-            "English"
-        ],
-        "tagline": "Indoor cat. Outdoor adventure.",
-        "budget": 60000000,
-        "revenue": 254907482,
-        "keywords": [
-            "friendship",
-            "cat",
-            "villain",
-            "based on comic",
-            "lasagne",
-            "computer animation",
-            "based on cartoon",
-            "food",
-            "dog",
-            "female villain",
-            "aftercreditsstinger",
-            "father son relationship",
-            "adaptation",
-            "absurd"
-        ]
-    },
-    {
-        "title": "Bad Influence",
-        "genres": [
-            "Drama",
-            "Thriller",
-            "Romance"
-        ],
-        "runtime": 0,
-        "release_date": "2025-01-24",
-        "overview": "A poor boy and a pampered rich girl seek to uncover secrets of the past to save their romance and their skin.",
-        "director": "Chloé Wallace",
-        "main_actors": [
-            "Alberto Olmo",
-            "Eléa Rochera",
-            "Enrique Arce",
-            "Mirela Balić",
-            "Farid Bechara"
-        ],
-        "country_of_production": [
-            "Spain",
-            "United States of America"
-        ],
-        "spoken_languages": [
-            "Español"
-        ],
-        "tagline": "",
-        "budget": 0,
-        "revenue": 0,
-        "keywords": [
-            "based on novel or book",
-            "orphan",
-            "rich girl",
-            "romantic thriller",
-            "romantic drama"
-        ]
-    },
-    {
-        "title": "The Price of Money: A Largo Winch Adventure",
-        "genres": [
-            "Action",
-            "Adventure",
-            "Thriller"
-        ],
-        "runtime": 100,
-        "release_date": "2024-07-31",
-        "overview": "Largo Winch, devastated by the kidnapping of his son, realizes that if he finds those responsible for his bankruptcy, maybe he'll see his son again.",
-        "director": "Olivier Masset-Depasse",
-        "main_actors": [
-            "Tomer Sisley",
-            "James Franco",
-            "Clotilde Hesme",
-            "Elise Tilloloy",
-            "Denis O'Hare"
-        ],
-        "country_of_production": [
-            "Belgium",
-            "France"
-        ],
-        "spoken_languages": [
-            "English",
-            "Français"
-        ],
-        "tagline": "",
-        "budget": 17000000,
-        "revenue": 0,
-        "keywords": [
-            "kidnapping",
-            "sequel"
-        ]
-    },
-    {
-        "title": "Tatsulok: Tatlo Magkasalo",
-        "genres": [
-            "Drama",
-            "Romance"
-        ],
-        "runtime": 61,
-        "release_date": "2024-10-11",
-        "overview": "Story about a happily married couple visited by an old friend, who ends up stirring the pot by becoming sexually involved with both the husband and the wife.",
-        "director": "Jojo Nadela",
-        "main_actors": [
-            "Mariane Saint",
-            "Marlon Marcia",
-            "Skye Gonzaga",
-            "Daniela Carolino",
-            "Mianne Agualada"
-        ],
-        "country_of_production": [
-            "Philippines"
-        ],
-        "spoken_languages": [
-            ""
-        ],
-        "tagline": "",
-        "budget": 0,
-        "revenue": 0,
-        "keywords": [
-            "softcore",
-            "lgbt",
-            "lesbian",
-            "girls love",
-            "sexy"
-        ]
-    },
-    {
-        "title": "Survive",
-        "genres": [
-            "Science Fiction",
-            "Thriller",
-            "Adventure",
-            "Action"
-        ],
-        "runtime": 90,
-        "release_date": "2024-06-19",
-        "overview": "A couple celebrates their son’s birthday in the middle of the ocean on their boat. A violent storm hits and it brings up hungry creatures from the depths and they fight for their survival.",
-        "director": "Frédéric Jardin",
-        "main_actors": [
-            "Émilie Dequenne",
-            "Andreas Pietschmann",
-            "Lisa Delamar",
-            "Lucas Ebel",
-            "Arben Bajraktaraj"
-        ],
-        "country_of_production": [
-            "France"
-        ],
-        "spoken_languages": [
-            "Français"
-        ],
-        "tagline": "The world has gone sideways.",
-        "budget": 5270000,
-        "revenue": 0,
-        "keywords": []
     }
 ]
