@@ -120,5 +120,5 @@ def fetch_and_save_films(api_key, output_file):
 
 # Execute the script
 if __name__ == "__main__":
-    OUTPUT_FILE = "original_film_data.json"
+    OUTPUT_FILE = "raw_film_data.json"
     fetch_and_save_films(API_KEY, OUTPUT_FILE)

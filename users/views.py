@@ -42,7 +42,7 @@ class AdminView(View):
 
     def post(self, request):
         message = ""
-        output_file = "original_film_data.json"
+        output_file = "raw_film_data.json"
         try:
             fetch_and_save_films(settings.TMDB_API_KEY, output_file)
             message = (

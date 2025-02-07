@@ -12,7 +12,7 @@ from django.contrib import messages
 # Constants
 CACHE_DIR = os.path.join(settings.BASE_DIR, "cache")
 FAISS_INDEX_PATH = os.path.join(CACHE_DIR, "faiss_index")
-ORIGINAL_FILM_DATA_PATH = os.path.join(settings.BASE_DIR, "original_film_data.json")
+RAW_FILM_DATA_PATH = os.path.join(settings.BASE_DIR, "raw_film_data.json")
 OLLAMA_URL = "http://ollama:11434/api"
 
 # Parameters
@@ -210,7 +210,7 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
         """
         Generate embeddings for the original film data.
         """
-        with open(ORIGINAL_FILM_DATA_PATH, "r", encoding="utf-8") as f:
+        with open(RAW_FILM_DATA_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         data_texts = [self.json_to_text(item) for item in data]
