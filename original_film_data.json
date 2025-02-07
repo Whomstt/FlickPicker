@@ -819,6 +819,91 @@
         ]
     },
     {
+        "title": "Wolf Man",
+        "genres": [
+            "Horror",
+            "Thriller"
+        ],
+        "runtime": 103,
+        "release_date": "2025-01-15",
+        "overview": "With his marriage fraying, Blake persuades his wife Charlotte to take a break from the city and visit his remote childhood home in rural Oregon. As they arrive at the farmhouse in the dead of night, they're attacked by an unseen animal and barricade themselves inside the home as the creature prowls the perimeter. But as the night stretches on, Blake begins to behave strangely, transforming into something unrecognizable.",
+        "director": "Leigh Whannell",
+        "main_actors": [
+            "Christopher Abbott",
+            "Julia Garner",
+            "Matilda Firth",
+            "Sam Jaeger",
+            "Ben Prendergast"
+        ],
+        "country_of_production": [
+            "United States of America"
+        ],
+        "spoken_languages": [
+            "English"
+        ],
+        "tagline": "Protect your own.",
+        "budget": 25000000,
+        "revenue": 32279083,
+        "keywords": [
+            "monster",
+            "moon",
+            "transformation",
+            "full moon",
+            "infection",
+            "car crash",
+            "woods",
+            "oregon, usa",
+            "remake",
+            "wolfman",
+            "werewolf",
+            "childhood home",
+            "creature feature",
+            "monster movie",
+            "lycanthrope",
+            "body horror",
+            "horror"
+        ]
+    },
+    {
+        "title": "Elevation",
+        "genres": [
+            "Action",
+            "Science Fiction",
+            "Thriller"
+        ],
+        "runtime": 91,
+        "release_date": "2024-11-07",
+        "overview": "A single father and two women venture from the safety of their homes to face monstrous creatures to save the life of a young boy.",
+        "director": "George Nolfi",
+        "main_actors": [
+            "Anthony Mackie",
+            "Morena Baccarin",
+            "Maddie Hasson",
+            "Danny Boyd Jr.",
+            "Rachel Nicks"
+        ],
+        "country_of_production": [
+            "United States of America"
+        ],
+        "spoken_languages": [
+            "English"
+        ],
+        "tagline": "Don't go down without a fight.",
+        "budget": 18000000,
+        "revenue": 3300000,
+        "keywords": [
+            "mine",
+            "colorado",
+            "alien",
+            "hospital",
+            "alien invasion",
+            "ski lift",
+            "abandoned mine",
+            "monsters",
+            "mountains"
+        ]
+    },
+    {
         "title": "Red One",
         "genres": [
             "Action",
@@ -861,155 +946,88 @@
         ]
     },
     {
-        "title": "You're Cordially Invited",
+        "title": "The Lord of the Rings: The War of the Rohirrim",
         "genres": [
-            "Comedy"
+            "Animation",
+            "Fantasy",
+            "Adventure",
+            "Family",
+            "Action"
         ],
-        "runtime": 109,
-        "release_date": "2025-01-29",
-        "overview": "When two weddings are accidentally booked on the same day at the same venue, each bridal party is challenged with preserving their family's special moment while making the most of the unanticipated tight quarters. In a hilarious battle of determination and grit, the father of the bride and sister of the other bride chaotically go head-to-head as they stop at nothing to uphold an unforgettable celebration for their loved ones.",
-        "director": "Nicholas Stoller",
+        "runtime": 134,
+        "release_date": "2024-12-05",
+        "overview": "A sudden attack by Wulf, a clever and traitorous lord of Rohan seeking vengeance for the death of his father, forces Helm Hammerhand, the King of Rohan, and his people to make a daring last stand in the ancient stronghold of the Hornburg.",
+        "director": "Kenji Kamiyama",
         "main_actors": [
-            "Will Ferrell",
-            "Reese Witherspoon",
-            "Geraldine Viswanathan",
-            "Meredith Hagner",
-            "Jimmy Tatro"
+            "Brian Cox",
+            "Gaia Wise",
+            "Luke Pasqualino",
+            "Laurence Ubong Williams",
+            "Lorraine Ashbourne"
         ],
         "country_of_production": [
+            "Japan",
+            "New Zealand",
             "United States of America"
         ],
         "spoken_languages": [
             "English"
         ],
-        "tagline": "Save the date. Prepare for chaos.",
-        "budget": 0,
-        "revenue": 0,
+        "tagline": "Hope has yet to abandon these lands.",
+        "budget": 30000000,
+        "revenue": 19958572,
         "keywords": [
-            "wedding",
-            "father daughter relationship",
-            "comedy of errors",
-            "destination wedding",
-            "father of the bride",
-            "sister of the bride",
-            "island wedding"
-        ]
-    },
-    {
-        "title": "Wicked",
-        "genres": [
-            "Drama",
-            "Romance",
-            "Fantasy"
-        ],
-        "runtime": 162,
-        "release_date": "2024-11-20",
-        "overview": "In the land of Oz, ostracized and misunderstood green-skinned Elphaba is forced to share a room with the popular aristocrat Glinda at Shiz University, and the two's unlikely friendship is tested as they begin to fulfill their respective destinies as Glinda the Good and the Wicked Witch of the West.",
-        "director": "Jon M. Chu",
-        "main_actors": [
-            "Cynthia Erivo",
-            "Ariana Grande",
-            "Jeff Goldblum",
-            "Michelle Yeoh",
-            "Jonathan Bailey"
-        ],
-        "country_of_production": [
-            "United States of America"
-        ],
-        "spoken_languages": [
-            "English"
-        ],
-        "tagline": "Everyone deserves the chance to fly.",
-        "budget": 150000000,
-        "revenue": 722173180,
-        "keywords": [
-            "witch",
-            "dancing",
+            "epic",
             "based on novel or book",
-            "college",
-            "wish",
-            "musical",
-            "female friendship",
-            "bullying",
-            "based on play or musical",
-            "celebrity",
             "prequel",
-            "singer",
-            "singing",
-            "corrupt politician",
-            "death in childbirth",
+            "treachery",
             "fantasy world",
-            "wizard",
-            "gravity",
-            "discrimination",
-            "ostracism",
-            "woman in wheelchair",
-            "musical comedy",
-            "sister sister relationship",
-            "belonging",
-            "fantasy",
-            "romantic fantasy",
-            "fantasy comedy"
+            "anime",
+            "war",
+            "amused",
+            "epic fantasy",
+            "horsemen"
         ]
     },
     {
-        "title": "Anora",
+        "title": "The Wild Robot",
         "genres": [
-            "Drama",
-            "Comedy",
-            "Romance"
+            "Animation",
+            "Science Fiction",
+            "Family"
         ],
-        "runtime": 139,
-        "release_date": "2024-10-14",
-        "overview": "A young sex worker from Brooklyn gets her chance at a Cinderella story when she meets and impulsively marries the son of an oligarch. Once the news reaches Russia, her fairytale is threatened as his parents set out to get the marriage annulled.",
-        "director": "Sean Baker",
+        "runtime": 102,
+        "release_date": "2024-09-12",
+        "overview": "After a shipwreck, an intelligent robot called Roz is stranded on an uninhabited island. To survive the harsh environment, Roz bonds with the island's animals and cares for an orphaned baby goose.",
+        "director": "Chris Sanders",
         "main_actors": [
-            "Mikey Madison",
-            "Mark Eydelshteyn",
-            "Yura Borisov",
-            "Karren Karagulian",
-            "Vache Tovmasyan"
+            "Lupita Nyong'o",
+            "Pedro Pascal",
+            "Kit Connor",
+            "Bill Nighy",
+            "Stephanie Hsu"
         ],
         "country_of_production": [
             "United States of America"
         ],
         "spoken_languages": [
-            "",
-            "Pусский",
             "English"
         ],
-        "tagline": "Love is a hustle.",
-        "budget": 6000000,
-        "revenue": 33516549,
+        "tagline": "Discover your true nature.",
+        "budget": 78000000,
+        "revenue": 324816010,
         "keywords": [
-            "new year's eve",
-            "new york city",
-            "marriage",
-            "boardwalk",
-            "baptism",
-            "strip club",
-            "coney island",
-            "mafia",
-            "female protagonist",
-            "mansion",
-            "las vegas",
-            "brooklyn, new york city",
-            "screwball comedy",
-            "immaturity",
-            "city hall",
-            "exotic dancer",
-            "sex worker",
-            "meddling parents",
-            "annulment",
-            "strip show",
-            "russian oligarch",
-            "sex",
-            "party",
-            "romantic dramedy",
-            "hilarious",
-            "cinderella story",
-            "female nudity",
-            "brighton beach"
+            "villain",
+            "robot",
+            "based on children's book",
+            "female villain",
+            "aftercreditsstinger",
+            "duringcreditsstinger",
+            "adopted son",
+            "kids",
+            "traditional parenting",
+            "approving",
+            "familiar"
         ]
     },
     {
@@ -1078,22 +1096,22 @@
         ]
     },
     {
-        "title": "The Wild Robot",
+        "title": "Wicked",
         "genres": [
-            "Animation",
-            "Science Fiction",
-            "Family"
+            "Drama",
+            "Romance",
+            "Fantasy"
         ],
-        "runtime": 102,
-        "release_date": "2024-09-12",
-        "overview": "After a shipwreck, an intelligent robot called Roz is stranded on an uninhabited island. To survive the harsh environment, Roz bonds with the island's animals and cares for an orphaned baby goose.",
-        "director": "Chris Sanders",
+        "runtime": 162,
+        "release_date": "2024-11-20",
+        "overview": "In the land of Oz, ostracized and misunderstood green-skinned Elphaba is forced to share a room with the popular aristocrat Glinda at Shiz University, and the two's unlikely friendship is tested as they begin to fulfill their respective destinies as Glinda the Good and the Wicked Witch of the West.",
+        "director": "Jon M. Chu",
         "main_actors": [
-            "Lupita Nyong'o",
-            "Pedro Pascal",
-            "Kit Connor",
-            "Bill Nighy",
-            "Stephanie Hsu"
+            "Cynthia Erivo",
+            "Ariana Grande",
+            "Jeff Goldblum",
+            "Michelle Yeoh",
+            "Jonathan Bailey"
         ],
         "country_of_production": [
             "United States of America"
@@ -1101,21 +1119,125 @@
         "spoken_languages": [
             "English"
         ],
-        "tagline": "Discover your true nature.",
-        "budget": 78000000,
-        "revenue": 324816010,
+        "tagline": "Everyone deserves the chance to fly.",
+        "budget": 150000000,
+        "revenue": 722173180,
         "keywords": [
-            "villain",
-            "robot",
-            "based on children's book",
-            "female villain",
-            "aftercreditsstinger",
-            "duringcreditsstinger",
-            "adopted son",
-            "kids",
-            "traditional parenting",
-            "approving",
-            "familiar"
+            "witch",
+            "dancing",
+            "based on novel or book",
+            "college",
+            "wish",
+            "musical",
+            "female friendship",
+            "bullying",
+            "based on play or musical",
+            "celebrity",
+            "prequel",
+            "singer",
+            "singing",
+            "corrupt politician",
+            "death in childbirth",
+            "fantasy world",
+            "wizard",
+            "gravity",
+            "discrimination",
+            "ostracism",
+            "woman in wheelchair",
+            "musical comedy",
+            "sister sister relationship",
+            "belonging",
+            "fantasy",
+            "romantic fantasy",
+            "fantasy comedy"
+        ]
+    },
+    {
+        "title": "Aftermath",
+        "genres": [
+            "Action",
+            "Thriller"
+        ],
+        "runtime": 95,
+        "release_date": "2024-09-27",
+        "overview": "A returning war veteran, stricken with PTSD, gets trapped with his teenage sister on Boston's Tobin Memorial Bridge when a heavily armed group of ex-military revolutionaries take everyone hostage.",
+        "director": "Patrick Lussier",
+        "main_actors": [
+            "Dylan Sprouse",
+            "Mason Gooding",
+            "Dichen Lachman",
+            "Megan Stott",
+            "Kevin Chapman"
+        ],
+        "country_of_production": [
+            "United States of America"
+        ],
+        "spoken_languages": [
+            "English"
+        ],
+        "tagline": "Survival is the only option.",
+        "budget": 0,
+        "revenue": 0,
+        "keywords": []
+    },
+    {
+        "title": "Anora",
+        "genres": [
+            "Drama",
+            "Comedy",
+            "Romance"
+        ],
+        "runtime": 139,
+        "release_date": "2024-10-14",
+        "overview": "A young sex worker from Brooklyn gets her chance at a Cinderella story when she meets and impulsively marries the son of an oligarch. Once the news reaches Russia, her fairytale is threatened as his parents set out to get the marriage annulled.",
+        "director": "Sean Baker",
+        "main_actors": [
+            "Mikey Madison",
+            "Mark Eydelshteyn",
+            "Yura Borisov",
+            "Karren Karagulian",
+            "Vache Tovmasyan"
+        ],
+        "country_of_production": [
+            "United States of America"
+        ],
+        "spoken_languages": [
+            "",
+            "Pусский",
+            "English"
+        ],
+        "tagline": "Love is a hustle.",
+        "budget": 6000000,
+        "revenue": 33516549,
+        "keywords": [
+            "new year's eve",
+            "new york city",
+            "marriage",
+            "boardwalk",
+            "baptism",
+            "strip club",
+            "coney island",
+            "mafia",
+            "female protagonist",
+            "mansion",
+            "las vegas",
+            "brooklyn, new york city",
+            "screwball comedy",
+            "immaturity",
+            "city hall",
+            "exotic dancer",
+            "sex worker",
+            "meddling parents",
+            "annulment",
+            "strip show",
+            "russian oligarch",
+            "sex",
+            "party",
+            "romantic dramedy",
+            "hilarious",
+            "cinderella story",
+            "female nudity",
+            "brighton beach"
         ]
     },
     {
@@ -1154,21 +1276,20 @@
         ]
     },
     {
-        "title": "Aftermath",
+        "title": "You're Cordially Invited",
         "genres": [
-            "Action",
-            "Thriller"
+            "Comedy"
         ],
-        "runtime": 95,
-        "release_date": "2024-09-27",
-        "overview": "A returning war veteran, stricken with PTSD, gets trapped with his teenage sister on Boston's Tobin Memorial Bridge when a heavily armed group of ex-military revolutionaries take everyone hostage.",
-        "director": "Patrick Lussier",
+        "runtime": 109,
+        "release_date": "2025-01-29",
+        "overview": "When two weddings are accidentally booked on the same day at the same venue, each bridal party is challenged with preserving their family's special moment while making the most of the unanticipated tight quarters. In a hilarious battle of determination and grit, the father of the bride and sister of the other bride chaotically go head-to-head as they stop at nothing to uphold an unforgettable celebration for their loved ones.",
+        "director": "Nicholas Stoller",
         "main_actors": [
-            "Dylan Sprouse",
-            "Mason Gooding",
-            "Dichen Lachman",
-            "Megan Stott",
-            "Kevin Chapman"
+            "Will Ferrell",
+            "Reese Witherspoon",
+            "Geraldine Viswanathan",
+            "Meredith Hagner",
+            "Jimmy Tatro"
         ],
         "country_of_production": [
             "United States of America"
@@ -1176,81 +1297,17 @@
         "spoken_languages": [
             "English"
         ],
-        "tagline": "Survival is the only option.",
+        "tagline": "Save the date. Prepare for chaos.",
         "budget": 0,
         "revenue": 0,
-        "keywords": []
-    },
-    {
-        "title": "Panda Plan",
-        "genres": [
-            "Action",
-            "Comedy"
-        ],
-        "runtime": 99,
-        "release_date": "2024-10-01",
-        "overview": "International action star Jackie Chan is invited to the adoption ceremony of a rare baby panda, but after an international crime syndicate attempts to kidnap the bear, Jackie has to save the bear using his stunt work skills.",
-        "director": "Zhang Luan",
-        "main_actors": [
-            "Jackie Chan",
-            "Shi Ce",
-            "Wei Xiang",
-            "Han Yanbo",
-            "Danny Ray"
-        ],
-        "country_of_production": [
-            "China"
-        ],
-        "spoken_languages": [
-            "العربية",
-            "普通话",
-            "English"
-        ],
-        "tagline": "",
-        "budget": 0,
-        "revenue": 42333207,
         "keywords": [
-            "assistant",
-            "zoo",
-            "panda",
-            "superstar",
-            "rescue operation",
-            "cliché",
-            "international superstar"
-        ]
-    },
-    {
-        "title": "Number 24",
-        "genres": [
-            "War",
-            "History",
-            "Drama"
-        ],
-        "runtime": 112,
-        "release_date": "2024-10-30",
-        "overview": "On the brink of the Second World War, a young Norwegian man's drive to resist the Nazis sets a new course for his future – and the future of his country.",
-        "director": "John Andreas Andersen",
-        "main_actors": [
-            "Sjur Vatne Brean",
-            "Erik Hivju",
-            "Philip Helgar",
-            "Magnus Dugdale",
-            "Jakob Maanum Trulsen"
-        ],
-        "country_of_production": [
-            "Norway"
-        ],
-        "spoken_languages": [
-            "English",
-            "Norsk"
-        ],
-        "tagline": "",
-        "budget": 0,
-        "revenue": 3301976,
-        "keywords": [
-            "world war ii",
-            "norway",
-            "understated"
+            "wedding",
+            "father daughter relationship",
+            "comedy of errors",
+            "destination wedding",
+            "father of the bride",
+            "sister of the bride",
+            "island wedding"
         ]
     },
     {
@@ -1390,154 +1447,37 @@
         ]
     },
     {
-        "title": "River of Blood",
+        "title": "Number 24",
         "genres": [
-            "Horror",
-            "Thriller"
-        ],
-        "runtime": 86,
-        "release_date": "2024-08-29",
-        "overview": "Four kayakers take the wrong river into a jungle inhabited by a tribe of merciless cannibals.",
-        "director": "Howard J. Ford",
-        "main_actors": [
-            "Joseph Millson",
-            "Sarah Alexandra Marks",
-            "David Wayman",
-            "Ella Starbuck",
-            "Louis James"
-        ],
-        "country_of_production": [
-            "Denmark",
-            "United Kingdom"
-        ],
-        "spoken_languages": [
-            "English"
-        ],
-        "tagline": "",
-        "budget": 0,
-        "revenue": 0,
-        "keywords": [
-            "kayak",
-            "betrayal",
-            "jungle",
-            "psychological thriller",
-            "cannibal",
-            "cannibal cult",
-            "psychological horror"
-        ]
-    },
-    {
-        "title": "Flow",
-        "genres": [
-            "Animation",
-            "Fantasy",
-            "Adventure"
-        ],
-        "runtime": 85,
-        "release_date": "2024-08-29",
-        "overview": "A solitary cat, displaced by a great flood, finds refuge on a boat with various species and must navigate the challenges of adapting to a transformed world together.",
-        "director": "Gints Zilbalodis",
-        "main_actors": [],
-        "country_of_production": [
-            "Belgium",
-            "France",
-            "Latvia"
-        ],
-        "spoken_languages": [
-            "No Language"
-        ],
-        "tagline": "",
-        "budget": 3500000,
-        "revenue": 14463155,
-        "keywords": [
-            "ocean",
-            "cat",
-            "boat",
-            "dystopia",
-            "dog",
-            "golden retriever",
-            "flood",
-            "lemur",
-            "calm",
-            "reflective",
-            "bird",
-            "3d animation",
-            "fantasy",
-            "capybara",
-            "adventure"
-        ]
-    },
-    {
-        "title": "Lucca's World",
-        "genres": [
+            "War",
+            "History",
             "Drama"
         ],
-        "runtime": 96,
-        "release_date": "2025-01-30",
-        "overview": "Determined to help her son, who has cerebral palsy, Bárbara takes her family to India for an experimental treatment.",
-        "director": "Mariana Chenillo",
+        "runtime": 112,
+        "release_date": "2024-10-30",
+        "overview": "On the brink of the Second World War, a young Norwegian man's drive to resist the Nazis sets a new course for his future – and the future of his country.",
+        "director": "John Andreas Andersen",
         "main_actors": [
-            "Bárbara Mori",
-            "Julián Tello",
-            "Juan Pablo Medina",
-            "Ari Brickman",
-            "Danish Hussain"
+            "Sjur Vatne Brean",
+            "Erik Hivju",
+            "Philip Helgar",
+            "Magnus Dugdale",
+            "Jakob Maanum Trulsen"
         ],
         "country_of_production": [
-            "Mexico"
+            "Norway"
         ],
         "spoken_languages": [
-            "Español"
+            "English",
+            "Norsk"
         ],
         "tagline": "",
         "budget": 0,
-        "revenue": 0,
-        "keywords": []
-    },
-    {
-        "title": "Wolf Man",
-        "genres": [
-            "Horror",
-            "Thriller"
-        ],
-        "runtime": 103,
-        "release_date": "2025-01-15",
-        "overview": "With his marriage fraying, Blake persuades his wife Charlotte to take a break from the city and visit his remote childhood home in rural Oregon. As they arrive at the farmhouse in the dead of night, they're attacked by an unseen animal and barricade themselves inside the home as the creature prowls the perimeter. But as the night stretches on, Blake begins to behave strangely, transforming into something unrecognizable.",
-        "director": "Leigh Whannell",
-        "main_actors": [
-            "Christopher Abbott",
-            "Julia Garner",
-            "Matilda Firth",
-            "Sam Jaeger",
-            "Ben Prendergast"
-        ],
-        "country_of_production": [
-            "United States of America"
-        ],
-        "spoken_languages": [
-            "English"
-        ],
-        "tagline": "Protect your own.",
-        "budget": 25000000,
-        "revenue": 32279083,
+        "revenue": 3301976,
         "keywords": [
-            "monster",
-            "moon",
-            "transformation",
-            "full moon",
-            "infection",
-            "car crash",
-            "woods",
-            "oregon, usa",
-            "remake",
-            "wolfman",
-            "werewolf",
-            "childhood home",
-            "creature feature",
-            "monster movie",
-            "lycanthrope",
-            "body horror",
-            "horror"
+            "world war ii",
+            "norway",
+            "understated"
         ]
     },
     {
@@ -1582,6 +1522,87 @@
             "nsa agent",
             "adrenaline junkie",
             "thrill seeker"
+        ]
+    },
+    {
+        "title": "Flow",
+        "genres": [
+            "Animation",
+            "Fantasy",
+            "Adventure"
+        ],
+        "runtime": 85,
+        "release_date": "2024-08-29",
+        "overview": "A solitary cat, displaced by a great flood, finds refuge on a boat with various species and must navigate the challenges of adapting to a transformed world together.",
+        "director": "Gints Zilbalodis",
+        "main_actors": [],
+        "country_of_production": [
+            "Belgium",
+            "France",
+            "Latvia"
+        ],
+        "spoken_languages": [
+            "No Language"
+        ],
+        "tagline": "",
+        "budget": 3500000,
+        "revenue": 14463155,
+        "keywords": [
+            "ocean",
+            "cat",
+            "boat",
+            "dystopia",
+            "dog",
+            "golden retriever",
+            "flood",
+            "lemur",
+            "calm",
+            "reflective",
+            "bird",
+            "3d animation",
+            "fantasy",
+            "capybara",
+            "adventure"
+        ]
+    },
+    {
+        "title": "Despicable Me 4",
+        "genres": [
+            "Animation",
+            "Family",
+            "Comedy",
+            "Science Fiction"
+        ],
+        "runtime": 94,
+        "release_date": "2024-06-20",
+        "overview": "Gru and Lucy and their girls—Margo, Edith and Agnes—welcome a new member to the Gru family, Gru Jr., who is intent on tormenting his dad. Gru also faces a new nemesis in Maxime Le Mal and his femme fatale girlfriend Valentina, forcing the family to go on the run.",
+        "director": "Chris Renaud",
+        "main_actors": [
+            "Steve Carell",
+            "Kristen Wiig",
+            "Will Ferrell",
+            "Sofía Vergara",
+            "Miranda Cosgrove"
+        ],
+        "country_of_production": [
+            "United States of America"
+        ],
+        "spoken_languages": [
+            "English"
+        ],
+        "tagline": "Things just got a little more despicable.",
+        "budget": 100000000,
+        "revenue": 969280910,
+        "keywords": [
+            "superhero",
+            "villain",
+            "sequel",
+            "super villain",
+            "aftercreditsstinger",
+            "duringcreditsstinger",
+            "calm",
+            "illumination",
+            "kids"
         ]
     },
     {
@@ -2415,39 +2436,58 @@
         ]
     },
     {
-        "title": "Captain America: Brave New World",
+        "title": "The Chronicles of Narnia: The Lion, the Witch and the Wardrobe",
         "genres": [
-            "Science Fiction",
-            "Action",
-            "Thriller"
+            "Adventure",
+            "Family",
+            "Fantasy"
         ],
-        "runtime": 119,
-        "release_date": "2025-02-12",
-        "overview": "After meeting with newly elected U.S. President Thaddeus Ross, Sam finds himself in the middle of an international incident. He must discover the reason behind a nefarious global plot before the true mastermind has the entire world seeing red.",
-        "director": "Julius Onah",
+        "runtime": 143,
+        "release_date": "2005-12-07",
+        "overview": "Siblings Lucy, Edmund, Susan and Peter step through a magical wardrobe and find the land of Narnia. There, they discover a charming, once peaceful kingdom that has been plunged into eternal winter by the evil White Witch, Jadis. Aided by the wise and magnificent lion, Aslan, the children lead Narnia into a spectacular, climactic battle to be free of the Witch's glacial powers forever.",
+        "director": "Andrew Adamson",
         "main_actors": [
-            "Anthony Mackie",
-            "Danny Ramirez",
-            "Harrison Ford",
-            "Shira Haas",
-            "Xosha Roquemore"
+            "William Moseley",
+            "Anna Popplewell",
+            "Skandar Keynes",
+            "Georgie Henley",
+            "Liam Neeson"
         ],
         "country_of_production": [
+            "United Kingdom",
             "United States of America"
         ],
         "spoken_languages": [
-            "English"
+            "English",
+            "Deutsch"
         ],
-        "tagline": "The future favors the brave.",
+        "tagline": "The beloved masterpiece comes to life.",
         "budget": 180000000,
-        "revenue": 0,
+        "revenue": 745013115,
         "keywords": [
-            "hero",
-            "superhero",
-            "superhero team",
-            "marvel cinematic universe (mcu)",
-            "assassination attempt",
-            "political thriller"
+            "witch",
+            "epic",
+            "sibling relationship",
+            "saving the world",
+            "based on novel or book",
+            "self sacrifice",
+            "winter",
+            "fairy tale",
+            "cupboard",
+            "beaver",
+            "lion",
+            "surrealism",
+            "battle",
+            "based on children's book",
+            "fantasy world",
+            "duringcreditsstinger",
+            "1940s",
+            "high fantasy",
+            "isekai",
+            "based on young adult novel",
+            "faun",
+            "good versus evil",
+            "admiring"
         ]
     },
     {
@@ -2523,6 +2563,42 @@
         ]
     },
     {
+        "title": "Captain America: Brave New World",
+        "genres": [
+            "Science Fiction",
+            "Action",
+            "Thriller"
+        ],
+        "runtime": 119,
+        "release_date": "2025-02-12",
+        "overview": "After meeting with newly elected U.S. President Thaddeus Ross, Sam finds himself in the middle of an international incident. He must discover the reason behind a nefarious global plot before the true mastermind has the entire world seeing red.",
+        "director": "Julius Onah",
+        "main_actors": [
+            "Anthony Mackie",
+            "Danny Ramirez",
+            "Harrison Ford",
+            "Shira Haas",
+            "Xosha Roquemore"
+        ],
+        "country_of_production": [
+            "United States of America"
+        ],
+        "spoken_languages": [
+            "English"
+        ],
+        "tagline": "The future favors the brave.",
+        "budget": 180000000,
+        "revenue": 0,
+        "keywords": [
+            "hero",
+            "superhero",
+            "superhero team",
+            "marvel cinematic universe (mcu)",
+            "assassination attempt",
+            "political thriller"
+        ]
+    },
+    {
         "title": "Skin. Like. Sun.",
         "genres": [
             "Romance"
@@ -2545,175 +2621,6 @@
         "budget": 0,
         "revenue": 0,
         "keywords": []
-    },
-    {
-        "title": "Arcadian",
-        "genres": [
-            "Action",
-            "Horror",
-            "Thriller",
-            "Science Fiction"
-        ],
-        "runtime": 92,
-        "release_date": "2024-04-12",
-        "overview": "In the near future, on a decimated Earth, Paul and his twin sons face terror at night when ferocious creatures awaken. When Paul is nearly killed, the boys come up with a plan for survival, using everything their father taught them to keep him alive.",
-        "director": "Benjamin Brewer",
-        "main_actors": [
-            "Nicolas Cage",
-            "Jaeden Martell",
-            "Maxwell Jenkins",
-            "Sadie Soverall",
-            "Samantha Coughlan"
-        ],
-        "country_of_production": [
-            "Ireland",
-            "United States of America"
-        ],
-        "spoken_languages": [
-            "English"
-        ],
-        "tagline": "Family is stronger than fear.",
-        "budget": 0,
-        "revenue": 859453,
-        "keywords": [
-            "survival",
-            "fear",
-            "family",
-            "isolated farmhouse",
-            "calm",
-            "relaxed",
-            "post apocalypse",
-            "anxiety",
-            "science fiction",
-            "post-apocalyptic"
-        ]
-    },
-    {
-        "title": "The Chronicles of Narnia: The Lion, the Witch and the Wardrobe",
-        "genres": [
-            "Adventure",
-            "Family",
-            "Fantasy"
-        ],
-        "runtime": 143,
-        "release_date": "2005-12-07",
-        "overview": "Siblings Lucy, Edmund, Susan and Peter step through a magical wardrobe and find the land of Narnia. There, they discover a charming, once peaceful kingdom that has been plunged into eternal winter by the evil White Witch, Jadis. Aided by the wise and magnificent lion, Aslan, the children lead Narnia into a spectacular, climactic battle to be free of the Witch's glacial powers forever.",
-        "director": "Andrew Adamson",
-        "main_actors": [
-            "William Moseley",
-            "Anna Popplewell",
-            "Skandar Keynes",
-            "Georgie Henley",
-            "Liam Neeson"
-        ],
-        "country_of_production": [
-            "United Kingdom",
-            "United States of America"
-        ],
-        "spoken_languages": [
-            "English",
-            "Deutsch"
-        ],
-        "tagline": "The beloved masterpiece comes to life.",
-        "budget": 180000000,
-        "revenue": 745013115,
-        "keywords": [
-            "witch",
-            "epic",
-            "sibling relationship",
-            "saving the world",
-            "based on novel or book",
-            "self sacrifice",
-            "winter",
-            "fairy tale",
-            "cupboard",
-            "beaver",
-            "lion",
-            "surrealism",
-            "battle",
-            "based on children's book",
-            "fantasy world",
-            "duringcreditsstinger",
-            "1940s",
-            "high fantasy",
-            "isekai",
-            "based on young adult novel",
-            "faun",
-            "good versus evil",
-            "admiring"
-        ]
-    },
-    {
-        "title": "Flight Risk",
-        "genres": [
-            "Thriller",
-            "Action",
-            "Crime"
-        ],
-        "runtime": 91,
-        "release_date": "2025-01-22",
-        "overview": "A U.S. Marshal escorts a government witness to trial after he's accused of getting involved with a mob boss, only to discover that the pilot who is transporting them is also a hitman sent to assassinate the informant. After they subdue him, they're forced to fly together after discovering that there are others attempting to eliminate them.",
-        "director": "Mel Gibson",
-        "main_actors": [
-            "Michelle Dockery",
-            "Mark Wahlberg",
-            "Topher Grace",
-            "Leah Remini",
-            "Paul Ben-Victor"
-        ],
-        "country_of_production": [
-            "United States of America"
-        ],
-        "spoken_languages": [
-            "English"
-        ],
-        "tagline": "Y'all need a pilot?",
-        "budget": 25000000,
-        "revenue": 25109086,
-        "keywords": [
-            "airplane",
-            "pilot",
-            "flight",
-            "airplane accident"
-        ]
-    },
-    {
-        "title": "Creation of the Gods II: Demon Force",
-        "genres": [
-            "Action",
-            "Fantasy",
-            "War"
-        ],
-        "runtime": 145,
-        "release_date": "2025-01-29",
-        "overview": "Taishi Wen Zhong led the army of Shang Dynasty including Deng Chanyu and four generals of the Mo Family to Xiqi. With the help of Kunlun immortals such as Jiang Ziya, Ji Fa led the army and civilians of Xiqi to defend their homeland.",
-        "director": "Wuershan",
-        "main_actors": [
-            "Huang Bo",
-            "Yu Shi",
-            "Nashi",
-            "Chen Muchi",
-            "Kris Phillips"
-        ],
-        "country_of_production": [
-            "China"
-        ],
-        "spoken_languages": [
-            "普通话"
-        ],
-        "tagline": "",
-        "budget": 120000000,
-        "revenue": 123310000,
-        "keywords": [
-            "monster",
-            "based on novel or book",
-            "sequel",
-            "mythological beast",
-            "high fantasy",
-            "physical immortality",
-            "chinese mythology",
-            "god warrior"
-        ]
     },
     {
         "title": "Azrael",
@@ -2794,6 +2701,39 @@
         ]
     },
     {
+        "title": "Belyas",
+        "genres": [
+            "Drama"
+        ],
+        "runtime": 0,
+        "release_date": "2025-02-07",
+        "overview": "Audrey Avila, Denise Esteban and Dani Yoshida star as sultry Belyas. A housewife who is tired of her controlling husband takes a different turn when two young prostitutes rent their apartment. As she befriends the two, she begins to admire the sexual freedom they have.",
+        "director": "G.B. Sampedro",
+        "main_actors": [
+            "Audrey Avila",
+            "Dani Yoshida",
+            "Denise Esteban",
+            "Matthew Francisco",
+            "JD Aguas"
+        ],
+        "country_of_production": [
+            "Philippines"
+        ],
+        "spoken_languages": [
+            ""
+        ],
+        "tagline": "",
+        "budget": 0,
+        "revenue": 0,
+        "keywords": [
+            "lgbt",
+            "lesbian",
+            "girls love",
+            "lesbian kiss",
+            "sexy"
+        ]
+    },
+    {
         "title": "Squid Game: Making Season 2",
         "genres": [
             "Documentary"
@@ -2871,6 +2811,119 @@
         ]
     },
     {
+        "title": "Pleasure",
+        "genres": [
+            "Drama"
+        ],
+        "runtime": 108,
+        "release_date": "2021-10-08",
+        "overview": "19 year old Linnéa leaves her small town in Sweden and heads for Los Angeles with the aim of becoming the world's next big porn star, but the road to her goal turns out to be bumpier than she imagined.",
+        "director": "Ninja Thyberg",
+        "main_actors": [
+            "Sofia Kappel",
+            "Zelda Morrison",
+            "Tee Reel",
+            "Evelyn Claire",
+            "Chris Cock"
+        ],
+        "country_of_production": [
+            "France",
+            "Netherlands",
+            "Sweden"
+        ],
+        "spoken_languages": [
+            "English",
+            "svenska"
+        ],
+        "tagline": "In the pursuit of fame, she discovers the price of pleasure.",
+        "budget": 1800000,
+        "revenue": 393824,
+        "keywords": [
+            "pornography",
+            "female friendship",
+            "porn star",
+            "female protagonist",
+            "los angeles, california",
+            "porn industry",
+            "porn actress",
+            "woman director",
+            "intimate",
+            "absurd",
+            "disgusted"
+        ]
+    },
+    {
+        "title": "Lembayung",
+        "genres": [
+            "Horror",
+            "Thriller"
+        ],
+        "runtime": 123,
+        "release_date": "2024-09-19",
+        "overview": "Arum and Pica, who wanted to complete their internship at Lembayung hospital, had to face mysterious terror from a woman satan who was suspected of hanged herself in the bathroom. The situation became even more tense after they asked others for help to the point where they threatened their own lives and those closest to them.",
+        "director": "Baim Wong",
+        "main_actors": [
+            "Taskya Namya",
+            "Yasamin Jasem",
+            "Arya Saloka",
+            "Anna Jobling",
+            "Daffa Wardhana"
+        ],
+        "country_of_production": [
+            "Indonesia"
+        ],
+        "spoken_languages": [
+            "Bahasa indonesia"
+        ],
+        "tagline": "",
+        "budget": 0,
+        "revenue": 0,
+        "keywords": [
+            "based on novel or book",
+            "haunting",
+            "female protagonist",
+            "hospital",
+            "ghost",
+            "haunted hospital",
+            "terror",
+            "based on twitter thread"
+        ]
+    },
+    {
+        "title": "Ferry 2",
+        "genres": [
+            "Action",
+            "Drama",
+            "Crime",
+            "Thriller"
+        ],
+        "runtime": 94,
+        "release_date": "2024-12-19",
+        "overview": "After losing his drug empire, Ferry Bouman has found a measure of peace away from Brabant's criminal underworld — until his past catches up to him.",
+        "director": "Wannes Destoop",
+        "main_actors": [
+            "Frank Lammers",
+            "Aiko Beemsterboer",
+            "Tobias Kersloot",
+            "Marouane Meftah",
+            "Hamza Othman"
+        ],
+        "country_of_production": [
+            "Belgium"
+        ],
+        "spoken_languages": [
+            "Nederlands"
+        ],
+        "tagline": "",
+        "budget": 0,
+        "revenue": 0,
+        "keywords": [
+            "sequel",
+            "conscience",
+            "based on tv series"
+        ]
+    },
+    {
         "title": "Sonic the Hedgehog 2",
         "genres": [
             "Action",
@@ -2913,24 +2966,22 @@
         ]
     },
     {
-        "title": "Bad Boys: Ride or Die",
+        "title": "Flight Risk",
         "genres": [
-            "Action",
-            "Comedy",
-            "Crime",
             "Thriller",
-            "Adventure"
+            "Action",
+            "Crime"
         ],
-        "runtime": 115,
-        "release_date": "2024-06-05",
-        "overview": "After their late former Captain is framed, Lowrey and Burnett try to clear his name, only to end up on the run themselves.",
-        "director": "Adil El Arbi",
+        "runtime": 91,
+        "release_date": "2025-01-22",
+        "overview": "A U.S. Marshal escorts a government witness to trial after he's accused of getting involved with a mob boss, only to discover that the pilot who is transporting them is also a hitman sent to assassinate the informant. After they subdue him, they're forced to fly together after discovering that there are others attempting to eliminate them.",
+        "director": "Mel Gibson",
         "main_actors": [
-            "Will Smith",
-            "Martin Lawrence",
-            "Vanessa Hudgens",
-            "Alexander Ludwig",
-            "Paola Nuñez"
+            "Michelle Dockery",
+            "Mark Wahlberg",
+            "Topher Grace",
+            "Leah Remini",
+            "Paul Ben-Victor"
         ],
         "country_of_production": [
             "United States of America"
@@ -2938,19 +2989,93 @@
         "spoken_languages": [
             "English"
         ],
-        "tagline": "Miami's finest are now its most wanted.",
-        "budget": 100000000,
-        "revenue": 404547819,
+        "tagline": "Y'all need a pilot?",
+        "budget": 25000000,
+        "revenue": 25109086,
         "keywords": [
-            "miami, florida",
+            "airplane",
+            "pilot",
+            "flight",
+            "airplane accident"
+        ]
+    },
+    {
+        "title": "Fast X",
+        "genres": [
+            "Action",
+            "Crime",
+            "Thriller"
+        ],
+        "runtime": 142,
+        "release_date": "2023-05-17",
+        "overview": "Over many missions and against impossible odds, Dom Toretto and his family have outsmarted, out-nerved and outdriven every foe in their path. Now, they confront the most lethal opponent they've ever faced: A terrifying threat emerging from the shadows of the past who's fueled by blood revenge, and who is determined to shatter this family and destroy everything—and everyone—that Dom loves, forever.",
+        "director": "Louis Leterrier",
+        "main_actors": [
+            "Vin Diesel",
+            "Michelle Rodriguez",
+            "Tyrese Gibson",
+            "Ludacris",
+            "John Cena"
+        ],
+        "country_of_production": [
+            "United States of America"
+        ],
+        "spoken_languages": [
+            "English",
+            "Español"
+        ],
+        "tagline": "The end of the road begins.",
+        "budget": 340000000,
+        "revenue": 704709660,
+        "keywords": [
             "sequel",
-            "on the run",
-            "police detective",
-            "buddy cop",
-            "buddy comedy",
-            "aftercreditsstinger",
-            "hilarious",
-            "exhilarated"
+            "revenge",
+            "betrayal",
+            "racing",
+            "family",
+            "cliffhanger",
+            "shocking",
+            "cars",
+            "dramatic",
+            "ominous"
+        ]
+    },
+    {
+        "title": "Creation of the Gods II: Demon Force",
+        "genres": [
+            "Action",
+            "Fantasy",
+            "War"
+        ],
+        "runtime": 145,
+        "release_date": "2025-01-29",
+        "overview": "Taishi Wen Zhong led the army of Shang Dynasty including Deng Chanyu and four generals of the Mo Family to Xiqi. With the help of Kunlun immortals such as Jiang Ziya, Ji Fa led the army and civilians of Xiqi to defend their homeland.",
+        "director": "Wuershan",
+        "main_actors": [
+            "Huang Bo",
+            "Yu Shi",
+            "Nashi",
+            "Chen Muchi",
+            "Kris Phillips"
+        ],
+        "country_of_production": [
+            "China"
+        ],
+        "spoken_languages": [
+            "普通话"
+        ],
+        "tagline": "",
+        "budget": 120000000,
+        "revenue": 123310000,
+        "keywords": [
+            "monster",
+            "based on novel or book",
+            "sequel",
+            "mythological beast",
+            "high fantasy",
+            "physical immortality",
+            "chinese mythology",
+            "god warrior"
         ]
     },
     {
@@ -3008,59 +3133,63 @@
         "keywords": []
     },
     {
-        "title": "The Count of Monte Cristo",
+        "title": "365 Days: This Day",
         "genres": [
-            "Action",
-            "Adventure",
+            "Romance",
             "Drama"
         ],
-        "runtime": 178,
-        "release_date": "2024-06-28",
-        "overview": "Edmond Dantes becomes the target of a sinister plot and is arrested on his wedding day for a crime he did not commit. After 14 years in the island prison of Château d’If, he manages a daring escape. Now rich beyond his dreams, he assumes the identity of the Count of Monte-Cristo and exacts his revenge on the three men who betrayed him.",
-        "director": "Alexandre de La Patellière",
+        "runtime": 111,
+        "release_date": "2022-04-26",
+        "overview": "Laura and Massimo are back and hotter than ever. But the reunited couple's new beginning is complicated by Massimo’s family ties and a mysterious man who enters Laura’s life to win her heart and trust, at any cost.",
+        "director": "Barbara Białowąs",
         "main_actors": [
-            "Pierre Niney",
-            "Bastien Bouillon",
-            "Anaïs Demoustier",
-            "Anamaria Vartolomei",
-            "Laurent Lafitte"
+            "Anna-Maria Sieklucka",
+            "Michele Morrone",
+            "Simone Susinna",
+            "Magdalena Lamparska",
+            "Otar Saralidze"
         ],
         "country_of_production": [
-            "France"
+            "Poland"
         ],
         "spoken_languages": [
-            "Français",
             "English",
+            "Français",
             "Italiano",
-            "Română"
+            "Polski",
+            "Español"
         ],
-        "tagline": "This is not vengeance, this is justice.",
-        "budget": 46000000,
-        "revenue": 75360860,
+        "tagline": "Oh Yes.",
+        "budget": 0,
+        "revenue": 0,
         "keywords": [
-            "based on novel or book",
-            "count",
-            "revenge",
-            "wrongful conviction"
+            "gangster",
+            "sequel",
+            "bdsm",
+            "rich man poor woman",
+            "sex",
+            "erotique"
         ]
     },
     {
-        "title": "Godzilla x Kong: The New Empire",
+        "title": "Bad Boys: Ride or Die",
         "genres": [
             "Action",
-            "Adventure",
-            "Science Fiction"
+            "Comedy",
+            "Crime",
+            "Thriller",
+            "Adventure"
         ],
         "runtime": 115,
-        "release_date": "2024-03-27",
-        "overview": "Following their explosive showdown, Godzilla and Kong must reunite against a colossal undiscovered threat hidden within our world, challenging their very existence – and our own.",
-        "director": "Adam Wingard",
+        "release_date": "2024-06-05",
+        "overview": "After their late former Captain is framed, Lowrey and Burnett try to clear his name, only to end up on the run themselves.",
+        "director": "Adil El Arbi",
         "main_actors": [
-            "Rebecca Hall",
-            "Brian Tyree Henry",
-            "Dan Stevens",
-            "Kaylee Hottle",
-            "Alex Ferns"
+            "Will Smith",
+            "Martin Lawrence",
+            "Vanessa Hudgens",
+            "Alexander Ludwig",
+            "Paola Nuñez"
         ],
         "country_of_production": [
             "United States of America"
@@ -3068,132 +3197,19 @@
         "spoken_languages": [
             "English"
         ],
-        "tagline": "Rise together or fall alone.",
-        "budget": 150000000,
-        "revenue": 571750016,
+        "tagline": "Miami's finest are now its most wanted.",
+        "budget": 100000000,
+        "revenue": 404547819,
         "keywords": [
-            "giant monster",
+            "miami, florida",
             "sequel",
-            "dinosaur",
-            "monkey",
-            "kaiju",
-            "fantasy world",
-            "giant ape",
-            "langue française",
-            "godzilla",
-            "king kong"
-        ]
-    },
-    {
-        "title": "Paprika",
-        "genres": [
-            "Drama"
-        ],
-        "runtime": 116,
-        "release_date": "1991-02-13",
-        "overview": "Mimma starts working in Madame Colette’s brothel to help her boyfriend financially. There she is rechristened “Paprika,” and falls in love with her first client, naval officer Franco. Despite this attraction, she begins her climb through the sex trade, residing in Italy’s most illustrious brothels.",
-        "director": "Tinto Brass",
-        "main_actors": [
-            "Debora Caprioglio",
-            "Stéphane Ferrara",
-            "Martine Brochard",
-            "Stéphane Bonnet",
-            "Rossana Gavinel"
-        ],
-        "country_of_production": [
-            "Italy"
-        ],
-        "spoken_languages": [
-            "Italiano"
-        ],
-        "tagline": "Tinto Brass re-opens the closed houses!",
-        "budget": 0,
-        "revenue": 0,
-        "keywords": [
-            "prostitute",
-            "based on novel or book",
-            "self sacrifice",
-            "rome, italy",
-            "italy",
-            "brothel",
-            "pimp",
-            "marriage",
-            "train",
-            "prostitution",
-            "suburb",
-            "softcore",
-            "erotic movie"
-        ]
-    },
-    {
-        "title": "Wallace & Gromit: Vengeance Most Fowl",
-        "genres": [
-            "Animation",
-            "Comedy",
-            "Family",
-            "Adventure"
-        ],
-        "runtime": 79,
-        "release_date": "2024-12-18",
-        "overview": "Gromit’s concern that Wallace is becoming too dependent on his inventions proves justified, when Wallace invents a “smart” gnome that seems to develop a mind of its own. When it emerges that a vengeful figure from the past might be masterminding things, it falls to Gromit to battle sinister forces and save his master… or Wallace may never be able to invent again!",
-        "director": "Merlin Crossingham",
-        "main_actors": [
-            "Ben Whitehead",
-            "Peter Kay",
-            "Lauren Patel",
-            "Reece Shearsmith",
-            "Diane Morgan"
-        ],
-        "country_of_production": [
-            "United Kingdom"
-        ],
-        "spoken_languages": [
-            "English"
-        ],
-        "tagline": "New friends. Old enemies.",
-        "budget": 0,
-        "revenue": 191452,
-        "keywords": [
-            "inventor",
-            "human animal relationship",
-            "penguin",
-            "anthropomorphism",
-            "revenge",
-            "stop motion",
-            "robot",
-            "dog",
-            "jewel heist",
-            "gnome"
-        ]
-    },
-    {
-        "title": "The Flesh",
-        "genres": [
-            "Drama",
-            "Romance"
-        ],
-        "runtime": 90,
-        "release_date": "1991-05-09",
-        "overview": "A beautiful film which is basically about a man, a piano player, who meets and falls in love with a beautiful and voluptuous woman, who, by some strange procedure, leaves the man unable to move but with a permanent priapism! After some time he becomes sick of it and she relieves his paralysis. Eventually she gets bored and decides to leave, but he can't take it because he loves her…",
-        "director": "Marco Ferreri",
-        "main_actors": [
-            "Sergio Castellitto",
-            "Francesca Dellera",
-            "Philippe Léotard",
-            "Farid Chopel",
-            "Petra Reinhardt"
-        ],
-        "country_of_production": [
-            "Italy"
-        ],
-        "spoken_languages": [
-            "Italiano"
-        ],
-        "tagline": "",
-        "budget": 0,
-        "revenue": 0,
-        "keywords": [
-            "italian"
+            "on the run",
+            "police detective",
+            "buddy cop",
+            "buddy comedy",
+            "aftercreditsstinger",
+            "hilarious",
+            "exhilarated"
         ]
     },
     {

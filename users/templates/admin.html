@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="text-center my-5">Admin Panel</h1>
+        <h2 class="text-center">Pull Movies from TMDB</h2>
+        
+        {% if message %}
+            <div class="alert alert-info text-center mt-4">
+                {{ message }}
+            </div>
+        {% endif %}
+        
+        <div class="text-center mt-4">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Pull Movies from TMDB</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
