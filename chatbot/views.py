@@ -51,11 +51,14 @@ class BaseEmbeddingView(View):
         payload = {"model": EMBEDDING_MODEL, "prompt": text, "keep_alive": -1}
         response = await self.send_request(f"{OLLAMA_URL}/embeddings", payload, session)
         embedding = np.array(response.get("embedding", []), dtype="float32")
-        return (
-            embedding / np.linalg.norm(embedding)
-            if embedding.size > 0
-            else np.zeros(EMBEDDING_DIM, dtype="float32")
-        )
+        if embedding.size > 0:
+            return embedding / np.linalg.norm(
+                embedding
+            )  # Divide the embedding by its norm to normalize it
+        else:
+            return np.zeros(
+                EMBEDDING_DIM, dtype="float32"
+            )  # Return a zero vector if embedding is empty
 
     async def generate_embeddings(self, data_texts):
         """
@@ -73,9 +76,11 @@ class BaseEmbeddingView(View):
         """
         os.makedirs(CACHE_DIR, exist_ok=True)
         with open(os.path.join(CACHE_DIR, "film_data.json"), "w") as f:
-            json.dump(data, f)  # Save the data
-        np.save(os.path.join(CACHE_DIR, "film_embeddings.npy"), embeddings)
-        faiss.write_index(index, FAISS_INDEX_PATH)
+            json.dump(data, f)  # Save the json data
+        np.save(
+            os.path.join(CACHE_DIR, "film_embeddings.npy"), embeddings
+        )  # Save the embeddings
+        faiss.write_index(index, FAISS_INDEX_PATH)  # Save the index
 
     def load_cache(self):
         """
@@ -115,8 +120,9 @@ class BaseEmbeddingView(View):
             ("Revenue", "revenue"),
         ]
         return "\n".join(
-            f"{label}: {', '.join(map(str, item.get(key, 'N/A'))) if isinstance(item.get(key, 'N/A'), list) else item.get(key, 'N/A')}"
+            f"{label}: {', '.join(map(str, value)) if isinstance(value, list) else value}"
             for label, key in fields
+            if (value := item.get(key, "N/A")) is not None
         )
 
 
@@ -220,12 +226,14 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
         data_texts = [self.json_to_text(item) for item in data]
         embeddings = await self.generate_embeddings(data_texts)
 
-        quantizer = faiss.IndexFlatL2(EMBEDDING_DIM)
+        l2_quantizer = faiss.IndexFlatL2(
+            EMBEDDING_DIM
+        )  # Flat L2 index for quantization
         index = faiss.IndexIVFPQ(
-            quantizer, EMBEDDING_DIM, NLIST, M, NBITS, faiss.METRIC_INNER_PRODUCT
+            l2_quantizer, EMBEDDING_DIM, NLIST, M, NBITS, faiss.METRIC_INNER_PRODUCT
         )
-        index.train(embeddings)
-        index.add(embeddings)
+        index.train(embeddings)  # Train the index
+        index.add(embeddings)  # Add the embeddings to the index
 
         return data, embeddings, index
 
