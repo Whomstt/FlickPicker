@@ -45,9 +45,7 @@ class FetchFilmsView(View):
         output_file = "raw_film_data.json"
         try:
             fetch_and_save_films(settings.TMDB_API_KEY, output_file)
-            message = (
-                f"Successfully pulled movies from TMDB and saved to {output_file}."
-            )
+            message = f"Successfully pulled films from TMDB and saved to {output_file}."
         except Exception as e:
             message = f"Error occurred: {e}"
         context = {

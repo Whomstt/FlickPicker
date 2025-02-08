@@ -16,12 +16,14 @@ RAW_FILM_DATA_PATH = os.path.join(settings.BASE_DIR, "raw_film_data.json")
 OLLAMA_URL = "http://ollama:11434/api"
 
 # Parameters
-OLLAMA_EMBEDDING_MODEL = "nomic-embed-text"
-OLLAMA_GENERATION_MODEL = "llama3.2"
+EMBEDDING_MODEL = "nomic-embed-text"
+GENERATION_MODEL = "llama3.2"
 EMBEDDING_DIM = 768
 NPROBE = 10  # Number of clusters to be searched
 NLIST = 100  # Number of clusters to be stored
-N_TOP_MATCHES = 5  # Number of top matches to return
+N_TOP_MATCHES = 3  # Number of top matches to return
+M = 96  # Number of subquantizers
+NBITS = 7  # Number of bits per subquantizer
 
 
 class BaseEmbeddingView(View):
@@ -46,7 +48,7 @@ class BaseEmbeddingView(View):
         """
         Fetch embedding for a given text and normalize it.
         """
-        payload = {"model": OLLAMA_EMBEDDING_MODEL, "prompt": text, "keep_alive": -1}
+        payload = {"model": EMBEDDING_MODEL, "prompt": text, "keep_alive": -1}
         response = await self.send_request(f"{OLLAMA_URL}/embeddings", payload, session)
         embedding = np.array(response.get("embedding", []), dtype="float32")
         return (
@@ -143,7 +145,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
             messages.error(request, "Embeddings not found. Please generate them first.")
             return redirect("film_recommendations")
 
-        if isinstance(index, faiss.IndexIVFFlat):
+        if isinstance(index, faiss.IndexIVF):
             index.nprobe = NPROBE
 
         async with aiohttp.ClientSession() as session:
@@ -182,7 +184,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
             response = await self.send_request(
                 f"{OLLAMA_URL}/generate",
                 {
-                    "model": OLLAMA_GENERATION_MODEL,
+                    "model": GENERATION_MODEL,
                     "prompt": SYSTEM_PROMPT,
                     "keep_alive": -1,
                     "stream": False,
@@ -213,14 +215,30 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
         with open(RAW_FILM_DATA_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
 
+        data = remove_duplicates(data)
+
         data_texts = [self.json_to_text(item) for item in data]
         embeddings = await self.generate_embeddings(data_texts)
 
         quantizer = faiss.IndexFlatL2(EMBEDDING_DIM)
-        index = faiss.IndexIVFFlat(
-            quantizer, EMBEDDING_DIM, NLIST, faiss.METRIC_INNER_PRODUCT
+        index = faiss.IndexIVFPQ(
+            quantizer, EMBEDDING_DIM, NLIST, M, NBITS, faiss.METRIC_INNER_PRODUCT
         )
         index.train(embeddings)
         index.add(embeddings)
 
         return data, embeddings, index
+
+
+def remove_duplicates(data):
+    """
+    Remove duplicate films based on title and release date.
+    """
+    seen = set()
+    unique_data = []
+    for item in data:
+        identifier = (item.get("title"), item.get("release_date"))
+        if identifier not in seen:
+            seen.add(identifier)
+            unique_data.append(item)
+    return unique_data

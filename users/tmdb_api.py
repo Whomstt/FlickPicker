@@ -3,8 +3,10 @@ import json
 
 BASE_URL = "https://api.themoviedb.org/3"
 
+NUM_FILMS = 10000
 
-def get_top_films(api_key, num_films=100):
+
+def get_top_films(api_key, num_films):
     films = []
     page = 1
     while len(films) < num_films:
@@ -17,9 +19,15 @@ def get_top_films(api_key, num_films=100):
         response = requests.get(url, params=params)
         response.raise_for_status()
         data = response.json()
-        films.extend(data["results"])
+        results = data.get("results", [])
+        if not results:  # Exit if no more results
+            break
+
+        # Add only the required number of films
+        remaining_films = num_films - len(films)
+        films.extend(results[:remaining_films])
         page += 1
-    return films[:num_films]
+    return films
 
 
 def get_film_details(api_key, film_id):
@@ -48,7 +56,7 @@ def get_film_keywords(api_key, film_id):
 
 def fetch_and_save_films(api_key, output_file):
     # Fetch the top 100 films
-    top_films = get_top_films(api_key, 100)
+    top_films = get_top_films(api_key, NUM_FILMS)
     films_data = []
     for film in top_films:
         film_id = film["id"]
