@@ -2,7 +2,11 @@
 {% block title %}Chatbot{% endblock %}
 {% block content %}
     <div class="container">
-        <h2 class="text-center mb-4">Film Recommendation Assistant</h2>
+        <h2 class="display-4 text-center my-5">Film Recommendation Assistant</h2>
+
+        <div class="alert alert-info mb-4">
+            Note: The first response may take a bit longer as the models are being loaded into memory.
+        </div>
 
         {% if messages %}
             {% for message in messages %}
@@ -15,7 +19,7 @@
         <form method="POST" class="mb-4">
             {% csrf_token %}
             <div class="mb-3">
-                <label for="prompt" class="form-label">Enter your film preferences or query:</label>
+                <label for="prompt" class="form-label">Enter a prompt of a film you would like to watch:</label>
                 <textarea id="prompt" name="prompt" rows="4" class="form-control" placeholder="I want a sci-fi film about space exploration..."></textarea>
             </div>
             <button type="submit" class="btn btn-primary w-100">Get Recommendations</button>

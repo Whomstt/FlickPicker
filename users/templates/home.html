@@ -4,29 +4,29 @@
 
 {% block content %}
     {% load socialaccount %}
-    {% if not user.is_authenticated %}
-        <div class="container">
-            <h1 class="text-center my-5">Welcome To FlickPicker</h1>
-            <h2 class="text-center">To Use FlickPicker Please Login</h2>
-            <h3 class="text-center">Google Login</h3>
-            <div class="text-center">
-                <a href="{% provider_login_url 'google' %}" class="btn btn-primary">Login With Google</a>
-            </div>
-        </div>
-    {% endif %}
-    
-    {% if user.is_authenticated %}
-        <div class="container">
-            <h1 class="text-center my-5">Welcome To FlickPicker, {{ google_given_name }}</h1>
-            <div class="text-center">
-                <img src="{{ google_picture }}" alt="Google Profile Picture" class="rounded-circle" width="150">
-            </div>
-            <h2 class="text-center mt-4">Ready To Find A Film?</h2>
-            <div class="text-center mt-3">
-                <a href="{% url 'film_recommendations' %}" class="btn btn-primary mb-3">Recommend me a Film!</a><br>
-                <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
-                
-            </div>
-        </div>
-    {% endif %}
+    {% load static %}
+
+    <div class="container text-center my-5">
+        {% if not user.is_authenticated %}
+            <h1 class="display-4 mb-4">Welcome To FlickPicker</h1>
+            <p class="mb-4">To make full use of FlickPicker, please log in.</p>
+            <a href="{% provider_login_url 'google' %}">
+                <img src="{% static 'google/png@2x/dark/web_dark_sq_SI@2x.png' %}" 
+                     alt="Login with Google" 
+                     class="img-fluid" 
+                     style="max-width: 200px;">
+            </a>
+            <h2 class="display-6 mt-4">Ready To Find A Film?</h2>
+            <a href="{% url 'film_recommendations' %}" class="btn btn-primary mt-3">Recommend me a Film!</a>
+        {% else %}
+            <h1 class="display-4">Welcome To FlickPicker, {{ google_given_name }}</h1>
+            <img src="{{ google_picture }}" 
+                 alt="Google Profile Picture" 
+                 class="rounded-circle my-3 img-fluid" 
+                 style="max-width: 150px;">
+            <h2 class="display-6 mt-2">Ready To Find A Film?</h2>
+            <a href="{% url 'film_recommendations' %}" class="btn btn-primary mt-3">Recommend me a Film!</a>
+            <a href="{% url 'logout' %}" class="btn btn-danger mt-3">Logout</a>
+        {% endif %}
+    </div>
 {% endblock %}

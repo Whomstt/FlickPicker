@@ -4,6 +4,7 @@ import numpy as np
 import faiss
 import asyncio
 import aiohttp
+from asgiref.sync import sync_to_async
 from django.views import View
 from django.shortcuts import render, redirect
 from django.conf import settings
@@ -135,7 +136,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
         """
         Render the chatbot interface.
         """
-        return render(request, "chat.html")
+        return await sync_to_async(render)(request, "chat.html")
 
     async def post(self, request, *args, **kwargs):
         """

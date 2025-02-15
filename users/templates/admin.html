@@ -3,27 +3,28 @@
 {% block title %}Admin Panel{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="text-center my-5">Admin Panel</h1>
+<div class="container text-center">
+    <h1 class="display-4 my-5">Admin Panel</h1>
 
-    <h2 class="text-center">Fetch Latest Popular Films from TMDB</h2>
     {% if message %}
-    <div class="alert alert-info text-center mt-4">
+    <div class="alert alert-info mt-4">
         {{ message }}
     </div>
     {% endif %}
-    <div class="text-center mt-4">
+
+    <div class="mt-4">
+        <h2 class="display-6">Fetch Latest Popular Films from TMDB</h2>
         <form method="post" action="{% url 'fetch_films' %}">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary">Fetch Films</button>
+            <button type="submit" class="btn btn-primary mt-3">Fetch Films</button>
         </form>
     </div>
 
-    <h2 class="text-center mt-5">Generate Original Embeddings</h2>
-    <div class="text-center mt-4">
+    <div class="mt-5">
+        <h2 class="display-6">Generate Original Embeddings</h2>
         <form method="post" action="{% url 'generate_original_embeddings' %}">
             {% csrf_token %}
-            <button type="submit" class="btn btn-success">Generate Embeddings</button>
+            <button type="submit" class="btn btn-success mt-3">Generate Embeddings</button>
         </form>
     </div>
 </div>
