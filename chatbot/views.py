@@ -145,12 +145,12 @@ class FilmRecommendationsView(BaseEmbeddingView):
         prompt = request.POST.get("prompt", "").strip()
         if not prompt:
             messages.error(request, "Please enter a prompt.")
-            return redirect("film_recommendations")
+            return await sync_to_async(redirect)("film_recommendations")
 
         data, embeddings, index = self.load_cache()
         if data is None:
             messages.error(request, "Embeddings not found. Please generate them first.")
-            return redirect("film_recommendations")
+            return await sync_to_async(redirect)("film_recommendations")
 
         if isinstance(index, faiss.IndexIVF):
             index.nprobe = NPROBE
@@ -166,8 +166,10 @@ class FilmRecommendationsView(BaseEmbeddingView):
             prompt, top_matches
         )
 
-        return render(
-            request, "chat.html", {"response": explanation, "matches": top_matches}
+        return await sync_to_async(render)(
+            request,
+            "chat.html",
+            {"response": explanation, "matches": top_matches, "prompt": prompt},
         )
 
     def prepare_top_matches(self, data, distances, indices):
@@ -213,7 +215,7 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
         data, embeddings, index = await self.generate_original_embeddings()
         self.save_cache(data, embeddings, index)
         message = "Embeddings and index generated successfully!"
-        return render(request, "admin.html", {"message": message})
+        return await sync_to_async(render)(request, "admin.html", {"message": message})
 
     async def generate_original_embeddings(self):
         """
@@ -221,8 +223,6 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
         """
         with open(RAW_FILM_DATA_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
-
-        data = remove_duplicates(data)
 
         data_texts = [self.json_to_text(item) for item in data]
         embeddings = await self.generate_embeddings(data_texts)
@@ -237,17 +237,3 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
         index.add(embeddings)  # Add the embeddings to the index
 
         return data, embeddings, index
-
-
-def remove_duplicates(data):
-    """
-    Remove duplicate films based on title and release date.
-    """
-    seen = set()
-    unique_data = []
-    for item in data:
-        identifier = (item.get("title"), item.get("release_date"))
-        if identifier not in seen:
-            seen.add(identifier)
-            unique_data.append(item)
-    return unique_data
