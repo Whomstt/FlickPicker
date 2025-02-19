@@ -119,6 +119,7 @@ class BaseEmbeddingView(View):
             ("Keywords", "keywords"),
             ("Budget", "budget"),
             ("Revenue", "revenue"),
+            ("Rating", "rating"),
         ]
         return "\n".join(
             f"{label}: {', '.join(map(str, value)) if isinstance(value, list) else value}"

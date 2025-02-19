@@ -7,6 +7,8 @@ from django.urls import path
 from django.template.response import TemplateResponse
 from django.conf import settings
 from .tmdb_api import fetch_and_save_films
+import asyncio
+import aiohttp
 
 
 def home(request):
@@ -43,7 +45,7 @@ class FetchFilmsView(View):
         message = ""
         output_file = "raw_film_data.json"
         try:
-            fetch_and_save_films(settings.TMDB_API_KEY, output_file)
+            asyncio.run(fetch_and_save_films(settings.TMDB_API_KEY, output_file))
             message = f"Successfully pulled films from TMDB and saved to {output_file}."
         except Exception as e:
             message = f"Error occurred: {e}"
