@@ -20,11 +20,11 @@ OLLAMA_URL = "http://ollama:11434/api"
 EMBEDDING_MODEL = "nomic-embed-text"
 GENERATION_MODEL = "llama3.2"
 EMBEDDING_DIM = 768
-NPROBE = 10  # Number of clusters to be searched
-NLIST = 100  # Number of clusters to be stored
+NPROBE = 2  # Number of clusters to be searched
+NLIST = 5  # Number of clusters to be stored
 N_TOP_MATCHES = 3  # Number of top matches to return
-M = 96  # Number of subquantizers
-NBITS = 7  # Number of bits per subquantizer
+M = 2  # Number of subquantizers
+NBITS = 4  # Number of bits per subquantizer
 
 
 class BaseEmbeddingView(View):
@@ -76,8 +76,6 @@ class BaseEmbeddingView(View):
         Save the data, embeddings, and index to the cache directory.
         """
         os.makedirs(CACHE_DIR, exist_ok=True)
-        with open(os.path.join(CACHE_DIR, "film_data.json"), "w") as f:
-            json.dump(data, f)  # Save the json data
         np.save(
             os.path.join(CACHE_DIR, "film_embeddings.npy"), embeddings
         )  # Save the embeddings
@@ -88,7 +86,7 @@ class BaseEmbeddingView(View):
         Load the data, embeddings, and index from the cache directory.
         """
         required_files = [
-            os.path.join(CACHE_DIR, "film_data.json"),
+            os.path.join(RAW_FILM_DATA_PATH),
             os.path.join(CACHE_DIR, "film_embeddings.npy"),
             FAISS_INDEX_PATH,
         ]
@@ -103,28 +101,43 @@ class BaseEmbeddingView(View):
 
     def json_to_text(self, item):
         """
-        Convert Film data JSON to enriched text.
+        Convert Film data JSON to enriched text for semantic embedding.
         """
-        fields = [
-            ("Title", "title"),
-            ("Genres", "genres"),
-            ("Overview", "overview"),
-            ("Director", "director"),
-            ("Main Actors", "main_actors"),
-            ("Runtime", "runtime"),
-            ("Release Date", "release_date"),
-            ("Tagline", "tagline"),
-            ("Country of Production", "country_of_production"),
-            ("Spoken Languages", "spoken_languages"),
-            ("Keywords", "keywords"),
-            ("Budget", "budget"),
-            ("Revenue", "revenue"),
-            ("Rating", "rating"),
-        ]
-        return "\n".join(
-            f"{label}: {', '.join(map(str, value)) if isinstance(value, list) else value}"
-            for label, key in fields
-            if (value := item.get(key, "N/A")) is not None
+        # Basic metadata
+        title = item.get("title", "N/A")
+        genres = ", ".join(item.get("genres", [])) or "N/A"
+        tagline = item.get("tagline", "N/A")
+        overview = item.get("overview", "N/A")
+        director = item.get("director", "N/A")
+        main_actors = ", ".join(item.get("main_actors", [])) or "N/A"
+
+        # Enhanced metadata
+        runtime = item.get("runtime", "N/A")
+        release_date = item.get("release_date", "N/A")
+        country = ", ".join(item.get("country_of_production", [])) or "N/A"
+        spoken_languages = ", ".join(item.get("spoken_languages", [])) or "N/A"
+
+        # Financial and rating metadata
+        budget = item.get("budget", "N/A")
+        revenue = item.get("revenue", "N/A")
+        rating = item.get("rating", "N/A")
+
+        # Keywords
+        keywords = ", ".join(item.get("keywords", [])) or "N/A"
+
+        # Format the enriched text
+        return (
+            f"Film Title: {title}\n"
+            f"Genres: {genres}\n"
+            f"Tagline: {tagline}\n"
+            f"Overview: {overview}\n\n"
+            f"Directed by {director}, featuring {main_actors}.\n"
+            f"Runtime: {runtime}\n"
+            f"Release Date: {release_date}\n"
+            f"Country of Production: {country}\n"
+            f"Spoken Languages: {spoken_languages}\n\n"
+            f"Budget: {budget}, Revenue: {revenue}, Rating: {rating}\n"
+            f"Keywords: {keywords}\n"
         )
 
 

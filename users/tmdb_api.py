@@ -12,7 +12,7 @@ load_dotenv()
 # Constants
 BASE_URL = "https://api.themoviedb.org/3"
 API_KEY = os.getenv("TMDB_API_KEY")  # API key from environment variables
-NUM_FILMS = 10000  # Number of films to fetch
+NUM_FILMS = 100  # Number of films to fetch
 RATE_LIMIT = 40  # TMDB rate limit (40 requests per 10 seconds)
 RATE_LIMIT_WINDOW = 10  # Rate limit window in seconds
 OUTPUT_FILE = "films_data.json"
