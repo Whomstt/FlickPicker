@@ -20,11 +20,11 @@ OLLAMA_URL = "http://ollama:11434/api"
 EMBEDDING_MODEL = "nomic-embed-text"
 GENERATION_MODEL = "llama3.2"
 EMBEDDING_DIM = 768
-NPROBE = 2  # Number of clusters to be searched
-NLIST = 5  # Number of clusters to be stored
+NPROBE = 10  # Number of clusters to be searched
+NLIST = 100  # Number of clusters to be stored
 N_TOP_MATCHES = 3  # Number of top matches to return
-M = 2  # Number of subquantizers
-NBITS = 4  # Number of bits per subquantizer
+M = 16  # Number of subquantizers
+NBITS = 8  # Number of bits per subquantizer
 
 
 class BaseEmbeddingView(View):
@@ -101,44 +101,51 @@ class BaseEmbeddingView(View):
 
     def json_to_text(self, item):
         """
-        Convert Film data JSON to enriched text for semantic embedding.
+        Convert film data JSON to enriched text for semantic embedding.
+        Excludes attributes with missing or placeholder values to reduce noise.
         """
-        # Basic metadata
-        title = item.get("title", "N/A")
-        genres = ", ".join(item.get("genres", [])) or "N/A"
-        tagline = item.get("tagline", "N/A")
-        overview = item.get("overview", "N/A")
-        director = item.get("director", "N/A")
-        main_actors = ", ".join(item.get("main_actors", [])) or "N/A"
+        components = []
 
-        # Enhanced metadata
-        runtime = item.get("runtime", "N/A")
-        release_date = item.get("release_date", "N/A")
-        country = ", ".join(item.get("country_of_production", [])) or "N/A"
-        spoken_languages = ", ".join(item.get("spoken_languages", [])) or "N/A"
+        # Core metadata
+        if title := item.get("title"):
+            components.append(f"Film Title: {title}")
+        if genres := item.get("genres"):
+            components.append(f"Genres: {', '.join(genres)}")
+        if tagline := item.get("tagline"):
+            components.append(f"Tagline: {tagline}")
+        if overview := item.get("overview"):
+            components.append(f"Overview: {overview}")
+
+        # Director and cast
+        if director := item.get("director"):
+            components.append(f"Directed by {director}")
+        if main_actors := item.get("main_actors"):
+            components.append(f"Featuring: {', '.join(main_actors)}")
+
+        # Runtime, release date, and production
+        if runtime := item.get("runtime"):
+            components.append(f"Runtime: {runtime}")
+        if release_date := item.get("release_date"):
+            components.append(f"Release Date: {release_date}")
+        if country := item.get("country_of_production"):
+            components.append(f"Country of Production: {', '.join(country)}")
+        if languages := item.get("spoken_languages"):
+            components.append(f"Spoken Languages: {', '.join(languages)}")
 
         # Financial and rating metadata
-        budget = item.get("budget", "N/A")
-        revenue = item.get("revenue", "N/A")
-        rating = item.get("rating", "N/A")
+        if budget := item.get("budget"):
+            components.append(f"Budget: {budget}")
+        if revenue := item.get("revenue"):
+            components.append(f"Revenue: {revenue}")
+        if rating := item.get("rating"):
+            components.append(f"Rating: {rating}")
 
         # Keywords
-        keywords = ", ".join(item.get("keywords", [])) or "N/A"
+        if keywords := item.get("keywords"):
+            components.append(f"Keywords: {', '.join(keywords)}")
 
-        # Format the enriched text
-        return (
-            f"Film Title: {title}\n"
-            f"Genres: {genres}\n"
-            f"Tagline: {tagline}\n"
-            f"Overview: {overview}\n\n"
-            f"Directed by {director}, featuring {main_actors}.\n"
-            f"Runtime: {runtime}\n"
-            f"Release Date: {release_date}\n"
-            f"Country of Production: {country}\n"
-            f"Spoken Languages: {spoken_languages}\n\n"
-            f"Budget: {budget}, Revenue: {revenue}, Rating: {rating}\n"
-            f"Keywords: {keywords}\n"
-        )
+        # Combine all non-empty components into a single string
+        return "\n".join(components)
 
 
 class FilmRecommendationsView(BaseEmbeddingView):
@@ -202,6 +209,10 @@ class FilmRecommendationsView(BaseEmbeddingView):
         SYSTEM_PROMPT = f"Query: {prompt}\n\n"
         SYSTEM_PROMPT += "\n\n".join(self.json_to_text(item) for item in top_matches)
         SYSTEM_PROMPT += "\n\nProvide a detailed film recommendation explanation."
+
+        # For Debugging view the top matches in format received by the model
+        # for item in top_matches:
+        #     print(self.json_to_text(item))
 
         async with aiohttp.ClientSession() as session:
             response = await self.send_request(
