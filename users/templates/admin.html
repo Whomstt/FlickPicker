@@ -18,6 +18,12 @@
             {% csrf_token %}
             <button type="submit" class="btn btn-primary mt-3">Fetch Films</button>
         </form>
+        <div id="fetch-films-loading" class="text-center my-4" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Fetching films...</p>
+        </div>
     </div>
 
     <div class="mt-5">
@@ -26,6 +32,23 @@
             {% csrf_token %}
             <button type="submit" class="btn btn-success mt-3">Generate Embeddings</button>
         </form>
+        <div id="generate-embeddings-loading" class="text-center my-4" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Generating embeddings...</p>
+        </div>
     </div>
 </div>
+
+<script>
+    document.getElementById("fetch-films-form").addEventListener("submit", function() {
+        document.getElementById("fetch-films-loading").style.display = "block";
+        document.getElementById("fetch-films-button").disabled = true;
+    });
+    document.getElementById("generate-embeddings-form").addEventListener("submit", function() {
+        document.getElementById("generate-embeddings-loading").style.display = "block";
+        document.getElementById("generate-embeddings-button").disabled = true;
+    });
+</script>
 {% endblock %}

@@ -1,71 +1,84 @@
 {% extends "base.html" %}
 {% block title %}Chatbot{% endblock %}
 {% block content %}
-    <div class="container">
-        <h2 class="display-4 text-center my-5">Film Recommendation Assistant</h2>
+<div class="container">
+    <h2 class="display-4 text-center my-5">Film Recommendation Assistant</h2>
 
-        <div class="alert alert-info mb-4">
-            Note: The first response may take a bit longer as the models are being loaded into memory.
+    <div class="alert alert-info mb-4">
+        Note: The first response may take a bit longer as the models are being loaded into memory.
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" class="mb-4" id="recommendation-form">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="prompt" class="form-label">Enter a prompt of a film you would like to watch:</label>
+            <textarea id="prompt" name="prompt" rows="4" class="form-control" placeholder="I want a sci-fi film about space exploration..."></textarea>
         </div>
+        <button type="submit" class="btn btn-primary w-100" id="submit-button">Get Recommendations</button>
+    </form>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
+    <div id="loading-indicator" class="text-center my-4" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Fetching recommendations...</p>
+    </div>
 
-        <form method="POST" class="mb-4">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="prompt" class="form-label">Enter a prompt of a film you would like to watch:</label>
-                <textarea id="prompt" name="prompt" rows="4" class="form-control" placeholder="I want a sci-fi film about space exploration..."></textarea>
+    {% if response %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Your Prompt</h3>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Get Recommendations</button>
-        </form>
-
-
-        {% if response %}
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3>Your Prompt</h3>
-                </div>
-                <div class="card-body">
-                    <p>{{ prompt }}</p>
-                </div>
+            <div class="card-body">
+                <p>{{ prompt }}</p>
             </div>
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3>Top Matching Films</h3>
-                </div>
-                <div class="card-body">
-                    {% for match in matches %}
-                        <div class="mb-3 p-3 border rounded">
-                            <h4>{{ match.title }}</h4>
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <p><strong>Genres:</strong> {{ match.genres|join:", " }}</p>
-                                    <p><strong>Overview:</strong> {{ match.overview }}</p>
-                                    <p><strong>Director:</strong> {{ match.director }}</p>
-                                    <p><strong>Main Actors:</strong> {{ match.main_actors|join:", " }}</p>
-                                    <p class="text-muted">
-                                        <small>Similarity Score: {{ match.similarity_distance|floatformat:4 }}</small>
-                                    </p>
-                                </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Top Matching Films</h3>
+            </div>
+            <div class="card-body">
+                {% for match in matches %}
+                    <div class="mb-3 p-3 border rounded">
+                        <h4>{{ match.title }}</h4>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <p><strong>Genres:</strong> {{ match.genres|join:", " }}</p>
+                                <p><strong>Overview:</strong> {{ match.overview }}</p>
+                                <p><strong>Director:</strong> {{ match.director }}</p>
+                                <p><strong>Main Actors:</strong> {{ match.main_actors|join:", " }}</p>
+                                <p class="text-muted">
+                                    <small>Similarity Score: {{ match.similarity_distance|floatformat:4 }}</small>
+                                </p>
                             </div>
                         </div>
-                    {% endfor %}
-                </div>
+                    </div>
+                {% endfor %}
             </div>
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3>Recommendation Explanation</h3>
-                </div>
-                <div class="card-body">
-                    <p>{{ response }}</p>
-                </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Recommendation Explanation</h3>
             </div>
-        {% endif %}
-    </div>
+            <div class="card-body">
+                <p>{{ response }}</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    document.getElementById("recommendation-form").addEventListener("submit", function () {
+        document.getElementById("loading-indicator").style.display = "block";
+        document.getElementById("submit-button").disabled = true;
+    });
+</script>
 {% endblock %}
