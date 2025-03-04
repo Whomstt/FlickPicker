@@ -26,7 +26,7 @@ NPROBE = 10  # Number of clusters to be searched
 NLIST = 100  # Number of clusters to be stored
 N_TOP_MATCHES = 3  # Number of top matches to return
 M = 16  # Number of subquantizers
-NBITS = 8  # Number of bits per subquantizer
+NBITS = 7  # Number of bits per subquantizer
 
 # Field weights for film attributes - higher value means more important
 FIELD_WEIGHTS = {
