@@ -9,6 +9,7 @@ from django.views import View
 from django.shortcuts import render, redirect
 from django.conf import settings
 from django.contrib import messages
+import time
 
 # Constants
 CACHE_DIR = os.path.join(settings.BASE_DIR, "cache")
@@ -163,6 +164,8 @@ class FilmRecommendationsView(BaseEmbeddingView):
         """
         Handle the chatbot form submission.
         """
+        start_time = time.time()
+
         prompt = request.POST.get("prompt", "").strip()
         if not prompt:
             messages.error(request, "Please enter a prompt.")
@@ -176,9 +179,11 @@ class FilmRecommendationsView(BaseEmbeddingView):
         if isinstance(index, faiss.IndexIVF):
             index.nprobe = NPROBE
 
+        # Generate weighted query embedding
         async with aiohttp.ClientSession() as session:
             prompt_embedding = await self.fetch_embedding(prompt, session)
 
+        # Search for top matches
         distances, indices = index.search(
             prompt_embedding.reshape(1, -1), N_TOP_MATCHES
         )
@@ -187,10 +192,18 @@ class FilmRecommendationsView(BaseEmbeddingView):
             prompt, top_matches
         )
 
+        end_time = time.time()
+        recommendation_time = end_time - start_time
+
         return await sync_to_async(render)(
             request,
             "chat.html",
-            {"response": explanation, "matches": top_matches, "prompt": prompt},
+            {
+                "response": explanation,
+                "matches": top_matches,
+                "prompt": prompt,
+                "recommendation_time": recommendation_time,
+            },
         )
 
     def prepare_top_matches(self, data, distances, indices):
