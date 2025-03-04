@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import numpy as np
 import faiss
 import asyncio
@@ -26,6 +27,24 @@ NLIST = 100  # Number of clusters to be stored
 N_TOP_MATCHES = 3  # Number of top matches to return
 M = 16  # Number of subquantizers
 NBITS = 8  # Number of bits per subquantizer
+
+# Field weights for film attributes - higher value means more important
+FIELD_WEIGHTS = {
+    "genres": 1.0,
+    "title": 0.8,
+    "tagline": 0.6,
+    "overview": 0.7,
+    "keywords": 0.5,
+    "director": 0.4,
+    "main_actors": 0.3,
+    "country_of_production": 0.1,
+    "spoken_languages": 0.1,
+    "runtime": 0.2,
+    "release_date": 0.3,
+    "budget": 0.1,
+    "revenue": 0.1,
+    "rating": 0.5,
+}
 
 
 class BaseEmbeddingView(View):
@@ -54,23 +73,51 @@ class BaseEmbeddingView(View):
         response = await self.send_request(f"{OLLAMA_URL}/embeddings", payload, session)
         embedding = np.array(response.get("embedding", []), dtype="float32")
         if embedding.size > 0:
-            return embedding / np.linalg.norm(
-                embedding
-            )  # Divide the embedding by its norm to normalize it
+            return embedding / np.linalg.norm(embedding)  # Normalize
         else:
             return np.zeros(
                 EMBEDDING_DIM, dtype="float32"
-            )  # Return a zero vector if embedding is empty
+            )  # Return zero vector if empty
 
-    async def generate_embeddings(self, data_texts):
+    async def generate_field_embeddings(self, item):
         """
-        Generate normalized embeddings for a list of texts.
+        Generate embeddings for each field in the item separately.
         """
+        field_embeddings = {}
+
         async with aiohttp.ClientSession() as session:
-            embeddings = await asyncio.gather(
-                *[self.fetch_embedding(text, session) for text in data_texts]
-            )
-        return np.array(embeddings, dtype="float32")
+            for field, weight in FIELD_WEIGHTS.items():
+                if (value := item.get(field)) is not None:
+                    # Format the field value
+                    if isinstance(value, list):
+                        text_value = ", ".join(map(str, value))
+                    else:
+                        text_value = str(value)
+
+                    # Generate embedding for the field
+                    field_text = f"{field}: {text_value}"
+                    embedding = await self.fetch_embedding(field_text, session)
+
+                    # Store the embedding with its weight
+                    field_embeddings[field] = (embedding, weight)
+
+        return field_embeddings
+
+    def combine_weighted_embeddings(self, field_embeddings):
+        """
+        Combine field embeddings using their weights and normalize the result.
+        """
+        weighted_sum = np.zeros(EMBEDDING_DIM, dtype="float32")
+
+        for field, (embedding, weight) in field_embeddings.items():
+            weighted_sum += embedding * weight
+
+        # Normalize to ensure the final embedding is a unit vector
+        norm = np.linalg.norm(weighted_sum)
+        if norm > 0:
+            weighted_sum /= norm
+
+        return weighted_sum
 
     def save_cache(self, data, embeddings, index):
         """
@@ -79,8 +126,8 @@ class BaseEmbeddingView(View):
         os.makedirs(CACHE_DIR, exist_ok=True)
         np.save(
             os.path.join(CACHE_DIR, "film_embeddings.npy"), embeddings
-        )  # Save the embeddings
-        faiss.write_index(index, FAISS_INDEX_PATH)  # Save the index
+        )  # Save embeddings
+        faiss.write_index(index, FAISS_INDEX_PATH)  # Save index
 
     def load_cache(self):
         """
@@ -102,12 +149,10 @@ class BaseEmbeddingView(View):
 
     def json_to_text(self, item):
         """
-        Convert film data JSON to enriched text for semantic embedding.
-        Excludes attributes with missing or placeholder values to reduce noise.
+        Convert film data JSON to enriched text for display or explanation.
         """
         components = []
 
-        # Core metadata
         if title := item.get("title"):
             components.append(f"Film Title: {title}")
         if genres := item.get("genres"):
@@ -116,14 +161,10 @@ class BaseEmbeddingView(View):
             components.append(f"Tagline: {tagline}")
         if overview := item.get("overview"):
             components.append(f"Overview: {overview}")
-
-        # Director and cast
         if director := item.get("director"):
             components.append(f"Directed by {director}")
         if main_actors := item.get("main_actors"):
             components.append(f"Featuring: {', '.join(main_actors)}")
-
-        # Runtime, release date, and production
         if runtime := item.get("runtime"):
             components.append(f"Runtime: {runtime}")
         if release_date := item.get("release_date"):
@@ -132,16 +173,12 @@ class BaseEmbeddingView(View):
             components.append(f"Country of Production: {', '.join(country)}")
         if languages := item.get("spoken_languages"):
             components.append(f"Spoken Languages: {', '.join(languages)}")
-
-        # Financial and rating metadata
         if budget := item.get("budget"):
             components.append(f"Budget: {budget}")
         if revenue := item.get("revenue"):
             components.append(f"Revenue: {revenue}")
         if rating := item.get("rating"):
             components.append(f"Rating: {rating}")
-
-        # Keywords
         if keywords := item.get("keywords"):
             components.append(f"Keywords: {', '.join(keywords)}")
 
@@ -223,10 +260,6 @@ class FilmRecommendationsView(BaseEmbeddingView):
         SYSTEM_PROMPT += "\n\n".join(self.json_to_text(item) for item in top_matches)
         SYSTEM_PROMPT += "\n\nProvide a detailed film recommendation explanation."
 
-        # For Debugging view the top matches in format received by the model
-        # for item in top_matches:
-        #     print(self.json_to_text(item))
-
         async with aiohttp.ClientSession() as session:
             response = await self.send_request(
                 f"{OLLAMA_URL}/generate",
@@ -257,21 +290,27 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
 
     async def generate_original_embeddings(self):
         """
-        Generate embeddings for the original film data.
+        Generate embeddings for the original film data using field-specific weighting.
         """
         with open(RAW_FILM_DATA_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        data_texts = [self.json_to_text(item) for item in data]
-        embeddings = await self.generate_embeddings(data_texts)
+        embeddings = []
 
-        l2_quantizer = faiss.IndexFlatL2(
-            EMBEDDING_DIM
-        )  # Flat L2 index for quantization
-        index = faiss.IndexIVFPQ(
-            l2_quantizer, EMBEDDING_DIM, NLIST, M, NBITS, faiss.METRIC_INNER_PRODUCT
-        )
-        index.train(embeddings)  # Train the index
-        index.add(embeddings)  # Add the embeddings to the index
+        for item in data:
+            # Generate embeddings for each field
+            field_embeddings = await self.generate_field_embeddings(item)
+
+            # Combine embeddings with weighting
+            combined_embedding = self.combine_weighted_embeddings(field_embeddings)
+            embeddings.append(combined_embedding)
+
+        embeddings = np.array(embeddings, dtype="float32")
+
+        # Create FAISS index
+        quantizer = faiss.IndexFlatL2(EMBEDDING_DIM)
+        index = faiss.IndexIVFPQ(quantizer, EMBEDDING_DIM, NLIST, M, NBITS)
+        index.train(embeddings)
+        index.add(embeddings)
 
         return data, embeddings, index
