@@ -41,6 +41,18 @@
                 <p>{{ prompt }}</p>
             </div>
         </div>
+        
+        {% if recommendation_time %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Processing Time</h3>
+                </div>
+                <div class="card-body">
+                    <p>The recommendation was generated in {{ recommendation_time|floatformat:2 }} seconds.</p>
+                </div>
+            </div>
+        {% endif %}
+        
         <div class="card mb-4">
             <div class="card-header">
                 <h3>Top Matching Films</h3>
