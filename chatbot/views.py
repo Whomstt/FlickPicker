@@ -11,17 +11,33 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 from django.contrib import messages
 import time
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 # Constants
 CACHE_DIR = os.path.join(settings.BASE_DIR, "cache")
 FAISS_INDEX_PATH = os.path.join(CACHE_DIR, "faiss_index")
 RAW_FILM_DATA_PATH = os.path.join(settings.BASE_DIR, "raw_film_data.json")
-OLLAMA_URL = "http://ollama:11434/api"
 
-# Parameters
-EMBEDDING_MODEL = "nomic-embed-text"
-GENERATION_MODEL = "llama3.2"
+# OpenAI API settings
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
+OPENAI_MODEL = "gpt-4o-mini"
+
+# Nomic API settings
+NOMIC_API_KEY = os.getenv("NOMIC_API_KEY")
+NOMIC_API_URL = "https://api-atlas.nomic.ai/v1/embedding/text"
+NOMIC_MODEL = "nomic-embed-text-v1.5"
 EMBEDDING_DIM = 768
+
+# Ollama settings
+OLLAMA_URL = "http://ollama:11434/api"
+EMBEDDING_MODEL = "nomic-embed-text"
+# GENERATION_MODEL = "llama3.2"
+
+
 NPROBE = 10  # Number of clusters to be searched
 NLIST = 100  # Number of clusters to be stored
 N_TOP_MATCHES = 3  # Number of top matches to return
@@ -54,32 +70,61 @@ class BaseEmbeddingView(View):
     """
 
     async def send_request(self, url, payload, session):
-        """
-        Send a POST request to the OLLAMA API.
-        """
+        headers = {}
+        if url == OPENAI_API_URL:
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {OPENAI_API_KEY}",
+            }
+        elif url == NOMIC_API_URL:
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {NOMIC_API_KEY}",
+            }
         try:
-            async with session.post(url, json=payload) as response:
+            async with session.post(url, json=payload, headers=headers) as response:
                 response.raise_for_status()
                 return await response.json()
         except aiohttp.ClientError as e:
             print(f"Error sending request to {url}: {e}")
             return {}
 
-    async def fetch_embedding(self, text, session):
-        """
-        Fetch embedding for a given text and normalize it.
-        """
-        payload = {"model": EMBEDDING_MODEL, "prompt": text, "keep_alive": -1}
-        response = await self.send_request(f"{OLLAMA_URL}/embeddings", payload, session)
-        embedding = np.array(response.get("embedding", []), dtype="float32")
-        if embedding.size > 0:
-            return embedding / np.linalg.norm(embedding)  # Normalize
-        else:
-            return np.zeros(
-                EMBEDDING_DIM, dtype="float32"
-            )  # Return zero vector if empty
+    async def fetch_embedding(self, text, session, service="nomic"):
+        """Fetch embeddings from specified service"""
+        if service == "nomic":
+            payload = {
+                "model": NOMIC_MODEL,
+                "texts": [text],
+                "task_type": "clustering",
+            }
+            url = NOMIC_API_URL
+            headers = {"Authorization": f"Bearer {NOMIC_API_KEY}"}
+        elif service == "ollama":
+            payload = {"model": EMBEDDING_MODEL, "prompt": text}
+            url = f"{OLLAMA_URL}/embeddings"
+            headers = {}
 
-    async def generate_field_embeddings(self, item):
+        try:
+            async with session.post(url, json=payload, headers=headers) as response:
+                response.raise_for_status()
+                data = await response.json()
+
+                # Handle different response formats
+                if service == "nomic":
+                    embedding = np.array(data["embeddings"][0], dtype="float32")
+                elif service == "ollama":
+                    embedding = np.array(data["embedding"], dtype="float32")
+
+                return (
+                    embedding / np.linalg.norm(embedding)
+                    if embedding.any()
+                    else np.zeros(EMBEDDING_DIM)
+                )
+        except Exception as e:
+            print(f"Error from {service}: {str(e)}")
+            return np.zeros(EMBEDDING_DIM)
+
+    async def generate_field_embeddings(self, item, use_ollama=False):
         """
         Generate embeddings for each field in the item separately.
         """
@@ -96,7 +141,8 @@ class BaseEmbeddingView(View):
 
                     # Generate embedding for the field
                     field_text = f"{field}: {text_value}"
-                    embedding = await self.fetch_embedding(field_text, session)
+                    service = "ollama" if use_ollama else "nomic"
+                    embedding = await self.fetch_embedding(field_text, session, service)
 
                     # Store the embedding with its weight
                     field_embeddings[field] = (embedding, weight)
@@ -218,7 +264,9 @@ class FilmRecommendationsView(BaseEmbeddingView):
 
         # Generate weighted query embedding
         async with aiohttp.ClientSession() as session:
-            prompt_embedding = await self.fetch_embedding(prompt, session)
+            prompt_embedding = await self.fetch_embedding(
+                prompt, session, service="nomic"
+            )
 
         # Search for top matches
         distances, indices = index.search(
@@ -260,18 +308,47 @@ class FilmRecommendationsView(BaseEmbeddingView):
         SYSTEM_PROMPT += "\n\n".join(self.json_to_text(item) for item in top_matches)
         SYSTEM_PROMPT += "\n\nProvide a detailed film recommendation explanation."
 
-        async with aiohttp.ClientSession() as session:
-            response = await self.send_request(
-                f"{OLLAMA_URL}/generate",
+        payload = {
+            "model": OPENAI_MODEL,
+            "messages": [
                 {
-                    "model": GENERATION_MODEL,
-                    "prompt": SYSTEM_PROMPT,
-                    "keep_alive": -1,
-                    "stream": False,
+                    "role": "system",
+                    "content": "You are a helpful assistant for recommending movies.",
                 },
-                session,
+                {"role": "user", "content": SYSTEM_PROMPT},
+            ],
+            "max_tokens": 500,
+            "temperature": 0.7,
+        }
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                response = await self.send_request(OPENAI_API_URL, payload, session)
+
+            explanation = (
+                response.get("choices", [{}])[0]
+                .get("message", {})
+                .get("content", "No explanation available.")
             )
-            return response.get("response", "No explanation available.")
+            return explanation
+
+        except aiohttp.ClientError as e:
+            print(f"Error generating explanation with OpenAI: {e}")
+            return "An error occurred while generating the explanation."
+
+        ## Uncomment the following code to use OLLAMA for explanation generation
+        # async with aiohttp.ClientSession() as session:
+        #     response = await self.send_request(
+        #         f"{OLLAMA_URL}/generate",
+        #         {
+        #             "model": GENERATION_MODEL,
+        #             "prompt": SYSTEM_PROMPT,
+        #             "keep_alive": -1,
+        #             "stream": False,
+        #         },
+        #         session,
+        #     )
+        #     return response.get("response", "No explanation available.")
 
 
 class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
@@ -299,7 +376,9 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
 
         for item in data:
             # Generate embeddings for each field
-            field_embeddings = await self.generate_field_embeddings(item)
+            field_embeddings = await self.generate_field_embeddings(
+                item, use_ollama=True
+            )
 
             # Combine embeddings with weighting
             combined_embedding = self.combine_weighted_embeddings(field_embeddings)
