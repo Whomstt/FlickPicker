@@ -16,21 +16,21 @@ services:
     networks:
       - app_network
 
-  # postgres-db:
-  #   container_name: fyp-postgres-db
-  #   image: postgres:latest
-  #   restart: unless-stopped
-  #   environment:
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: postgres
-  #     POSTGRES_DB: postgres
-  #     POSTGRES_INITDB_ARGS: "--data-checksums"
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   networks:
-  #     - app_network
+  postgres-db:
+    container_name: fyp-postgres-db
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
 
   # pgadmin:
   #   container_name: fyp-pgadmin
@@ -77,6 +77,6 @@ networks:
   app_network:
     driver: bridge
 
-# volumes:
-#   postgres_data:
-#   ollamadata:
+volumes:
+  postgres_data:
+  # ollamadata:
