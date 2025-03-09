@@ -40,7 +40,7 @@ TMDB_API_KEY = os.environ.get("TMDB_API_KEY", None)
 
 # Application definition
 
-SITE_ID = 9
+SITE_ID = 10
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
@@ -108,7 +108,14 @@ WSGI_APPLICATION = "app.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {"default": dj_database_url.config(default=os.getenv("DATABASE_URL"))}
+# DATABASES = {"default": dj_database_url.config(default=os.getenv("DATABASE_URL"))}
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
 
 
 # Password validation
