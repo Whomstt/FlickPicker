@@ -30,7 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # SECURITY WARNING: update this when you have the production host
 ALLOWED_HOSTS = ["flickpicker.site", "www.flickpicker.site", "localhost", "127.0.0.1"]
@@ -46,7 +46,10 @@ TMDB_API_KEY = os.environ.get("TMDB_API_KEY", None)
 
 # Application definition
 
-SITE_ID = 10
+SITE_ID = 1
+
+SOCIAL_AUTH_GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+SOCIAL_AUTH_GOOGLE_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
