@@ -45,13 +45,19 @@ jobs:
           imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.CONTAINER_APP_NAME }}
-          environmentVariables: |
-            ASPNETCORE_ENVIRONMENT=Development
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
-            DJANGO_ADMIN_PASSWORD=${{ secrets.DJANGO_ADMIN_PASSWORD }}
-            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-            NOMIC_API_KEY=${{ secrets.NOMIC_API_KEY }}
-            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            SECRET_KEY=${{ secrets.SECRET_KEY }}
-            TMDB_API_KEY=${{ secrets.TMDB_API_KEY }}
+          environmentVariables: >
+            {
+              "ASPNETCORE_ENVIRONMENT": "Development",
+              "DJANGO_ADMIN_PASSWORD": "${{ secrets.DJANGO_ADMIN_PASSWORD }}",
+              "GOOGLE_CLIENT_ID": "${{ secrets.GOOGLE_CLIENT_ID }}",
+              "GOOGLE_CLIENT_SECRET": "${{ secrets.GOOGLE_CLIENT_SECRET }}",
+              "SECRET_KEY": "${{ secrets.SECRET_KEY }}",
+              "TMDB_API_KEY": "${{ secrets.TMDB_API_KEY }}",
+              "OPENAI_API_KEY": "${{ secrets.OPENAI_API_KEY }}",
+              "NOMIC_API_KEY": "${{ secrets.NOMIC_API_KEY }}",
+              "PGDATABASE": "${{ secrets.PGDATABASE }}",
+              "PGUSER": "${{ secrets.PGUSER }}",
+              "PGPASSWORD": "${{ secrets.PGPASSWORD }}",
+              "PGHOST": "${{ secrets.PGHOST }}",
+              "PGPORT": "${{ secrets.PGPORT }}"
+            }
