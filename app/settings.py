@@ -31,7 +31,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
+DEBUG = False
+
+# Enforce HTTPS for production
+SECURE_SSL_REDIRECT = True  # Redirect all HTTP requests to HTTPS
+SECURE_PROXY_SSL_HEADER = (
+    "HTTP_X_FORWARDED_PROTO",
+    "https",
+)  # Respect HTTPS from proxies
+CSRF_COOKIE_SECURE = True  # Secure CSRF cookies
+SESSION_COOKIE_SECURE = True  # Secure session cookies
+SECURE_HSTS_SECONDS = 31536000  # HTTP Strict Transport Security (1 year)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
+SECURE_HSTS_PRELOAD = True  # Allow browsers to preload HSTS
+
+SITE_ID = 1
 
 # SECURITY WARNING: update this when you have the production host
 ALLOWED_HOSTS = ["flickpicker.site", "www.flickpicker.site", "localhost", "127.0.0.1"]
@@ -46,8 +61,6 @@ CSRF_TRUSTED_ORIGINS = [
 TMDB_API_KEY = os.environ.get("TMDB_API_KEY", None)
 
 # Application definition
-
-SITE_ID = 1
 
 SOCIAL_AUTH_GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 SOCIAL_AUTH_GOOGLE_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
@@ -70,16 +83,19 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
 ]
 
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "CLIENT_ID": os.environ.get("GOOGLE_CLIENT_ID"),
-        "SECRET:": os.environ.get("GOOGLE_CLIENT_SECRET"),
-        "SCOPE": [
-            "profile",
-            "email",
-        ],
-    }
-}
+# SOCIALACCOUNT_PROVIDERS = {
+#     "google": {
+#         "APP": {
+#             "client_id": os.environ.get("GOOGLE_CLIENT_ID"),
+#             "secret": os.environ.get("GOOGLE_CLIENT_SECRET"),
+#         },
+#         "SCOPE": [
+#             "profile",
+#             "email",
+#         ],
+#     }
+# }
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
