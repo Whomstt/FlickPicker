@@ -9,3 +9,4 @@ dj-database-url==2.3.0
 langchain-community==0.3.16
 ollama==0.4.7
 faiss-cpu==1.10.0
+whitenoise==6.9.0
