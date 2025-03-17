@@ -7,10 +7,6 @@
 <div class="container">
     <h2 class="display-4 text-center my-5">Film Recommendation Assistant</h2>
 
-    <div class="alert alert-info mb-4">
-        Note: The first response may take a bit longer as the models are being loaded into memory.
-    </div>
-
     {% if messages %}
         {% for message in messages %}
             <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">

@@ -35,7 +35,6 @@ EMBEDDING_DIM = 768
 # Ollama settings
 OLLAMA_URL = "http://ollama:11434/api"
 EMBEDDING_MODEL = "nomic-embed-text"
-# GENERATION_MODEL = "llama3.2"
 
 
 NPROBE = 10  # Number of clusters to be searched
@@ -335,20 +334,6 @@ class FilmRecommendationsView(BaseEmbeddingView):
         except aiohttp.ClientError as e:
             print(f"Error generating explanation with OpenAI: {e}")
             return "An error occurred while generating the explanation."
-
-        ## Uncomment the following code to use OLLAMA for explanation generation
-        # async with aiohttp.ClientSession() as session:
-        #     response = await self.send_request(
-        #         f"{OLLAMA_URL}/generate",
-        #         {
-        #             "model": GENERATION_MODEL,
-        #             "prompt": SYSTEM_PROMPT,
-        #             "keep_alive": -1,
-        #             "stream": False,
-        #         },
-        #         session,
-        #     )
-        #     return response.get("response", "No explanation available.")
 
 
 class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
