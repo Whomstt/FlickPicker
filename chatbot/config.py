@@ -1,0 +1,50 @@
+import os
+from django.conf import settings
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Cache and data paths
+CACHE_DIR = os.path.join(settings.BASE_DIR, "cache")
+FAISS_INDEX_PATH = os.path.join(CACHE_DIR, "faiss_index")
+RAW_FILM_DATA_PATH = os.path.join(settings.BASE_DIR, "raw_film_data.json")
+
+# OpenAI API settings
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
+OPENAI_MODEL = "gpt-4o-mini"
+
+# Nomic API settings
+NOMIC_API_KEY = os.getenv("NOMIC_API_KEY")
+NOMIC_API_URL = "https://api-atlas.nomic.ai/v1/embedding/text"
+NOMIC_MODEL = "nomic-embed-text-v1.5"
+EMBEDDING_DIM = 768
+
+# Ollama settings
+OLLAMA_URL = "http://ollama:11434/api"
+EMBEDDING_MODEL = "nomic-embed-text"
+
+# FAISS and embedding parameters
+NPROBE = 10  # Number of clusters to be searched
+NLIST = 100  # Number of clusters to be stored
+N_TOP_MATCHES = 3  # Number of top matches to return
+M = 16  # Number of subquantizers
+NBITS = 7  # Number of bits per subquantizer
+
+# Field weights for film attributes - higher value means more important
+FIELD_WEIGHTS = {
+    "genres": 1.0,
+    "title": 0.8,
+    "tagline": 0.6,
+    "overview": 0.7,
+    "keywords": 0.5,
+    "director": 0.4,
+    "main_actors": 0.3,
+    "country_of_production": 0.1,
+    "spoken_languages": 0.1,
+    "runtime": 0.2,
+    "release_date": 0.3,
+    "budget": 0.1,
+    "revenue": 0.1,
+    "rating": 0.5,
+}

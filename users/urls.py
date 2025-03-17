@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from chatbot.views import GenerateOriginalEmbeddingsView
+from chatbot.views.generate_embeddings import GenerateOriginalEmbeddingsView
 from django.contrib.admin.views.decorators import staff_member_required
 
 urlpatterns = [

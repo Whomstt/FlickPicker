@@ -1,10 +1,10 @@
 from django.urls import path
-from . import views
+from chatbot.views.film_recommendations import FilmRecommendationsView
 
 urlpatterns = [
     path(
         "film-recommendations/",
-        views.FilmRecommendationsView.as_view(),
+        FilmRecommendationsView.as_view(),
         name="film_recommendations",
     ),
 ]
