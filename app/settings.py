@@ -35,17 +35,17 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = False
 
 # Enforce HTTPS for production
-if DEBUG is False:
-    SECURE_SSL_REDIRECT = True  # Redirect all HTTP requests to HTTPS
-    SECURE_PROXY_SSL_HEADER = (
-        "HTTP_X_FORWARDED_PROTO",
-        "https",
-    )  # Respect HTTPS from proxies
-    CSRF_COOKIE_SECURE = True  # Secure CSRF cookies
-    SESSION_COOKIE_SECURE = True  # Secure session cookies
-    SECURE_HSTS_SECONDS = 31536000  # HTTP Strict Transport Security (1 year)
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
-    SECURE_HSTS_PRELOAD = True  # Allow browsers to preload HSTS
+# if DEBUG is False:
+#     SECURE_SSL_REDIRECT = True  # Redirect all HTTP requests to HTTPS
+#     SECURE_PROXY_SSL_HEADER = (
+#         "HTTP_X_FORWARDED_PROTO",
+#         "https",
+#     )  # Respect HTTPS from proxies
+#     CSRF_COOKIE_SECURE = True  # Secure CSRF cookies
+#     SESSION_COOKIE_SECURE = True  # Secure session cookies
+#     SECURE_HSTS_SECONDS = 31536000  # HTTP Strict Transport Security (1 year)
+#     SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
+#     SECURE_HSTS_PRELOAD = True  # Allow browsers to preload HSTS
 
 SITE_ID = 1
 
@@ -188,11 +188,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
+STATIC_URL = "static/"
+
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
