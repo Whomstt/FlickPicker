@@ -34,17 +34,12 @@ NBITS = 7  # Number of bits per subquantizer
 # Field weights for film attributes - higher value means more important
 FIELD_WEIGHTS = {
     "genres": 1.0,
-    "title": 0.8,
-    "tagline": 0.6,
-    "overview": 0.7,
-    "keywords": 0.5,
-    "director": 0.4,
-    "main_actors": 0.3,
-    "country_of_production": 0.1,
-    "spoken_languages": 0.1,
+    "title": 0.6,
+    "overview": 1.0,
+    "tagline": 0.8,
+    "keywords": 0.7,
+    "director": 0.5,
+    "main_actors": 0.4,
     "runtime": 0.2,
     "release_date": 0.3,
-    "budget": 0.1,
-    "revenue": 0.1,
-    "rating": 0.5,
 }

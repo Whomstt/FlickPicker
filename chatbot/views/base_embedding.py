@@ -161,10 +161,12 @@ class BaseEmbeddingView(View):
             components.append(f"Film Title: {title}")
         if genres := item.get("genres"):
             components.append(f"Genres: {', '.join(genres)}")
-        if tagline := item.get("tagline"):
-            components.append(f"Tagline: {tagline}")
         if overview := item.get("overview"):
             components.append(f"Overview: {overview}")
+        if tagline := item.get("tagline"):
+            components.append(f"Tagline: {tagline}")
+        if keywords := item.get("keywords"):
+            components.append(f"Keywords: {', '.join(keywords)}")
         if director := item.get("director"):
             components.append(f"Directed by {director}")
         if main_actors := item.get("main_actors"):
@@ -173,18 +175,6 @@ class BaseEmbeddingView(View):
             components.append(f"Runtime: {runtime}")
         if release_date := item.get("release_date"):
             components.append(f"Release Date: {release_date}")
-        if country := item.get("country_of_production"):
-            components.append(f"Country of Production: {', '.join(country)}")
-        if languages := item.get("spoken_languages"):
-            components.append(f"Spoken Languages: {', '.join(languages)}")
-        if budget := item.get("budget"):
-            components.append(f"Budget: {budget}")
-        if revenue := item.get("revenue"):
-            components.append(f"Revenue: {revenue}")
-        if rating := item.get("rating"):
-            components.append(f"Rating: {rating}")
-        if keywords := item.get("keywords"):
-            components.append(f"Keywords: {', '.join(keywords)}")
 
         # Combine all non-empty components into a single string
         return "\n".join(components)

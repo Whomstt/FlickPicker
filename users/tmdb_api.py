@@ -12,7 +12,7 @@ load_dotenv()
 # Constants
 BASE_URL = "https://api.themoviedb.org/3"
 API_KEY = os.getenv("TMDB_API_KEY")  # API key from environment variables
-NUM_FILMS = 100  # Number of films to fetch
+NUM_FILMS = 10_000  # Number of films to fetch
 RATE_LIMIT = 40  # TMDB rate limit (40 requests per 10 seconds)
 RATE_LIMIT_WINDOW = 10  # Rate limit window in seconds
 OUTPUT_FILE = "films_data.json"
@@ -95,88 +95,47 @@ def remove_duplicates(films_data):
     return unique_films
 
 
-def convert_to_meaningful_text(film_data):
-    """Transform film data into a more readable and meaningful format."""
+def convert_to_meaningful_text(films):
+    """
+    Transform film data by categorizing runtime and release date into descriptive labels.
+    """
     runtime_categories = {
         (0, 90): "Short",
-        (91, 120): "Medium",
+        (91, 120): "Average",
         (121, float("inf")): "Long",
     }
-    budget_categories = {
-        (0, 1_000_000): "Low",
-        (1_000_001, 10_000_000): "Medium",
-        (10_000_001, float("inf")): "High",
-    }
-    revenue_categories = {
-        (0, 1_000_000): "Low",
-        (1_000_001, 10_000_000): "Medium",
-        (10_000_001, float("inf")): "High",
-    }
-    rating_categories = {
-        (0, 4.0): "Low",
-        (4.0, 6.0): "Average",
-        (6.0, 8.0): "Good",
-        (8.0, float("inf")): "Excellent",
+    release_age_categories = {
+        (0, 2): "New",
+        (2, 10): "Modern",
+        (10, float("inf")): "Old",
     }
 
-    for film in film_data:
-        # Runtime
+    current_year = datetime.now().year
+
+    for film in films:
+        # Categorize runtime
         runtime = film.get("runtime")
         if runtime:
-            for (min_val, max_val), category in runtime_categories.items():
-                if min_val <= runtime <= max_val:
-                    film["runtime"] = category
+            for (low, high), label in runtime_categories.items():
+                if low <= runtime <= high:
+                    film["runtime"] = label
                     break
 
-        # Release Date
+        # Categorize release date by film age
         release_date = film.get("release_date")
         if release_date:
-            date_obj = datetime.strptime(release_date, "%Y-%m-%d")
-            year = date_obj.year
-            current_year = datetime.now().year
-            age = current_year - year
-            if age < 2:
-                film["release_date"] = "New Release"
-            elif age < 10:
-                film["release_date"] = "Recent"
-            elif age < 25:
-                film["release_date"] = "Modern"
-            else:
-                film["release_date"] = "Classic"
-
-        # Budget
-        budget = film.get("budget")
-        if budget:
-            for (min_val, max_val), category in budget_categories.items():
-                if min_val <= budget <= max_val:
-                    film["budget"] = category
-                    break
-
-        # Revenue
-        revenue = film.get("revenue")
-        if revenue:
-            for (min_val, max_val), category in revenue_categories.items():
-                if min_val <= revenue <= max_val:
-                    film["revenue"] = category
-                    break
-
-        # Rating
-        rating = film.get("rating")
-        if rating:
-            for (min_val, max_val), category in rating_categories.items():
-                if min_val <= rating <= max_val:
-                    film["rating"] = category
-                    break
+            try:
+                year = datetime.strptime(release_date, "%Y-%m-%d").year
+                age = current_year - year
+                for (low, high), label in release_age_categories.items():
+                    if low <= age < high:
+                        film["release_date"] = label
+                        break
+            except ValueError:
+                pass
 
     logging.info("Transformed film data into meaningful text.")
-    return film_data
-
-
-def calculate_weighted_rating(vote_average, vote_count, C=1000, M=6.0):
-    """Calculate a weighted rating using the Bayesian Average formula."""
-    if vote_count == 0:
-        return 0
-    return (vote_average * vote_count + C * M) / (vote_count + C)
+    return films
 
 
 async def rate_limited_fetch(session, api_key, film_id, semaphore):
@@ -224,28 +183,22 @@ async def fetch_and_save_films(api_key, output_file):
             )
             vote_average = details.get("vote_average", 0)
             vote_count = details.get("vote_count", 0)
-            weighted_rating = calculate_weighted_rating(vote_average, vote_count)
 
             film_data = {
                 "title": details.get("title"),
                 "genres": [genre["name"] for genre in details.get("genres", [])],
-                "runtime": details.get("runtime"),
-                "release_date": details.get("release_date"),
                 "overview": details.get("overview"),
+                "tagline": details.get("tagline"),
+                "keywords": keywords,
                 "director": director,
                 "main_actors": main_actors,
-                "country_of_production": [
-                    country["name"]
-                    for country in details.get("production_countries", [])
-                ],
-                "spoken_languages": [
-                    language["name"] for language in details.get("spoken_languages", [])
-                ],
-                "tagline": details.get("tagline"),
-                "budget": details.get("budget"),
-                "revenue": details.get("revenue"),
-                "rating": weighted_rating,
-                "keywords": keywords,
+                "runtime": details.get("runtime"),
+                "release_date": details.get("release_date"),
+                "poster_image": (
+                    f"https://image.tmdb.org/t/p/w500{details.get('poster_path')}"
+                    if details.get("poster_path")
+                    else None
+                ),
             }
             # Remove empty or invalid fields
             cleaned_film_data = {

@@ -61,7 +61,14 @@
                     <div class="mb-3 p-3 border rounded">
                         <h4>{{ match.title }}</h4>
                         <div class="row">
+                            {% if match.poster_image %}
+                            <div class="col-md-4">
+                                <img src="{{ match.poster_image }}" alt="{{ match.title }} poster" class="img-fluid rounded">
+                            </div>
                             <div class="col-md-8">
+                            {% else %}
+                            <div class="col-md-12">
+                            {% endif %}
                                 <p><strong>Genres:</strong> {{ match.genres|join:", " }}</p>
                                 <p><strong>Overview:</strong> {{ match.overview }}</p>
                                 <p><strong>Director:</strong> {{ match.director }}</p>
@@ -73,6 +80,7 @@
                         </div>
                     </div>
                 {% endfor %}
+
             </div>
         </div>
         <div class="card mb-4">
