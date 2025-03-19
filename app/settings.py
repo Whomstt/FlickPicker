@@ -24,29 +24,13 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-
 DEBUG = False
 
-# Enforce HTTPS for production
-# if DEBUG is False:
-#     SECURE_SSL_REDIRECT = True  # Redirect all HTTP requests to HTTPS
-#     SECURE_PROXY_SSL_HEADER = (
-#         "HTTP_X_FORWARDED_PROTO",
-#         "https",
-#     )  # Respect HTTPS from proxies
-#     CSRF_COOKIE_SECURE = True  # Secure CSRF cookies
-#     SESSION_COOKIE_SECURE = True  # Secure session cookies
-#     SECURE_HSTS_SECONDS = 31536000  # HTTP Strict Transport Security (1 year)
-#     SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
-#     SECURE_HSTS_PRELOAD = True  # Allow browsers to preload HSTS
-
+# The site ID is used to identify the current site in the database.
 SITE_ID = 1
 
 # SECURITY WARNING: update this when you have the production host
@@ -83,19 +67,6 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
 ]
-
-# SOCIALACCOUNT_PROVIDERS = {
-#     "google": {
-#         "APP": {
-#             "client_id": os.environ.get("GOOGLE_CLIENT_ID"),
-#             "secret": os.environ.get("GOOGLE_CLIENT_SECRET"),
-#         },
-#         "SCOPE": [
-#             "profile",
-#             "email",
-#         ],
-#     }
-# }
 
 
 MIDDLEWARE = [
@@ -138,20 +109,28 @@ WSGI_APPLICATION = "app.wsgi.application"
 
 # DATABASES = {"default": dj_database_url.config(default=os.getenv("DATABASE_URL"))}
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": getenv("PGDATABASE"),
-        "USER": getenv("PGUSER"),
-        "PASSWORD": getenv("PGPASSWORD"),
-        "HOST": getenv("PGHOST"),
-        "PORT": getenv("PGPORT", 5432),
-        "OPTIONS": {
-            "sslmode": "require",
-        },
-        "DISABLE_SERVER_SIDE_CURSORS": True,
+if DEBUG == False:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": getenv("PGDATABASE"),
+            "USER": getenv("PGUSER"),
+            "PASSWORD": getenv("PGPASSWORD"),
+            "HOST": getenv("PGHOST"),
+            "PORT": getenv("PGPORT", 5432),
+            "OPTIONS": {
+                "sslmode": "require",
+            },
+            "DISABLE_SERVER_SIDE_CURSORS": True,
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation
