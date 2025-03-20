@@ -73,8 +73,12 @@
                                 <p><strong>Overview:</strong> {{ match.overview }}</p>
                                 <p><strong>Director:</strong> {{ match.director }}</p>
                                 <p><strong>Main Actors:</strong> {{ match.main_actors|join:", " }}</p>
+                                <p><strong>Runtime:</strong> {{ match.runtime }} minutes</p>
+                                <p><strong>Release Date:</strong> {{ match.release_date }}</p>
+                                <p><strong>Tagline:</strong> {{ match.tagline }}</p>
+                                <p><strong>Keywords:</strong> {{ match.keywords|join:", " }}</p>
                                 <p class="text-muted">
-                                    <small>Similarity Score: {{ match.similarity_distance|floatformat:4 }}</small>
+                                    <small>Similarity Score: {{ match.similarity_distance|floatformat:4 }} - (A lower score is a closer match to the user prompt)</small>
                                 </p>
                             </div>
                         </div>
