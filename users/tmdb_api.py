@@ -5,17 +5,14 @@ import os
 from datetime import datetime
 import logging
 from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
-
-# Constants
-BASE_URL = "https://api.themoviedb.org/3"
-API_KEY = os.getenv("TMDB_API_KEY")  # API key from environment variables
-NUM_FILMS = 10_000  # Number of films to fetch
-RATE_LIMIT = 40  # TMDB rate limit (40 requests per 10 seconds)
-RATE_LIMIT_WINDOW = 10  # Rate limit window in seconds
-OUTPUT_FILE = "films_data.json"
+from chatbot.config import (
+    TMDB_BASE_URL,
+    TMDB_API_KEY,
+    TMDB_NUM_FILMS,
+    TMDB_RATE_LIMIT,
+    TMDB_RATE_LIMIT_WINDOW,
+    TMDB_OUTPUT_FILE,
+)
 
 # Configure logging
 logging.basicConfig(
@@ -23,15 +20,15 @@ logging.basicConfig(
 )
 
 
-async def fetch_top_films(api_key, num_films):
+async def fetch_top_films(num_films):
     """Fetch the top films by popularity asynchronously."""
     films = []
     page = 1
     async with aiohttp.ClientSession() as session:
         while len(films) < num_films:
-            url = f"{BASE_URL}/movie/popular"
+            url = f"{TMDB_BASE_URL}/movie/popular"
             params = {
-                "api_key": api_key,
+                "api_key": TMDB_API_KEY,
                 "page": page,
             }
             try:
@@ -53,12 +50,12 @@ async def fetch_top_films(api_key, num_films):
     return films
 
 
-async def fetch_film_data(session, api_key, film_id):
+async def fetch_film_data(session, film_id):
     """Fetch film details, credits, and keywords asynchronously."""
     try:
-        url = f"{BASE_URL}/movie/{film_id}"
+        url = f"{TMDB_BASE_URL}/movie/{film_id}"
         params = {
-            "api_key": api_key,
+            "api_key": TMDB_API_KEY,
             "append_to_response": "credits,keywords",
         }
         async with session.get(url, params=params, timeout=10) as response:
@@ -95,71 +92,29 @@ def remove_duplicates(films_data):
     return unique_films
 
 
-def convert_to_meaningful_text(films):
-    """
-    Transform film data by categorizing runtime and release date into descriptive labels.
-    """
-    runtime_categories = {
-        (0, 90): "Short",
-        (91, 120): "Average",
-        (121, float("inf")): "Long",
-    }
-    release_age_categories = {
-        (0, 2): "New",
-        (2, 10): "Modern",
-        (10, float("inf")): "Old",
-    }
-
-    current_year = datetime.now().year
-
-    for film in films:
-        # Categorize runtime
-        runtime = film.get("runtime")
-        if runtime:
-            for (low, high), label in runtime_categories.items():
-                if low <= runtime <= high:
-                    film["runtime"] = label
-                    break
-
-        # Categorize release date by film age
-        release_date = film.get("release_date")
-        if release_date:
-            try:
-                year = datetime.strptime(release_date, "%Y-%m-%d").year
-                age = current_year - year
-                for (low, high), label in release_age_categories.items():
-                    if low <= age < high:
-                        film["release_date"] = label
-                        break
-            except ValueError:
-                pass
-
-    logging.info("Transformed film data into meaningful text.")
-    return films
-
-
-async def rate_limited_fetch(session, api_key, film_id, semaphore):
+async def rate_limited_fetch(session, film_id, semaphore):
     """Fetch film data while respecting the rate limit."""
     async with semaphore:
-        await asyncio.sleep(RATE_LIMIT_WINDOW / RATE_LIMIT)  # Spread requests evenly
-        return await fetch_film_data(session, api_key, film_id)
+        await asyncio.sleep(
+            TMDB_RATE_LIMIT_WINDOW / TMDB_RATE_LIMIT
+        )  # Spread requests evenly
+        return await fetch_film_data(session, film_id)
 
 
-async def fetch_and_save_films(api_key, output_file):
+async def fetch_and_save_films():
     """Fetch film data, process it, and save to a JSON file asynchronously."""
     # Fetch the top films
     logging.info("Fetching top films...")
-    top_films = await fetch_top_films(api_key, NUM_FILMS)
+    top_films = await fetch_top_films(TMDB_NUM_FILMS)
     films_data = []
 
     # Fetch film details concurrently with rate limiting
     logging.info("Fetching film details...")
     async with aiohttp.ClientSession() as session:
-        semaphore = asyncio.Semaphore(RATE_LIMIT)  # Limit concurrent requests
+        semaphore = asyncio.Semaphore(TMDB_RATE_LIMIT)  # Limit concurrent requests
 
         tasks = [
-            rate_limited_fetch(session, api_key, film["id"], semaphore)
-            for film in top_films
+            rate_limited_fetch(session, film["id"], semaphore) for film in top_films
         ]
         results = await asyncio.gather(*tasks)
 
@@ -215,13 +170,12 @@ async def fetch_and_save_films(api_key, output_file):
     # Remove duplicates and transform data
     logging.info("Processing film data...")
     unique_films = remove_duplicates(films_data)
-    meaningful_films = convert_to_meaningful_text(unique_films)
 
     # Save to JSON file
-    logging.info(f"Saving data to {output_file}...")
+    logging.info(f"Saving data to {TMDB_OUTPUT_FILE}...")
     try:
-        with open(output_file, "w", encoding="utf-8") as f:
-            json.dump(meaningful_films, f, indent=4, ensure_ascii=False)
-        logging.info(f"Data successfully saved to {output_file}.")
+        with open(TMDB_OUTPUT_FILE, "w", encoding="utf-8") as f:
+            json.dump(unique_films, f, indent=4, ensure_ascii=False)
+        logging.info(f"Data successfully saved to {TMDB_OUTPUT_FILE}.")
     except Exception as e:
-        logging.error(f"Error saving data to {output_file}: {e}")
+        logging.error(f"Error saving data to {TMDB_OUTPUT_FILE}: {e}")

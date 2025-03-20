@@ -7,7 +7,6 @@ load_dotenv()
 # Cache and data paths
 CACHE_DIR = os.path.join(settings.BASE_DIR, "cache")
 FAISS_INDEX_PATH = os.path.join(CACHE_DIR, "faiss_index")
-RAW_FILM_DATA_PATH = os.path.join(settings.BASE_DIR, "raw_film_data.json")
 
 # OpenAI API settings
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -25,8 +24,8 @@ OLLAMA_URL = "http://ollama:11434/api"
 EMBEDDING_MODEL = "nomic-embed-text"
 
 # FAISS and embedding parameters
-NPROBE = 10  # Number of clusters to be searched
-NLIST = 100  # Number of clusters to be stored
+NPROBE = 1  # Number of clusters to be searched
+NLIST = 10  # Number of clusters to be stored
 N_TOP_MATCHES = 3  # Number of top matches to return
 M = 16  # Number of subquantizers
 NBITS = 7  # Number of bits per subquantizer
@@ -34,12 +33,20 @@ NBITS = 7  # Number of bits per subquantizer
 # Field weights for film attributes - higher value means more important
 FIELD_WEIGHTS = {
     "genres": 1.0,
-    "title": 0.6,
-    "overview": 1.0,
-    "tagline": 0.8,
-    "keywords": 0.7,
-    "director": 0.5,
-    "main_actors": 0.4,
-    "runtime": 0.2,
-    "release_date": 0.3,
+    "title": 0.8,
+    "overview": 0.7,
+    "tagline": 0.5,
+    "keywords": 0.5,
+    "director": 0.8,
+    "main_actors": 0.8,
+    "runtime": 0.5,
+    "release_date": 0.5,
 }
+
+# Settings for TMDB API
+TMDB_BASE_URL = "https://api.themoviedb.org/3"
+TMDB_API_KEY = os.getenv("TMDB_API_KEY")  # API key from environment variables
+TMDB_NUM_FILMS = 1000  # Number of films to fetch
+TMDB_RATE_LIMIT = 40  # TMDB rate limit (40 requests per 10 seconds)
+TMDB_RATE_LIMIT_WINDOW = 10  # Rate limit window in seconds
+TMDB_OUTPUT_FILE = "films_data.json"

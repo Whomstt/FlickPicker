@@ -43,10 +43,9 @@ class FetchFilmsView(View):
 
     def post(self, request):
         message = ""
-        output_file = "raw_film_data.json"
         try:
-            asyncio.run(fetch_and_save_films(settings.TMDB_API_KEY, output_file))
-            message = f"Successfully pulled films from TMDB and saved to {output_file}."
+            asyncio.run(fetch_and_save_films())
+            message = f"Successfully pulled films from TMDB and saved them."
         except Exception as e:
             message = f"Error occurred: {e}"
         context = {

@@ -81,9 +81,16 @@ class FilmRecommendationsView(BaseEmbeddingView):
         """
         Generate a detailed explanation for the film recommendations.
         """
-        SYSTEM_PROMPT = f"Query: {prompt}\n\n"
-        SYSTEM_PROMPT += "\n\n".join(self.json_to_text(item) for item in top_matches)
-        SYSTEM_PROMPT += "\n\nProvide a detailed film recommendation explanation."
+        # Create a text block from the top matching films
+        films_text = "\n\n".join(self.json_to_text(item) for item in top_matches)
+
+        # Construct the system prompt with explicit instructions.
+        SYSTEM_PROMPT = (
+            f"Query: {prompt}\n\n"
+            f"{films_text}\n\n"
+            "Based solely on the films listed above, provide a detailed film recommendation explanation. "
+            "Do not include any films other than the ones provided."
+        )
 
         payload = {
             "model": OPENAI_MODEL,

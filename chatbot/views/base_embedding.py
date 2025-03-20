@@ -5,11 +5,11 @@ import faiss
 import aiohttp
 from asgiref.sync import sync_to_async
 from django.views import View
+from datetime import datetime
 
 from chatbot.config import (
     CACHE_DIR,
     FAISS_INDEX_PATH,
-    RAW_FILM_DATA_PATH,
     OPENAI_API_KEY,
     OPENAI_API_URL,
     OPENAI_MODEL,
@@ -20,6 +20,7 @@ from chatbot.config import (
     OLLAMA_URL,
     EMBEDDING_MODEL,
     FIELD_WEIGHTS,
+    TMDB_OUTPUT_FILE,
 )
 
 
@@ -86,25 +87,25 @@ class BaseEmbeddingView(View):
 
     async def generate_field_embeddings(self, item, use_ollama=False):
         """
-        Generate embeddings for each field in the item separately.
+        Generate embeddings for each field in the film item separately,
+        using enriched text for film data.
         """
         field_embeddings = {}
         async with aiohttp.ClientSession() as session:
             for field, weight in FIELD_WEIGHTS.items():
                 if (value := item.get(field)) is not None:
 
-                    # Format the field value
-                    if isinstance(value, list):
-                        text_value = ", ".join(map(str, value))
-                    else:
-                        text_value = str(value)
-
-                    # Generate embedding for the field
-                    field_text = f"{field}: {text_value}"
+                    # Convert value to string if it's a list
+                    text_value = (
+                        ", ".join(map(str, value))
+                        if isinstance(value, list)
+                        else str(value)
+                    )
+                    enriched_text = self.enrich_field_text(field, text_value)
                     service = "ollama" if use_ollama else "nomic"
-                    embedding = await self.fetch_embedding(field_text, session, service)
-
-                    # Store the embedding with its weight
+                    embedding = await self.fetch_embedding(
+                        enriched_text, session, service
+                    )
                     field_embeddings[field] = (embedding, weight)
         return field_embeddings
 
@@ -139,7 +140,7 @@ class BaseEmbeddingView(View):
         Load the data, embeddings, and index from the cache directory.
         """
         required_files = [
-            os.path.join(RAW_FILM_DATA_PATH),
+            os.path.join(TMDB_OUTPUT_FILE),
             os.path.join(CACHE_DIR, "film_embeddings.npy"),
             FAISS_INDEX_PATH,
         ]
@@ -158,7 +159,7 @@ class BaseEmbeddingView(View):
         """
         components = []
         if title := item.get("title"):
-            components.append(f"Film Title: {title}")
+            components.append(f"Title: {title}")
         if genres := item.get("genres"):
             components.append(f"Genres: {', '.join(genres)}")
         if overview := item.get("overview"):
@@ -178,3 +179,44 @@ class BaseEmbeddingView(View):
 
         # Combine all non-empty components into a single string
         return "\n".join(components)
+
+    def enrich_field_text(self, field, text_value):
+        """
+        Enriches the film field text with more descriptive language to match user prompts.
+        """
+        if field == "title":
+            return f"Title: {text_value}"
+        elif field == "genres":
+            return f"Genres: {text_value}"
+        elif field == "overview":
+            return f"Overview: {text_value}"
+        elif field == "tagline":
+            return f"Tagline: {text_value}"
+        elif field == "keywords":
+            return f"Keywords: {text_value}"
+        elif field == "director":
+            return f"Directed by {text_value}"
+        elif field == "main_actors":
+            return f"Featuring: {text_value}"
+        elif field == "runtime":
+            runtime = int(text_value)
+            if 0 <= runtime <= 90:
+                label = "Short"
+            elif 91 <= runtime <= 120:
+                label = "Average"
+            else:
+                label = "Long"
+            return f"Runtime: {label} ({text_value} minutes)"
+        elif field == "release_date":
+            year = int(text_value.split("-")[0])
+            current_year = datetime.now().year
+            age = current_year - year
+            if 0 <= age < 2:
+                label = "New"
+            elif 2 <= age < 15:
+                label = "Modern"
+            else:
+                label = "Old"
+            return f"Release Date: {label} ({text_value})"
+        else:
+            return f"{field.capitalize()}: {text_value}"

@@ -5,7 +5,7 @@ from asgiref.sync import sync_to_async
 from django.shortcuts import render
 
 from .base_embedding import BaseEmbeddingView
-from chatbot.config import RAW_FILM_DATA_PATH, EMBEDDING_DIM, NLIST, M, NBITS
+from chatbot.config import TMDB_OUTPUT_FILE, EMBEDDING_DIM, NLIST, M, NBITS
 
 
 class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
@@ -26,7 +26,7 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
         """
         Generate embeddings for the original film data using field-specific weighting.
         """
-        with open(RAW_FILM_DATA_PATH, "r", encoding="utf-8") as f:
+        with open(TMDB_OUTPUT_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         embeddings = []
