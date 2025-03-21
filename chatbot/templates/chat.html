@@ -78,7 +78,14 @@
                                 <p><strong>Tagline:</strong> {{ match.tagline }}</p>
                                 <p><strong>Keywords:</strong> {{ match.keywords|join:", " }}</p>
                                 <p class="text-muted">
-                                    <small>Cosine Similarity: {{ match.similarity_distance|floatformat:4 }} - (A higher score is a closer match to the user prompt)</small>
+                                    <small>
+                                        Cosine Similarity: {{ match.cosine_similarity|floatformat:4 }} 
+                                    </small>
+                                </p>
+                                <p class="text-muted">
+                                    <small>
+                                        L2 Distance: {{ match.l2_distance|floatformat:4 }}
+                                    </small>
                                 </p>
                             </div>
                         </div>

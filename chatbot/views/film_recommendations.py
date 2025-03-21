@@ -72,12 +72,21 @@ class FilmRecommendationsView(BaseEmbeddingView):
         Prepare the top matches for display, sorting in descending order
         by similarity score since a higher score is a closer match.
         """
-        matches = [
-            {**data[idx], "similarity_distance": float(dist)}
-            for dist, idx in zip(distances[0], indices[0])
-        ]
-        # Sort matches in descending order (highest score first)
-        matches.sort(key=lambda x: x["similarity_distance"], reverse=True)
+        matches = []
+        for sim, idx in zip(distances[0], indices[0]):
+            cosine_sim = float(sim)  # This is the cosine similarity.
+            # Compute the corresponding L2 distance from the cosine similarity.
+            l2_distance = (2 - 2 * cosine_sim) ** 0.5
+            matches.append(
+                {
+                    **data[idx],
+                    "cosine_similarity": cosine_sim,
+                    "l2_distance": l2_distance,
+                }
+            )
+
+        # Sort matches in descending order by cosine similarity (higher is better)
+        matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
         return matches
 
     async def generate_recommendation_explanation(self, prompt, top_matches):
