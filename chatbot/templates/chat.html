@@ -99,9 +99,20 @@
 </div>
 
 <script>
+    document.getElementById("prompt").addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            showLoadingIndicator();
+            document.getElementById("recommendation-form").submit();
+        }
+    });
     document.getElementById("recommendation-form").addEventListener("submit", function () {
+        showLoadingIndicator();
+    });
+    function showLoadingIndicator() {
         document.getElementById("loading-indicator").style.display = "block";
         document.getElementById("submit-button").disabled = true;
-    });
+    }
 </script>
+
 {% endblock %}
