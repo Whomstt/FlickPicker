@@ -6,6 +6,7 @@ import aiohttp
 from asgiref.sync import sync_to_async
 from django.views import View
 from datetime import datetime
+import re
 
 from chatbot.config import (
     CACHE_DIR,
@@ -176,43 +177,60 @@ class BaseEmbeddingView(View):
         # Combine all non-empty components into a single string
         return "\n".join(components)
 
+    def clean_text(text):
+        """
+        Converts the text into lowercase, removes special characters, and extra spaces
+        """
+        text = text.lower()
+        text = re.sub(r"[^a-z0-9\s]", "", text)
+        text = re.sub(r"\s+", " ", text).strip()
+        return text
+
     def enrich_field_text(self, field, text_value):
         """
-        Enriches the film field text with more descriptive language to match user prompts.
+        Enriches the film field text by making it match the expected input of users
         """
-        if field == "title":
-            return f"Title: {text_value}"
-        elif field == "genres":
-            return f"Genres: {text_value}"
-        elif field == "overview":
-            return f"Overview: {text_value}"
-        elif field == "tagline":
-            return f"Tagline: {text_value}"
-        elif field == "keywords":
-            return f"Keywords: {text_value}"
-        elif field == "director":
-            return f"Directed by {text_value}"
-        elif field == "main_actors":
-            return f"Featuring: {text_value}"
+        # Clean the input text first.
+        cleaned_value = self.clean_text(text_value)
+
+        if field in [
+            "title",
+            "genres",
+            "overview",
+            "tagline",
+            "keywords",
+            "director",
+            "main_actors",
+        ]:
+            return cleaned_value
+
         elif field == "runtime":
-            runtime = int(text_value)
-            if 0 <= runtime <= 90:
-                label = "Short"
-            elif 91 <= runtime <= 120:
-                label = "Average"
-            else:
-                label = "Long"
-            return f"Runtime: {label} ({text_value} minutes)"
+            try:
+                runtime = int(cleaned_value)
+                if runtime <= 90:
+                    return "short"
+                elif runtime <= 120:
+                    return "average"
+                else:
+                    return "long"
+            except ValueError:
+                return cleaned_value
+
         elif field == "release_date":
-            year = int(text_value.split("-")[0])
-            current_year = datetime.now().year
-            age = current_year - year
-            if 0 <= age < 2:
-                label = "New"
-            elif 2 <= age < 15:
-                label = "Modern"
-            else:
-                label = "Old"
-            return f"Release Date: {label} ({text_value})"
+            try:
+                # Expecting a date formatted as YYYY-MM-DD, we extract the year
+                year = int(cleaned_value.split("-")[0])
+                current_year = datetime.now().year
+                age = current_year - year
+                if age < 2:
+                    return "new"
+                elif age < 15:
+                    return "modern"
+                else:
+                    return "old"
+            except (ValueError, IndexError):
+                return cleaned_value
+
         else:
-            return f"{field.capitalize()}: {text_value}"
+            # For any additional fields, return a simple cleaned version
+            return cleaned_value
