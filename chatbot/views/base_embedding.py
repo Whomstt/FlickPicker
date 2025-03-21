@@ -76,11 +76,12 @@ class BaseEmbeddingView(View):
                     embedding = np.array(data["embeddings"][0], dtype="float32")
                 elif service == "ollama":
                     embedding = np.array(data["embedding"], dtype="float32")
-                return (
-                    embedding / np.linalg.norm(embedding)
-                    if embedding.any()
-                    else np.zeros(EMBEDDING_DIM)
-                )
+                norm = np.linalg.norm(embedding)
+                if norm > 0:
+                    return embedding
+                else:
+                    return np.zeros(EMBEDDING_DIM)
+
         except Exception as e:
             print(f"Error from {service}: {str(e)}")
             return np.zeros(EMBEDDING_DIM)
@@ -111,17 +112,12 @@ class BaseEmbeddingView(View):
 
     def combine_weighted_embeddings(self, field_embeddings):
         """
-        Combine field embeddings using their weights and normalize the result.
+        Combine field embeddings using their weights
         """
         weighted_sum = np.zeros(EMBEDDING_DIM, dtype="float32")
 
         for field, (embedding, weight) in field_embeddings.items():
             weighted_sum += embedding * weight
-
-        # Normalize to ensure the final embedding is a unit vector
-        norm = np.linalg.norm(weighted_sum)
-        if norm > 0:
-            weighted_sum /= norm
 
         return weighted_sum
 

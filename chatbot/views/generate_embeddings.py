@@ -43,8 +43,13 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
 
         embeddings = np.array(embeddings, dtype="float32")
 
+        # Normalize embeddings
+        faiss.normalize_L2(embeddings)
+
         # Create FAISS index
-        quantizer = faiss.IndexFlatL2(EMBEDDING_DIM)
+        quantizer = faiss.IndexFlatIP(
+            EMBEDDING_DIM
+        )  # IndexFlatIP for inner product (cosine similarity)
         index = faiss.IndexIVFPQ(quantizer, EMBEDDING_DIM, NLIST, M, NBITS)
         index.train(embeddings)
         index.add(embeddings)

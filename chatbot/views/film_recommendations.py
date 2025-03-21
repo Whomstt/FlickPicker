@@ -21,9 +21,6 @@ class FilmRecommendationsView(BaseEmbeddingView):
         return await sync_to_async(render)(request, "chat.html")
 
     async def post(self, request, *args, **kwargs):
-        """
-        Handle the chatbot form submission.
-        """
         start_time = time.time()
 
         prompt = request.POST.get("prompt", "").strip()
@@ -45,10 +42,12 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 prompt, session, service="nomic"
             )
 
-        # Search for top matches
-        distances, indices = index.search(
-            prompt_embedding.reshape(1, -1), N_TOP_MATCHES
-        )
+        # Normalize the query vector using FAISS
+        query_vector = prompt_embedding.reshape(1, -1)
+        faiss.normalize_L2(query_vector)
+
+        # Search for top matches using the normalized query vector
+        distances, indices = index.search(query_vector, N_TOP_MATCHES)
         top_matches = self.prepare_top_matches(data, distances, indices)
         explanation = await self.generate_recommendation_explanation(
             prompt, top_matches
@@ -70,12 +69,16 @@ class FilmRecommendationsView(BaseEmbeddingView):
 
     def prepare_top_matches(self, data, distances, indices):
         """
-        Prepare the top matches for display.
+        Prepare the top matches for display, sorting in descending order
+        by similarity score since a higher score is a closer match.
         """
-        return [
+        matches = [
             {**data[idx], "similarity_distance": float(dist)}
             for dist, idx in zip(distances[0], indices[0])
         ]
+        # Sort matches in descending order (highest score first)
+        matches.sort(key=lambda x: x["similarity_distance"], reverse=True)
+        return matches
 
     async def generate_recommendation_explanation(self, prompt, top_matches):
         """

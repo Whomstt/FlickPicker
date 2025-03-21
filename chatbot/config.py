@@ -24,8 +24,8 @@ OLLAMA_URL = "http://ollama:11434/api"
 EMBEDDING_MODEL = "nomic-embed-text"
 
 # FAISS and embedding parameters
-NPROBE = 10  # Number of clusters to be searched
-NLIST = 100  # Number of clusters to be stored
+NPROBE = 1  # Number of clusters to be searched
+NLIST = 10  # Number of clusters to be stored
 N_TOP_MATCHES = 3  # Number of top matches to return
 M = 16  # Number of subquantizers
 NBITS = 7  # Number of bits per subquantizer
@@ -46,7 +46,7 @@ FIELD_WEIGHTS = {
 # Settings for TMDB API
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")  # API key from environment variables
-TMDB_NUM_FILMS = 10000  # Number of films to fetch
+TMDB_NUM_FILMS = 1000  # Number of films to fetch
 TMDB_RATE_LIMIT = 40  # TMDB rate limit (40 requests per 10 seconds)
 TMDB_RATE_LIMIT_WINDOW = 10  # Rate limit window in seconds
 TMDB_OUTPUT_FILE = "films_data.json"
