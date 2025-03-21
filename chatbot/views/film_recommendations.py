@@ -100,7 +100,8 @@ class FilmRecommendationsView(BaseEmbeddingView):
         SYSTEM_PROMPT = (
             f"Query: {prompt}\n\n"
             f"{films_text}\n\n"
-            "Based solely on the films listed above, provide a detailed film recommendation explanation. "
+            "Based solely on the films listed above, provide a detailed film recommendation explanation for each film. "
+            "Please output your response in plain text with each film's explanation separated by a double newline. "
             "Do not include any films other than the ones provided."
         )
 
