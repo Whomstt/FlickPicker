@@ -85,8 +85,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 }
             )
 
-        # Sort matches in descending order by cosine similarity (higher is better)
-        matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
+        matches.sort(key=lambda x: x["cosine_similarity"], reverse=False)
         return matches
 
     async def generate_recommendation_explanation(self, prompt, top_matches):

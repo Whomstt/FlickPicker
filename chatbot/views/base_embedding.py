@@ -177,7 +177,7 @@ class BaseEmbeddingView(View):
         # Combine all non-empty components into a single string
         return "\n".join(components)
 
-    def clean_text(text):
+    def clean_text(self, text):
         """
         Converts the text into lowercase, removes special characters, and extra spaces
         """
@@ -186,51 +186,65 @@ class BaseEmbeddingView(View):
         text = re.sub(r"\s+", " ", text).strip()
         return text
 
-    def enrich_field_text(self, field, text_value):
+    def enrich_text(self, item):
         """
-        Enriches the film field text by making it match the expected input of users
+        Enrich film text data for embedding generation
         """
-        # Clean the input text first.
-        cleaned_value = self.clean_text(text_value)
+        enriched_parts = []
+        for field, value in item.items():
+            if value is not None:
+                # If the field's value is a list, join its items into a comma-separated string
+                text_value = (
+                    ", ".join(map(str, value))
+                    if isinstance(value, list)
+                    else str(value)
+                )
 
-        if field in [
-            "title",
-            "genres",
-            "overview",
-            "tagline",
-            "keywords",
-            "director",
-            "main_actors",
-        ]:
-            return cleaned_value
+                # Clean the input text
+                cleaned_value = self.clean_text(text_value)
 
-        elif field == "runtime":
-            try:
-                runtime = int(cleaned_value)
-                if runtime <= 90:
-                    return "short"
-                elif runtime <= 120:
-                    return "average"
+                # Field-specific enrichment
+                if field in [
+                    "title",
+                    "genres",
+                    "overview",
+                    "tagline",
+                    "keywords",
+                    "director",
+                    "main_actors",
+                ]:
+                    enriched = cleaned_value
+
+                elif field == "runtime":
+                    try:
+                        runtime = int(cleaned_value)
+                        if runtime <= 90:
+                            enriched = "short"
+                        elif runtime <= 120:
+                            enriched = "average"
+                        else:
+                            enriched = "long"
+                    except ValueError:
+                        enriched = cleaned_value
+
+                elif field == "release_date":
+                    try:
+                        # Expecting a date formatted as YYYY-MM-DD; extract the year.
+                        year = int(cleaned_value.split("-")[0])
+                        current_year = datetime.now().year
+                        age = current_year - year
+                        if age < 2:
+                            enriched = "new"
+                        elif age < 15:
+                            enriched = "modern"
+                        else:
+                            enriched = "old"
+                    except (ValueError, IndexError):
+                        enriched = cleaned_value
+
                 else:
-                    return "long"
-            except ValueError:
-                return cleaned_value
+                    enriched = cleaned_value
 
-        elif field == "release_date":
-            try:
-                # Expecting a date formatted as YYYY-MM-DD, we extract the year
-                year = int(cleaned_value.split("-")[0])
-                current_year = datetime.now().year
-                age = current_year - year
-                if age < 2:
-                    return "new"
-                elif age < 15:
-                    return "modern"
-                else:
-                    return "old"
-            except (ValueError, IndexError):
-                return cleaned_value
-
-        else:
-            # For any additional fields, return a simple cleaned version
-            return cleaned_value
+                enriched_parts.append(enriched)
+        # Combine all enriched parts into a single text block with a space separator.
+        return " ".join(enriched_parts)

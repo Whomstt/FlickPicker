@@ -1,4 +1,5 @@
 import json
+import aiohttp
 import numpy as np
 import faiss
 from asgiref.sync import sync_to_async
@@ -24,22 +25,21 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
 
     async def generate_original_embeddings(self):
         """
-        Generate embeddings for the original film data using field-specific weighting.
+        Generate embeddings for the original film data using a single enriched text block per film.
         """
         with open(TMDB_OUTPUT_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         embeddings = []
-
-        for item in data:
-            # Generate embeddings for each field
-            field_embeddings = await self.generate_field_embeddings(
-                item, use_ollama=True
-            )
-
-            # Combine embeddings with weighting
-            combined_embedding = self.combine_weighted_embeddings(field_embeddings)
-            embeddings.append(combined_embedding)
+        async with aiohttp.ClientSession() as session:
+            for item in data:
+                # Enrich the text
+                film_text = self.enrich_text(item)
+                # Embed the text
+                embedding = await self.fetch_embedding(
+                    film_text, session, service="ollama"
+                )
+                embeddings.append(embedding)
 
         embeddings = np.array(embeddings, dtype="float32")
 
