@@ -1,3 +1,6 @@
+import json
+import re
+from rapidfuzz import fuzz
 import time
 import faiss
 import aiohttp
@@ -14,9 +17,61 @@ class FilmRecommendationsView(BaseEmbeddingView):
     View for the film recommendations chatbot.
     """
 
+    def sliding_window_fuzzy(self, prompt, candidate, threshold):
+        """Slide window over prompt and check fuzzy match."""
+        prompt_words = prompt.split()
+        candidate_words = candidate.split()
+        window_size = len(candidate_words)
+        best_score = 0
+        for i in range(len(prompt_words) - window_size + 1):
+            window = " ".join(prompt_words[i : i + window_size])
+            score = fuzz.token_set_ratio(candidate, window)
+            best_score = max(best_score, score)
+            if best_score >= threshold:
+                return True
+        return False
+
+    def find_names_in_prompt(
+        self, prompt, json_path="actors_directors.json", threshold=90
+    ):
+        """
+        Detect candidate names from the prompt by checking if any known actor or director
+        appear as a full or near-full match in the prompt.
+        """
+        try:
+            with open(json_path, "r") as f:
+                data = json.load(f)
+        except (IOError, json.JSONDecodeError):
+            return []
+
+        detected_names = set()
+
+        # Regex-based full-word match.
+        def regex_match(name, text):
+            pattern = r"\b" + re.escape(name) + r"\b"
+            return re.search(pattern, text) is not None
+
+        # Check each actor name from "unique_main_actors"
+        for name in data.get("unique_main_actors", []):
+            if regex_match(name, prompt):
+                detected_names.add(name)
+            else:
+                if self.sliding_window_fuzzy(prompt, name, threshold):
+                    detected_names.add(name)
+
+        # Check each director name from "unique_directors"
+        for name in data.get("unique_directors", []):
+            if regex_match(name, prompt):
+                detected_names.add(name)
+            else:
+                if self.sliding_window_fuzzy(prompt, name, threshold):
+                    detected_names.add(name)
+
+        return list(detected_names)
+
     async def get(self, request, *args, **kwargs):
         """
-        Render the chatbot interface.
+        Render the chatbot interface for GET requests.
         """
         return await sync_to_async(render)(request, "chat.html")
 
@@ -28,6 +83,12 @@ class FilmRecommendationsView(BaseEmbeddingView):
             messages.error(request, "Please enter a prompt.")
             return await sync_to_async(redirect)("film_recommendations")
 
+        # Detect names in the prompt
+        detected_names = self.find_names_in_prompt(prompt)
+        if detected_names:
+            names_str = ", ".join(detected_names)
+            print(f"Detected names in prompt: {names_str}")
+
         data, embeddings, index = self.load_cache()
         if data is None:
             messages.error(request, "Embeddings not found. Please generate them first.")
@@ -36,7 +97,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
         if isinstance(index, faiss.IndexIVF):
             index.nprobe = NPROBE
 
-        # Generate weighted query embedding
+        # Generate query embedding using the prompt
         async with aiohttp.ClientSession() as session:
             prompt_embedding = await self.fetch_embedding(
                 prompt, session, service="nomic"
@@ -75,8 +136,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
         matches = []
         for sim, idx in zip(distances[0], indices[0]):
             cosine_sim = float(sim)  # This is the cosine similarity.
-            # Compute the corresponding L2 distance from the cosine similarity.
-            l2_distance = (2 - 2 * cosine_sim) ** 0.5
+            l2_distance = (2 - 2 * cosine_sim) ** 0.5  # Compute L2 distance.
             matches.append(
                 {
                     **data[idx],
@@ -92,10 +152,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
         """
         Generate a detailed explanation for the film recommendations.
         """
-        # Create a text block from the top matching films
         films_text = "\n\n".join(self.json_to_text(item) for item in top_matches)
-
-        # Construct the system prompt with explicit instructions.
         SYSTEM_PROMPT = (
             f"Query: {prompt}\n\n"
             f"{films_text}\n\n"
@@ -120,7 +177,6 @@ class FilmRecommendationsView(BaseEmbeddingView):
         try:
             async with aiohttp.ClientSession() as session:
                 response = await self.send_request(OPENAI_API_URL, payload, session)
-
             explanation = (
                 response.get("choices", [{}])[0]
                 .get("message", {})
