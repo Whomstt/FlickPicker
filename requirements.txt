@@ -10,3 +10,5 @@ langchain-community==0.3.16
 ollama==0.4.7
 faiss-cpu==1.10.0
 whitenoise==6.9.0
+spacy==3.8.2
+RapidFuzz==3.12.2

@@ -1,5 +1,5 @@
 # Use the official Python image as the base image
-FROM python:3.13.2-slim
+FROM python:3.12.9-slim
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -12,6 +12,7 @@ WORKDIR /code
 COPY requirements.txt /code/
 RUN apt-get update && apt-get install git -y && apt-get install curl -y
 RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m spacy download en_core_web_sm
 
 # Copy project files
 COPY . /code/

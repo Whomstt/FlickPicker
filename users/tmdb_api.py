@@ -101,6 +101,26 @@ async def rate_limited_fetch(session, film_id, semaphore):
         return await fetch_film_data(session, film_id)
 
 
+def extract_unique_names(films):
+    """
+    Extract and return sorted lists of unique main actors and directors
+    """
+    unique_actors = set()
+    unique_directors = set()
+
+    for film in films:
+        director = film.get("director")
+        if director:
+            unique_directors.add(director)
+
+        main_actors = film.get("main_actors", [])
+        for actor in main_actors:
+            unique_actors.add(actor)
+
+    # Return sorted lists for consistency.
+    return sorted(unique_actors), sorted(unique_directors)
+
+
 async def fetch_and_save_films():
     """Fetch film data, process it, and save to a JSON file asynchronously."""
     # Fetch the top films
@@ -171,11 +191,37 @@ async def fetch_and_save_films():
     logging.info("Processing film data...")
     unique_films = remove_duplicates(films_data)
 
-    # Save to JSON file
-    logging.info(f"Saving data to {TMDB_OUTPUT_FILE}...")
+    # Save film data to JSON file
+    logging.info(f"Saving film data to {TMDB_OUTPUT_FILE}...")
     try:
         with open(TMDB_OUTPUT_FILE, "w", encoding="utf-8") as f:
             json.dump(unique_films, f, indent=4, ensure_ascii=False)
-        logging.info(f"Data successfully saved to {TMDB_OUTPUT_FILE}.")
+        logging.info(f"Film data successfully saved to {TMDB_OUTPUT_FILE}.")
     except Exception as e:
-        logging.error(f"Error saving data to {TMDB_OUTPUT_FILE}: {e}")
+        logging.error(f"Error saving film data to {TMDB_OUTPUT_FILE}: {e}")
+
+    # Extract unique main actors and directors
+    logging.info("Extracting unique main actors and directors...")
+    unique_actors, unique_directors = extract_unique_names(unique_films)
+    actors_directors_data = {
+        "unique_main_actors": unique_actors,
+        "unique_directors": unique_directors,
+    }
+
+    # Save the unique actors and directors to a JSON file.
+    actors_directors_file = "actors_directors.json"
+    logging.info(f"Saving actors and directors to {actors_directors_file}...")
+    try:
+        with open(actors_directors_file, "w", encoding="utf-8") as f:
+            json.dump(actors_directors_data, f, indent=4, ensure_ascii=False)
+        logging.info(
+            f"Actors and directors successfully saved to {actors_directors_file}."
+        )
+    except Exception as e:
+        logging.error(
+            f"Error saving actors and directors to {actors_directors_file}: {e}"
+        )
+
+
+if __name__ == "__main__":
+    asyncio.run(fetch_and_save_films())
