@@ -111,11 +111,11 @@ def extract_unique_names(films):
     for film in films:
         director = film.get("director")
         if director:
-            unique_directors.add(director)
+            unique_directors.add(director.lower())
 
         main_actors = film.get("main_actors", [])
         for actor in main_actors:
-            unique_actors.add(actor)
+            unique_actors.add(actor.lower())
 
     # Return sorted lists for consistency.
     return sorted(unique_actors), sorted(unique_directors)
