@@ -26,7 +26,9 @@ EMBEDDING_MODEL = "nomic-embed-text"
 # FAISS and embedding parameters
 NPROBE = 5  # Number of clusters to be searched
 NLIST = 50  # Number of clusters to be stored
-N_TOP_MATCHES = 3  # Number of top matches to return
+N_TOP_MATCHES = 5  # Number of top matches to return
+SEARCH_INCREMENT = 10  # Increment for searching more results
+MAX_RESULTS = 100  # Maximum number of search results
 M = 16  # Number of subquantizers
 NBITS = 7  # Number of bits per subquantizer
 

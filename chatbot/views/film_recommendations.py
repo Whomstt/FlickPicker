@@ -9,7 +9,14 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 
 from .base_embedding import BaseEmbeddingView
-from chatbot.config import NPROBE, N_TOP_MATCHES, OPENAI_API_URL, OPENAI_MODEL
+from chatbot.config import (
+    NPROBE,
+    N_TOP_MATCHES,
+    OPENAI_API_URL,
+    OPENAI_MODEL,
+    SEARCH_INCREMENT,
+    MAX_RESULTS,
+)
 
 
 class FilmRecommendationsView(BaseEmbeddingView):
@@ -35,8 +42,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
         self, prompt, json_path="actors_directors.json", threshold=90
     ):
         """
-        Detect candidate names from the prompt by checking if any known actor or director
-        appear as a full or near-full match in the prompt.
+        Detect candidate names in user's prompt
         """
         try:
             with open(json_path, "r") as f:
@@ -46,48 +52,40 @@ class FilmRecommendationsView(BaseEmbeddingView):
 
         detected_names = set()
 
-        # Regex-based full-word match.
         def regex_match(name, text):
             pattern = r"\b" + re.escape(name) + r"\b"
             return re.search(pattern, text) is not None
 
-        # Check each actor name from "unique_main_actors"
         for name in data.get("unique_main_actors", []):
-            if regex_match(name, prompt):
-                detected_names.add(name)
-            else:
-                if self.sliding_window_fuzzy(prompt, name, threshold):
-                    detected_names.add(name)
+            if regex_match(name, prompt) or self.sliding_window_fuzzy(
+                prompt, name, threshold
+            ):
+                detected_names.add(name.lower())
 
-        # Check each director name from "unique_directors"
         for name in data.get("unique_directors", []):
-            if regex_match(name, prompt):
-                detected_names.add(name)
-            else:
-                if self.sliding_window_fuzzy(prompt, name, threshold):
-                    detected_names.add(name)
+            if regex_match(name, prompt) or self.sliding_window_fuzzy(
+                prompt, name, threshold
+            ):
+                detected_names.add(name.lower())
 
         return list(detected_names)
 
     async def get(self, request, *args, **kwargs):
         """
-        Render the chatbot interface for GET requests.
+        Render the chatbot interface for GET requests
         """
         return await sync_to_async(render)(request, "chat.html")
 
     async def post(self, request, *args, **kwargs):
         start_time = time.time()
-
         prompt = request.POST.get("prompt", "").strip()
         if not prompt:
             messages.error(request, "Please enter a prompt.")
             return await sync_to_async(redirect)("film_recommendations")
 
-        # Detect names in the prompt
         detected_names = self.find_names_in_prompt(prompt)
         if detected_names:
-            names_str = ", ".join(detected_names)
-            print(f"Detected names in prompt: {names_str}")
+            print("Detected names in prompt: " + ", ".join(detected_names))
 
         data, embeddings, index = self.load_cache()
         if data is None:
@@ -107,15 +105,15 @@ class FilmRecommendationsView(BaseEmbeddingView):
         query_vector = prompt_embedding.reshape(1, -1)
         faiss.normalize_L2(query_vector)
 
-        # Search for top matches using the normalized query vector
+        # Search for top matches
         distances, indices = index.search(query_vector, N_TOP_MATCHES)
-        top_matches = self.prepare_top_matches(data, distances, indices)
+        top_matches = self.prepare_top_matches(
+            data, distances, indices, detected_names, index, query_vector
+        )
         explanation = await self.generate_recommendation_explanation(
             prompt, top_matches
         )
-
-        end_time = time.time()
-        recommendation_time = end_time - start_time
+        recommendation_time = time.time() - start_time
 
         return await sync_to_async(render)(
             request,
@@ -128,25 +126,72 @@ class FilmRecommendationsView(BaseEmbeddingView):
             },
         )
 
-    def prepare_top_matches(self, data, distances, indices):
+    def prepare_top_matches(
+        self,
+        data,
+        distances,
+        indices,
+        detected_names=None,
+        index=None,
+        query_vector=None,
+    ):
         """
-        Prepare the top matches for display, sorting in descending order
-        by similarity score since a higher score is a closer match.
+        Prepare the top film matches for the user.
         """
+
+        def filter_matches(matches, lower_names):
+            filtered = []
+            for film in matches:
+                director = film.get("director", "").lower()
+                actors = [actor.lower() for actor in film.get("main_actors", [])]
+                if director in lower_names or any(
+                    actor in lower_names for actor in actors
+                ):
+                    filtered.append(film)
+            return filtered
+
+        # Build initial list of matches.
         matches = []
         for sim, idx in zip(distances[0], indices[0]):
-            cosine_sim = float(sim)  # This is the cosine similarity.
-            l2_distance = (2 - 2 * cosine_sim) ** 0.5  # Compute L2 distance.
-            matches.append(
-                {
+            cosine_sim = float(sim)
+            l2_distance = (2 - 2 * cosine_sim) ** 0.5
+            film = {
+                **data[idx],
+                "cosine_similarity": cosine_sim,
+                "l2_distance": l2_distance,
+            }
+            matches.append(film)
+
+        matches.sort(key=lambda x: x["cosine_similarity"])
+
+        # If no detected names were provided, return at most N_TOP_MATCHES.
+        if not detected_names:
+            return matches[:N_TOP_MATCHES]
+
+        lower_names = set(detected_names)
+        filtered = filter_matches(matches, lower_names)
+
+        current_k = N_TOP_MATCHES
+        while not filtered and current_k < MAX_RESULTS:
+            current_k += SEARCH_INCREMENT
+            distances, indices = index.search(query_vector, current_k)
+
+            matches = []
+            for sim, idx in zip(distances[0], indices[0]):
+                cosine_sim = float(sim)
+                l2_distance = (2 - 2 * cosine_sim) ** 0.5
+                film = {
                     **data[idx],
                     "cosine_similarity": cosine_sim,
                     "l2_distance": l2_distance,
                 }
-            )
+                matches.append(film)
 
-        matches.sort(key=lambda x: x["cosine_similarity"], reverse=False)
-        return matches
+            matches.sort(key=lambda x: x["cosine_similarity"])
+            filtered = filter_matches(matches, lower_names)
+
+        # Return filtered matches if any, otherwise return the top matches
+        return filtered[:N_TOP_MATCHES] if filtered else matches[:N_TOP_MATCHES]
 
     async def generate_recommendation_explanation(self, prompt, top_matches):
         """
@@ -157,8 +202,8 @@ class FilmRecommendationsView(BaseEmbeddingView):
             f"Query: {prompt}\n\n"
             f"{films_text}\n\n"
             "Based solely on the films listed above, provide a detailed film recommendation explanation for each film. "
-            "Please output your response in plain text with each film's explanation separated by a double newline. "
-            "Do not include any films other than the ones provided."
+            "Output each explanation in plain text separated by a double newline. "
+            "Do not include any films other than those provided."
         )
 
         payload = {
@@ -183,7 +228,6 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 .get("content", "No explanation available.")
             )
             return explanation
-
         except aiohttp.ClientError as e:
             print(f"Error generating explanation with OpenAI: {e}")
             return "An error occurred while generating the explanation."
