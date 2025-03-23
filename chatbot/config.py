@@ -12,6 +12,8 @@ FAISS_INDEX_PATH = os.path.join(CACHE_DIR, "faiss_index")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
 OPENAI_MODEL = "gpt-4o-mini"
+MAX_TOKENS = 1000
+TEMPERATURE = 0.7
 
 # Nomic API settings
 NOMIC_API_KEY = os.getenv("NOMIC_API_KEY")
@@ -27,8 +29,8 @@ EMBEDDING_MODEL = "nomic-embed-text"
 NPROBE = 5  # Number of clusters to be searched
 NLIST = 50  # Number of clusters to be stored
 N_TOP_MATCHES = 5  # Number of top matches to return
-SEARCH_INCREMENT = 10  # Increment for searching more results
-MAX_RESULTS = 100  # Maximum number of search results
+SEARCH_INCREMENT = 100  # Increment for searching more results
+MAX_RESULTS = 1000  # Maximum number of search results
 M = 16  # Number of subquantizers
 NBITS = 7  # Number of bits per subquantizer
 

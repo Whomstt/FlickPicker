@@ -16,6 +16,8 @@ from chatbot.config import (
     OPENAI_MODEL,
     SEARCH_INCREMENT,
     MAX_RESULTS,
+    MAX_TOKENS,
+    TEMPERATURE,
 )
 
 
@@ -136,7 +138,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
         query_vector=None,
     ):
         """
-        Prepare the top film matches for the user.
+        Prepare the top film matches for the user
         """
 
         def filter_matches(matches, lower_names):
@@ -150,7 +152,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
                     filtered.append(film)
             return filtered
 
-        # Build initial list of matches.
+        # Build initial list of matches from the first FAISS search
         matches = []
         for sim, idx in zip(distances[0], indices[0]):
             cosine_sim = float(sim)
@@ -162,20 +164,21 @@ class FilmRecommendationsView(BaseEmbeddingView):
             }
             matches.append(film)
 
-        matches.sort(key=lambda x: x["cosine_similarity"])
+        # Sort matches in descending order (highest cosine similarity first)
+        matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
 
-        # If no detected names were provided, return at most N_TOP_MATCHES.
+        # If no detected names are provided, return at most N_TOP_MATCHES
         if not detected_names:
             return matches[:N_TOP_MATCHES]
 
         lower_names = set(detected_names)
         filtered = filter_matches(matches, lower_names)
-
         current_k = N_TOP_MATCHES
-        while not filtered and current_k < MAX_RESULTS:
+
+        # Expand the search until we have at least N_TOP_MATCHES filtered films or reach MAX_RESULTS
+        while current_k < MAX_RESULTS and len(filtered) < N_TOP_MATCHES:
             current_k += SEARCH_INCREMENT
             distances, indices = index.search(query_vector, current_k)
-
             matches = []
             for sim, idx in zip(distances[0], indices[0]):
                 cosine_sim = float(sim)
@@ -186,12 +189,21 @@ class FilmRecommendationsView(BaseEmbeddingView):
                     "l2_distance": l2_distance,
                 }
                 matches.append(film)
-
-            matches.sort(key=lambda x: x["cosine_similarity"])
+            matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
             filtered = filter_matches(matches, lower_names)
 
-        # Return filtered matches if any, otherwise return the top matches
-        return filtered[:N_TOP_MATCHES] if filtered else matches[:N_TOP_MATCHES]
+        # Sort filtered and unfiltered groups in descending order
+        filtered.sort(key=lambda x: x["cosine_similarity"], reverse=True)
+        # Supplement with the best unfiltered matches not in filtered
+        supplement = [m for m in matches if m not in filtered]
+        supplement.sort(key=lambda x: x["cosine_similarity"], reverse=True)
+
+        # Build the final list.
+        if len(filtered) >= N_TOP_MATCHES:
+            return filtered[:N_TOP_MATCHES]
+        else:
+            remaining_needed = N_TOP_MATCHES - len(filtered)
+            return filtered + supplement[:remaining_needed]
 
     async def generate_recommendation_explanation(self, prompt, top_matches):
         """
@@ -215,8 +227,8 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 },
                 {"role": "user", "content": SYSTEM_PROMPT},
             ],
-            "max_tokens": 500,
-            "temperature": 0.7,
+            "max_tokens": MAX_TOKENS,
+            "temperature": TEMPERATURE,
         }
 
         try:
