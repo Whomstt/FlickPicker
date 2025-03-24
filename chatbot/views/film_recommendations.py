@@ -144,9 +144,9 @@ class FilmRecommendationsView(BaseEmbeddingView):
         def filter_matches(matches, lower_names):
             filtered = []
             for film in matches:
-                director = film.get("director", "").lower()
+                directors = [director.lower() for director in film.get("directors", [])]
                 actors = [actor.lower() for actor in film.get("main_actors", [])]
-                if director in lower_names or any(
+                if any(director in lower_names for director in directors) or any(
                     actor in lower_names for actor in actors
                 ):
                     filtered.append(film)

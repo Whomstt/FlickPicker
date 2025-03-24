@@ -165,8 +165,8 @@ class BaseEmbeddingView(View):
             components.append(f"Tagline: {tagline}")
         if keywords := item.get("keywords"):
             components.append(f"Keywords: {', '.join(keywords)}")
-        if director := item.get("director"):
-            components.append(f"Directed by {director}")
+        if directors := item.get("directors"):
+            components.append(f"Directed by {directors}")
         if main_actors := item.get("main_actors"):
             components.append(f"Featuring: {', '.join(main_actors)}")
         if runtime := item.get("runtime"):
@@ -182,7 +182,7 @@ class BaseEmbeddingView(View):
         Converts the text into lowercase, removes special characters, and extra spaces
         """
         text = text.lower()
-        text = re.sub(r"[^a-z0-9\s]", "", text)
+        text = re.sub(r"[^a-z0-9\s,:\.]", "", text)
         text = re.sub(r"\s+", " ", text).strip()
         return text
 
@@ -191,60 +191,61 @@ class BaseEmbeddingView(View):
         Enrich film text data for embedding generation
         """
         enriched_parts = []
-        for field, value in item.items():
+        # Process fields in a consistent order
+        field_order = [
+            "title",
+            "genres",
+            "overview",
+            "tagline",
+            "keywords",
+            "directors",
+            "main_actors",
+            "runtime",
+            "release_date",
+        ]
+
+        for field in field_order:
+            value = item.get(field)
             if value is not None:
-                # If the field's value is a list, join its items into a comma-separated string
+                # Join list values with commas
                 text_value = (
                     ", ".join(map(str, value))
                     if isinstance(value, list)
                     else str(value)
                 )
-
-                # Clean the input text
+                # Clean the text while preserving useful punctuation.
                 cleaned_value = self.clean_text(text_value)
 
-                # Field-specific enrichment
-                if field in [
-                    "title",
-                    "genres",
-                    "overview",
-                    "tagline",
-                    "keywords",
-                    "director",
-                    "main_actors",
-                ]:
-                    enriched = cleaned_value
-
-                elif field == "runtime":
+                # Field-specific enrichment logic
+                if field == "runtime":
                     try:
                         runtime = int(cleaned_value)
                         if runtime <= 90:
-                            enriched = "short"
+                            cleaned_value = "short"
                         elif runtime <= 120:
-                            enriched = "average"
+                            cleaned_value = "average"
                         else:
-                            enriched = "long"
-                    except ValueError:
-                        enriched = cleaned_value
+                            cleaned_value = "long"
+                    except Exception:
+                        pass
 
                 elif field == "release_date":
                     try:
-                        # Expecting a date formatted as YYYY-MM-DD; extract the year.
-                        year = int(cleaned_value.split("-")[0])
-                        current_year = datetime.now().year
-                        age = current_year - year
-                        if age < 2:
-                            enriched = "new"
-                        elif age < 15:
-                            enriched = "modern"
-                        else:
-                            enriched = "old"
-                    except (ValueError, IndexError):
-                        enriched = cleaned_value
+                        # Extract a four-digit year using a regex.
+                        match = re.search(r"(\d{4})", cleaned_value)
+                        if match:
+                            year = int(match.group(1))
+                            current_year = datetime.now().year
+                            age = current_year - year
+                            if age < 2:
+                                cleaned_value = "new"
+                            elif age < 15:
+                                cleaned_value = "modern"
+                            else:
+                                cleaned_value = "old"
+                    except Exception:
+                        pass
 
-                else:
-                    enriched = cleaned_value
-
-                enriched_parts.append(enriched)
-        # Combine all enriched parts into a single text block with a space separator.
-        return " ".join(enriched_parts)
+                # Append the enriched text with an explicit label
+                enriched_parts.append(f"{field.capitalize()}: {cleaned_value}")
+        return ", ".join(enriched_parts)

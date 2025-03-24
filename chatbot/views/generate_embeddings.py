@@ -1,4 +1,5 @@
 import json
+import logging
 import aiohttp
 import numpy as np
 import faiss
@@ -7,6 +8,11 @@ from django.shortcuts import render
 
 from .base_embedding import BaseEmbeddingView
 from chatbot.config import TMDB_OUTPUT_FILE, EMBEDDING_DIM, NLIST, M, NBITS
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 
 class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
@@ -27,9 +33,10 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
         """
         Generate embeddings for the original film data using a single enriched text block per film.
         """
+        counter = 1
         with open(TMDB_OUTPUT_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
-
+        logging.info(f"Fetched {len(data)} films from {TMDB_OUTPUT_FILE}")
         embeddings = []
         async with aiohttp.ClientSession() as session:
             for item in data:
@@ -40,6 +47,9 @@ class GenerateOriginalEmbeddingsView(BaseEmbeddingView):
                     film_text, session, service="ollama"
                 )
                 embeddings.append(embedding)
+                # Log progress
+                logging.info(f"Processed film {counter}/{len(data)}")
+                counter += 1
 
         embeddings = np.array(embeddings, dtype="float32")
 
