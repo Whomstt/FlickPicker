@@ -11,10 +11,15 @@ from chatbot.config import (
     TMDB_OUTPUT_FILE,
 )
 
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
+
+cancel_fetch = False
 
 
 async def fetch_film_data(session, film_id):
@@ -53,9 +58,7 @@ async def rate_limited_fetch(session, film_id, semaphore):
 
 
 def extract_unique_names(films):
-    """
-    Extract and return sorted lists of unique main actors and directors.
-    """
+    """Extract and return sorted lists of unique main actors and directors."""
     unique_actors = set()
     unique_directors = set()
     for film in films:
@@ -70,6 +73,7 @@ def extract_unique_names(films):
 
 async def fetch_and_save_films():
     """Fetch film data, process it, and save to a JSON file asynchronously."""
+    global cancel_fetch
     unique_films_dict = {}
     page = 1
     total_pages = None
@@ -77,12 +81,16 @@ async def fetch_and_save_films():
     async with aiohttp.ClientSession() as session:
         semaphore = asyncio.Semaphore(TMDB_RATE_LIMIT)
         while len(unique_films_dict) < TMDB_NUM_FILMS:
+            # Check cancellation flag on each loop iteration
+            if cancel_fetch:
+                logging.info("Film fetching cancelled by user.")
+                break
+
             logging.info(f"Fetching films from page {page}...")
             url = f"{TMDB_BASE_URL}/movie/popular"
             params = {"api_key": TMDB_API_KEY, "page": page}
             try:
                 async with session.get(url, params=params, timeout=10) as response:
-                    # If a 400 error occurs we skip to the next page
                     if response.status == 400:
                         logging.error(
                             f"Page {page} returned 400. Skipping to the next page."
@@ -169,19 +177,16 @@ async def fetch_and_save_films():
             )
             page += 1
 
-            # Stop if we've reached the last page available from the API
             if total_pages is not None and page > total_pages:
                 logging.warning("Reached the last available page from TMDB.")
                 break
 
     unique_films = list(unique_films_dict.values())
-    # Trim the list to exactly TMDB_NUM_FILMS if there are more
     if len(unique_films) > TMDB_NUM_FILMS:
         unique_films = unique_films[:TMDB_NUM_FILMS]
 
     logging.info(f"Total unique films after deduplication: {len(unique_films)}")
 
-    # Save film data to JSON file
     logging.info(f"Saving film data to {TMDB_OUTPUT_FILE}...")
     try:
         with open(TMDB_OUTPUT_FILE, "w", encoding="utf-8") as f:
@@ -190,7 +195,6 @@ async def fetch_and_save_films():
     except Exception as e:
         logging.error(f"Error saving film data to {TMDB_OUTPUT_FILE}: {e}")
 
-    # Extract and save unique main actors and directors
     logging.info("Extracting unique main actors and directors...")
     unique_actors, unique_directors = extract_unique_names(unique_films)
     actors_directors_data = {
@@ -210,6 +214,15 @@ async def fetch_and_save_films():
             f"Error saving actors and directors to {actors_directors_file}: {e}"
         )
 
+    # Reset cancellation flag
+    cancel_fetch = False
 
-if __name__ == "__main__":
-    asyncio.run(fetch_and_save_films())
+
+@require_POST
+def cancel_fetch_view(request):
+    """
+    Sets the cancellation flag for the film fetching process
+    """
+    global cancel_fetch
+    cancel_fetch = True
+    return JsonResponse({"status": "Fetch cancelled"})
