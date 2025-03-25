@@ -29,10 +29,10 @@ EMBEDDING_MODEL = "nomic-embed-text"
 NPROBE = 4  # Number of clusters to be searched
 NLIST = 64  # Number of clusters to be stored
 N_TOP_MATCHES = 5  # Number of top matches to return
-SEARCH_INCREMENT = 100  # Increment for searching more results
-MAX_RESULTS = 1000  # Maximum number of search results
+SEARCH_INCREMENT = 256  # Increment for searching more results
+MAX_RESULTS = 1024  # Maximum number of search results
 M = 16  # Number of subquantizers
-NBITS = 8  # Number of bits per subquantizer
+NBITS = 6  # Number of bits per subquantizer
 
 # Settings for TMDB API
 TMDB_BASE_URL = "https://api.themoviedb.org/3"

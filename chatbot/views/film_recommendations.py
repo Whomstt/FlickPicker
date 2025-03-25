@@ -173,7 +173,8 @@ class FilmRecommendationsView(BaseEmbeddingView):
 
         lower_names = set(detected_names)
         filtered = filter_matches(matches, lower_names)
-        current_k = N_TOP_MATCHES
+
+        current_k = 0
 
         # Expand the search until we have at least N_TOP_MATCHES filtered films or reach MAX_RESULTS
         while current_k < MAX_RESULTS and len(filtered) < N_TOP_MATCHES:
