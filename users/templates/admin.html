@@ -68,7 +68,6 @@
             document.getElementById("fetch-films-loading").style.display = "none";
             document.getElementById("cancel-fetch-button").style.display = "none";
             document.getElementById("fetch-films-button").style.display = "inline-block";
-            alert("Film fetching has been cancelled.");
         })
         .catch(error => {
             console.error("Error cancelling fetch:", error);
@@ -96,7 +95,6 @@
             document.getElementById("generate-embeddings-loading").style.display = "none";
             document.getElementById("cancel-generate-button").style.display = "none";
             document.getElementById("generate-embeddings-button").style.display = "inline-block";
-            alert("Embedding generation has been cancelled.");
         })
         .catch(error => {
             console.error("Error cancelling embedding generation:", error);
