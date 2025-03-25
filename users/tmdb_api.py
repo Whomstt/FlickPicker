@@ -9,6 +9,7 @@ from chatbot.config import (
     TMDB_RATE_LIMIT,
     TMDB_RATE_LIMIT_WINDOW,
     TMDB_OUTPUT_FILE,
+    TMDB_TOTAL_PAGES,
 )
 
 from django.http import JsonResponse
@@ -76,7 +77,7 @@ async def fetch_and_save_films():
     global cancel_fetch
     unique_films_dict = {}
     page = 1
-    total_pages = None
+    total_pages = TMDB_TOTAL_PAGES
 
     async with aiohttp.ClientSession() as session:
         semaphore = asyncio.Semaphore(TMDB_RATE_LIMIT)
@@ -100,10 +101,6 @@ async def fetch_and_save_films():
 
                     response.raise_for_status()
                     data = await response.json()
-
-                    if total_pages is None:
-                        total_pages = data.get("total_pages", 0)
-                        logging.info(f"Total pages available: {total_pages}")
 
                     results = data.get("results", [])
                     if not results:
@@ -177,7 +174,7 @@ async def fetch_and_save_films():
             )
             page += 1
 
-            if total_pages is not None and page > total_pages:
+            if page > total_pages:
                 logging.warning("Reached the last available page from TMDB.")
                 break
 
