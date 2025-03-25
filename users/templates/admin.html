@@ -13,6 +13,7 @@
     </div>
     {% endif %}
 
+    <!-- Fetch Films Section -->
     <div class="mt-4">
         <h2 class="display-6">Fetch Latest Popular Films from TMDB</h2>
         <form id="fetch-films-form" method="post" action="{% url 'fetch_films' %}">
@@ -28,11 +29,13 @@
         </div>
     </div>
 
+    <!-- Generate Embeddings Section -->
     <div class="mt-5">
         <h2 class="display-6">Generate Original Embeddings</h2>
         <form id="generate-embeddings-form" method="post" action="{% url 'generate_original_embeddings' %}">
             {% csrf_token %}
             <button id="generate-embeddings-button" type="submit" class="btn btn-success mt-3">Generate Embeddings</button>
+            <button id="cancel-generate-button" type="button" class="btn btn-danger mt-3" style="display: none;">Cancel Generate</button>
         </form>
         <div id="generate-embeddings-loading" class="text-center my-4" style="display: none;">
             <div class="spinner-border text-primary" role="status">
@@ -44,6 +47,7 @@
 </div>
 
 <script>
+    // -- Fetch Films Logic --
     document.getElementById("fetch-films-form").addEventListener("submit", function(event) {
         document.getElementById("fetch-films-loading").style.display = "block";
         document.getElementById("fetch-films-button").style.display = "none";
@@ -64,15 +68,39 @@
             document.getElementById("fetch-films-loading").style.display = "none";
             document.getElementById("cancel-fetch-button").style.display = "none";
             document.getElementById("fetch-films-button").style.display = "inline-block";
+            alert("Film fetching has been cancelled.");
         })
         .catch(error => {
             console.error("Error cancelling fetch:", error);
         });
     });
-    
-    document.getElementById("generate-embeddings-form").addEventListener("submit", function() {
+
+    // -- Generate Embeddings Logic --
+    document.getElementById("generate-embeddings-form").addEventListener("submit", function(event) {
         document.getElementById("generate-embeddings-loading").style.display = "block";
-        document.getElementById("generate-embeddings-button").disabled = true;
+        document.getElementById("generate-embeddings-button").style.display = "none";
+        document.getElementById("cancel-generate-button").style.display = "inline-block";
+    });
+
+    document.getElementById("cancel-generate-button").addEventListener("click", function() {
+        fetch("{% url 'cancel_generate' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("generate-embeddings-loading").style.display = "none";
+            document.getElementById("cancel-generate-button").style.display = "none";
+            document.getElementById("generate-embeddings-button").style.display = "inline-block";
+            alert("Embedding generation has been cancelled.");
+        })
+        .catch(error => {
+            console.error("Error cancelling embedding generation:", error);
+        });
     });
 </script>
 {% endblock %}

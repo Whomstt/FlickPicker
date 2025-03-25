@@ -1,6 +1,9 @@
 from django.urls import path
 from . import views
-from chatbot.views.generate_embeddings import GenerateOriginalEmbeddingsView
+from chatbot.views.generate_embeddings import (
+    GenerateOriginalEmbeddingsView,
+    cancel_generate_view,
+)
 from django.contrib.admin.views.decorators import staff_member_required
 from .tmdb_api import cancel_fetch_view
 
@@ -21,5 +24,10 @@ urlpatterns = [
         "cancel-fetch/",
         staff_member_required(cancel_fetch_view),
         name="cancel_fetch",
+    ),
+    path(
+        "cancel-generate/",
+        staff_member_required(cancel_generate_view),
+        name="cancel_generate",
     ),
 ]

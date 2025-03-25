@@ -83,7 +83,7 @@ async def fetch_and_save_films():
         while len(unique_films_dict) < TMDB_NUM_FILMS:
             # Check cancellation flag on each loop iteration
             if cancel_fetch:
-                logging.info("Film fetching cancelled by user.")
+                logging.info("Film fetching cancelled by user")
                 break
 
             logging.info(f"Fetching films from page {page}...")
