@@ -152,10 +152,19 @@ class FilmRecommendationsView(BaseEmbeddingView):
                     filtered.append(film)
             return filtered
 
-        # Build initial list of matches from the first FAISS search
+        # Set to track unique films and prevent duplicates
+        unique_films = set()
         matches = []
+
+        # Process initial FAISS search results
         for sim, idx in zip(distances[0], indices[0]):
-            cosine_sim = float(sim)
+            # Sanitize similarity score to prevent extreme values
+            cosine_sim = max(min(float(sim), 1.0), 0.0)
+
+            # Skip if film already processed
+            if idx in unique_films:
+                continue
+
             l2_distance = (2 - 2 * cosine_sim) ** 0.5
             film = {
                 **data[idx],
@@ -163,11 +172,12 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 "l2_distance": l2_distance,
             }
             matches.append(film)
+            unique_films.add(idx)
 
-        # Sort matches in descending order (highest cosine similarity first)
+        # Sort matches in descending order
         matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
 
-        # If no detected names are provided, return at most N_TOP_MATCHES
+        # If no detected names, return top matches
         if not detected_names:
             return matches[:N_TOP_MATCHES]
 
@@ -175,31 +185,51 @@ class FilmRecommendationsView(BaseEmbeddingView):
         filtered = filter_matches(matches, lower_names)
 
         current_k = 0
+        unique_filtered_films = set()
 
-        # Expand the search until we have at least N_TOP_MATCHES filtered films or reach MAX_RESULTS
+        # Expand search
         while current_k < MAX_RESULTS and len(filtered) < N_TOP_MATCHES:
             current_k += SEARCH_INCREMENT
             distances, indices = index.search(query_vector, current_k)
-            matches = []
+
             for sim, idx in zip(distances[0], indices[0]):
-                cosine_sim = float(sim)
+                # Sanitize similarity score
+                cosine_sim = max(min(float(sim), 1.0), 0.0)
+
+                # Skip if film already processed or not unique
+                if idx in unique_films or idx in unique_filtered_films:
+                    continue
+
                 l2_distance = (2 - 2 * cosine_sim) ** 0.5
                 film = {
                     **data[idx],
                     "cosine_similarity": cosine_sim,
                     "l2_distance": l2_distance,
                 }
-                matches.append(film)
-            matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
-            filtered = filter_matches(matches, lower_names)
 
-        # Sort filtered and unfiltered groups in descending order
-        filtered.sort(key=lambda x: x["cosine_similarity"], reverse=True)
-        # Supplement with the best unfiltered matches not in filtered
-        supplement = [m for m in matches if m not in filtered]
+                # Check name filtering
+                directors = [director.lower() for director in film.get("directors", [])]
+                actors = [actor.lower() for actor in film.get("main_actors", [])]
+
+                if any(director in lower_names for director in directors) or any(
+                    actor in lower_names for actor in actors
+                ):
+                    filtered.append(film)
+                    unique_filtered_films.add(idx)
+
+                unique_films.add(idx)
+
+            # Sort and truncate to prevent excessive growth
+            filtered.sort(key=lambda x: x["cosine_similarity"], reverse=True)
+            filtered = filtered[:MAX_RESULTS]
+
+        # Supplement with best unfiltered matches
+        supplement = [
+            m for m in matches if m not in filtered and m["cosine_similarity"] > 0.5
+        ]
         supplement.sort(key=lambda x: x["cosine_similarity"], reverse=True)
 
-        # Build the final list.
+        # Final match selection
         if len(filtered) >= N_TOP_MATCHES:
             return filtered[:N_TOP_MATCHES]
         else:
