@@ -59,7 +59,14 @@
             <div class="card-body">
                 {% for match in matches %}
                     <div class="mb-3 p-3 border rounded">
-                        <h4>{{ match.title }}</h4>
+                        <h4>
+                            {{ match.title }}
+                            {% if match.filtered_match %}
+                                <span class="badge bg-success ms-2">Filtered Match</span>
+                            {% else %}
+                                <span class="badge bg-info ms-2">Supplement Match</span>
+                            {% endif %}
+                        </h4>
                         <div class="row">
                             {% if match.poster_image %}
                             <div class="col-md-4">
@@ -69,17 +76,33 @@
                             {% else %}
                             <div class="col-md-12">
                             {% endif %}
+                                {% if match.genres %}
                                 <p><strong>Genres:</strong> {{ match.genres|join:", " }}</p>
-                                <p><strong>Overview:</strong> {{ match.overview }}</p>
-                                <p><strong>Directors:</strong> {{ match.directors|join:", " }}</p>
-                                <p><strong>Main Actors:</strong> {{ match.main_actors|join:", " }}</p>
-                                <p><strong>Runtime:</strong> {{ match.runtime }}</p>
-                                <p><strong>Release Date:</strong> {{ match.release_date }}</p>
-                                <p><strong>Tagline:</strong> {{ match.tagline }}</p>
-                                <p><strong>Keywords:</strong> {{ match.keywords|join:", " }}</p>
+                                {% endif %}
+                                {% if match.overview %}
+                                    <p><strong>Overview:</strong> {{ match.overview }}</p>
+                                {% endif %}
+                                {% if match.directors %}
+                                    <p><strong>Directors:</strong> {{ match.directors|join:", " }}</p>
+                                {% endif %}
+                                {% if match.main_actors %}
+                                    <p><strong>Main Actors:</strong> {{ match.main_actors|join:", " }}</p>
+                                {% endif %}
+                                {% if match.runtime %}
+                                    <p><strong>Runtime:</strong> {{ match.runtime }}</p>
+                                {% endif %}
+                                {% if match.release_date %}
+                                    <p><strong>Release Date:</strong> {{ match.release_date }}</p>
+                                {% endif %}
+                                {% if match.tagline %}
+                                    <p><strong>Tagline:</strong> {{ match.tagline }}</p>
+                                {% endif %}
+                                {% if match.keywords %}
+                                    <p><strong>Keywords:</strong> {{ match.keywords|join:", " }}</p>
+                                {% endif %}
                                 <p class="text-muted">
                                     <small>
-                                        Cosine Similarity: {{ match.cosine_similarity|floatformat:4 }} 
+                                        Cosine Similarity: {{ match.cosine_similarity|floatformat:4 }}
                                     </small>
                                 </p>
                                 <p class="text-muted">

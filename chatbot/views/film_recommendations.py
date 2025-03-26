@@ -28,6 +28,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
 
     def sliding_window_fuzzy(self, prompt, candidate, threshold):
         """Slide window over prompt and check fuzzy match."""
+        prompt = prompt.lower()
         prompt_words = prompt.split()
         candidate_words = candidate.split()
         window_size = len(candidate_words)
@@ -149,6 +150,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 if any(director in lower_names for director in directors) or any(
                     actor in lower_names for actor in actors
                 ):
+                    film["filtered_match"] = True
                     filtered.append(film)
             return filtered
 
@@ -158,7 +160,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
 
         # Process initial FAISS search results
         for sim, idx in zip(distances[0], indices[0]):
-            # Sanitize similarity score to prevent extreme values
+            # Sanitize similarity score
             cosine_sim = max(min(float(sim), 1.0), 0.0)
 
             # Skip if film already processed
@@ -214,6 +216,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 if any(director in lower_names for director in directors) or any(
                     actor in lower_names for actor in actors
                 ):
+                    film["filtered_match"] = True
                     filtered.append(film)
                     unique_filtered_films.add(idx)
 
@@ -224,9 +227,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
             filtered = filtered[:MAX_RESULTS]
 
         # Supplement with best unfiltered matches
-        supplement = [
-            m for m in matches if m not in filtered and m["cosine_similarity"] > 0.5
-        ]
+        supplement = [m for m in matches if m not in filtered]
         supplement.sort(key=lambda x: x["cosine_similarity"], reverse=True)
 
         # Final match selection
