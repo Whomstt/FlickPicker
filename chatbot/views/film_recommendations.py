@@ -46,6 +46,13 @@ class FilmRecommendationsView(BaseEmbeddingView):
         if detected_names:
             print("Detected names in prompt: " + ", ".join(detected_names))
 
+        # Clean the prompt by removing detected names
+        clean_prompt = prompt
+        for name in detected_names:
+            clean_prompt = re.sub(
+                rf"\b{re.escape(name)}\b", "", clean_prompt, flags=re.IGNORECASE
+            ).strip()
+
         data, embeddings, index = self.load_cache()
         if data is None:
             messages.error(request, "Embeddings not found. Please generate them first.")
@@ -56,9 +63,9 @@ class FilmRecommendationsView(BaseEmbeddingView):
 
         # Generate the query embedding using a weighted sum approach
         async with aiohttp.ClientSession() as session:
-            # Get the prompt embedding
+            # Get the embedding for the cleaned prompt
             prompt_embedding = await self.fetch_embedding(
-                prompt, session, service="nomic"
+                clean_prompt, session, service="nomic"
             )
             # Get the names embedding if detected
             if detected_names:
