@@ -34,6 +34,9 @@ MAX_RESULTS = 1024  # Maximum number of search results
 M = 16  # Number of subquantizers
 NBITS = 6  # Number of bits per subquantizer
 
+PROMPT_WEIGHT = 0.4  # Weight for prompt embedding
+NAME_WEIGHT = 0.6  # Weight for actor / director names embedding
+
 # Settings for TMDB API
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")  # API key from environment variables

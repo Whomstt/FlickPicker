@@ -18,6 +18,8 @@ from chatbot.config import (
     MAX_RESULTS,
     MAX_TOKENS,
     TEMPERATURE,
+    PROMPT_WEIGHT,
+    NAME_WEIGHT,
 )
 
 
@@ -98,14 +100,27 @@ class FilmRecommendationsView(BaseEmbeddingView):
         if isinstance(index, faiss.IndexIVF):
             index.nprobe = NPROBE
 
-        # Generate query embedding using the prompt
+        # Generate the query embedding using a weighted sum approach
         async with aiohttp.ClientSession() as session:
+            # Get the prompt embedding
             prompt_embedding = await self.fetch_embedding(
                 prompt, session, service="nomic"
             )
+            # Get the names embedding if detected
+            if detected_names:
+                names_str = ", ".join(detected_names)
+                names_embedding = await self.fetch_embedding(
+                    names_str, session, service="nomic"
+                )
+                # Weighted sum of embeddings
+                combined_embedding = (
+                    PROMPT_WEIGHT * prompt_embedding + NAME_WEIGHT * names_embedding
+                )
+                query_vector = combined_embedding.reshape(1, -1)
+            else:
+                query_vector = prompt_embedding.reshape(1, -1)
 
         # Normalize the query vector using FAISS
-        query_vector = prompt_embedding.reshape(1, -1)
         faiss.normalize_L2(query_vector)
 
         # Search for top matches
