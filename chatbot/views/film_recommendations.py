@@ -20,60 +20,14 @@ from chatbot.config import (
     TEMPERATURE,
     PROMPT_WEIGHT,
     NAME_WEIGHT,
+    FUZZY_THRESHOLD,
 )
 
 
 class FilmRecommendationsView(BaseEmbeddingView):
     """
-    View for the film recommendations chatbot.
+    View for the film recommendations chatbot
     """
-
-    def sliding_window_fuzzy(self, prompt, candidate, threshold):
-        """Slide window over prompt and check fuzzy match."""
-        prompt = prompt.lower()
-        prompt_words = prompt.split()
-        candidate_words = candidate.split()
-        window_size = len(candidate_words)
-        best_score = 0
-        for i in range(len(prompt_words) - window_size + 1):
-            window = " ".join(prompt_words[i : i + window_size])
-            score = fuzz.token_set_ratio(candidate, window)
-            best_score = max(best_score, score)
-            if best_score >= threshold:
-                return True
-        return False
-
-    def find_names_in_prompt(
-        self, prompt, json_path="actors_directors.json", threshold=90
-    ):
-        """
-        Detect candidate names in user's prompt
-        """
-        try:
-            with open(json_path, "r") as f:
-                data = json.load(f)
-        except (IOError, json.JSONDecodeError):
-            return []
-
-        detected_names = set()
-
-        def regex_match(name, text):
-            pattern = r"\b" + re.escape(name) + r"\b"
-            return re.search(pattern, text) is not None
-
-        for name in data.get("unique_main_actors", []):
-            if regex_match(name, prompt) or self.sliding_window_fuzzy(
-                prompt, name, threshold
-            ):
-                detected_names.add(name.lower())
-
-        for name in data.get("unique_directors", []):
-            if regex_match(name, prompt) or self.sliding_window_fuzzy(
-                prompt, name, threshold
-            ):
-                detected_names.add(name.lower())
-
-        return list(detected_names)
 
     async def get(self, request, *args, **kwargs):
         """
@@ -143,6 +97,60 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 "recommendation_time": recommendation_time,
             },
         )
+
+    def sliding_window_fuzzy(self, prompt, candidate, FUZZY_THRESHOLD):
+        """Slide window over prompt and search fuzzy match"""
+        prompt = prompt.lower()
+        candidate = candidate.lower()
+        prompt_words = prompt.split()
+        candidate_words = candidate.split()
+        window_size = len(candidate_words)
+
+        # Slide over prompt tokens
+        for i in range(len(prompt_words) - window_size + 1):
+            window = " ".join(prompt_words[i : i + window_size])
+            # Require an exact match first
+            if window == candidate:
+                return True
+            # Use a fuzzy ratio for partial matches
+            score = fuzz.ratio(candidate, window)
+            if score >= FUZZY_THRESHOLD:
+                return True
+        return False
+
+    def find_names_in_prompt(
+        self, prompt, json_path="actors_directors.json", FUZZY_THRESHOLD=90
+    ):
+        """
+        Detect candidate names in user's prompt
+        """
+        try:
+            with open(json_path, "r") as f:
+                data = json.load(f)
+        except (IOError, json.JSONDecodeError):
+            return []
+
+        detected_names = set()
+
+        def regex_match(name, text):
+            pattern = r"\b" + re.escape(name) + r"\b"
+            return re.search(pattern, text, re.IGNORECASE) is not None
+
+        for name in data.get("unique_main_actors", []):
+            # Try exact match first
+            if regex_match(name, prompt):
+                detected_names.add(name.lower())
+            # If exact match fails we use fuzzy matching
+            elif self.sliding_window_fuzzy(prompt, name, FUZZY_THRESHOLD):
+                detected_names.add(name.lower())
+
+        for name in data.get("unique_directors", []):
+            if regex_match(name, prompt):
+                detected_names.add(name.lower())
+            elif self.sliding_window_fuzzy(prompt, name, FUZZY_THRESHOLD):
+                detected_names.add(name.lower())
+
+        return list(detected_names)
 
     def prepare_top_matches(
         self,

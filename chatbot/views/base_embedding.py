@@ -20,7 +20,6 @@ from chatbot.config import (
     EMBEDDING_DIM,
     OLLAMA_URL,
     EMBEDDING_MODEL,
-    FIELD_WEIGHTS,
     TMDB_OUTPUT_FILE,
 )
 
@@ -86,41 +85,6 @@ class BaseEmbeddingView(View):
         except Exception as e:
             print(f"Error from {service}: {str(e)}")
             return np.zeros(EMBEDDING_DIM)
-
-    async def generate_field_embeddings(self, item, use_ollama=False):
-        """
-        Generate embeddings for each field in the film item separately,
-        using enriched text for film data.
-        """
-        field_embeddings = {}
-        async with aiohttp.ClientSession() as session:
-            for field, weight in FIELD_WEIGHTS.items():
-                if (value := item.get(field)) is not None:
-
-                    # Convert value to string if it's a list
-                    text_value = (
-                        ", ".join(map(str, value))
-                        if isinstance(value, list)
-                        else str(value)
-                    )
-                    enriched_text = self.enrich_field_text(field, text_value)
-                    service = "ollama" if use_ollama else "nomic"
-                    embedding = await self.fetch_embedding(
-                        enriched_text, session, service
-                    )
-                    field_embeddings[field] = (embedding, weight)
-        return field_embeddings
-
-    def combine_weighted_embeddings(self, field_embeddings):
-        """
-        Combine field embeddings using their weights
-        """
-        weighted_sum = np.zeros(EMBEDDING_DIM, dtype="float32")
-
-        for field, (embedding, weight) in field_embeddings.items():
-            weighted_sum += embedding * weight
-
-        return weighted_sum
 
     def save_cache(self, data, embeddings, index):
         """

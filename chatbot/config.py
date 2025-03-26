@@ -33,9 +33,11 @@ SEARCH_INCREMENT = 256  # Increment for searching more results
 MAX_RESULTS = 1024  # Maximum number of search results
 M = 16  # Number of subquantizers
 NBITS = 6  # Number of bits per subquantizer
-
 PROMPT_WEIGHT = 0.4  # Weight for prompt embedding
 NAME_WEIGHT = 0.6  # Weight for actor / director names embedding
+
+# Fuzzy matching settings
+FUZZY_THRESHOLD = 90  # Fuzzy matching threshold in %
 
 # Settings for TMDB API
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
@@ -45,16 +47,3 @@ TMDB_RATE_LIMIT = 50  # TMDB rate limit 50 requests per second
 TMDB_RATE_LIMIT_WINDOW = 1  # Rate limit window in seconds
 TMDB_TOTAL_PAGES = 500  # Total number of pages available
 TMDB_OUTPUT_FILE = "films_data.json"
-
-# Field weights for film attributes - higher value means more important
-FIELD_WEIGHTS = {
-    "genres": 1.0,
-    "title": 0.8,
-    "overview": 0.7,
-    "tagline": 0.5,
-    "keywords": 0.5,
-    "directors": 0.8,
-    "main_actors": 0.8,
-    "runtime": 0.5,
-    "release_date": 0.5,
-}
