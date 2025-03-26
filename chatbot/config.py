@@ -26,15 +26,15 @@ OLLAMA_URL = "http://ollama:11434/api"
 EMBEDDING_MODEL = "nomic-embed-text"
 
 # FAISS and embedding parameters
-NPROBE = 4  # Number of clusters to be searched
+NPROBE = 8  # Number of clusters to be searched
 NLIST = 64  # Number of clusters to be stored
 N_TOP_MATCHES = 5  # Number of top matches to return
 SEARCH_INCREMENT = 256  # Increment for searching more results
 MAX_RESULTS = 1024  # Maximum number of search results
 M = 16  # Number of subquantizers
 NBITS = 6  # Number of bits per subquantizer
-PROMPT_WEIGHT = 0.4  # Weight for prompt embedding
-NAME_WEIGHT = 0.6  # Weight for actor / director names embedding
+PROMPT_WEIGHT = 0.7  # Weight for prompt embedding
+NAME_WEIGHT = 0.3  # Weight for actor / director names embedding
 
 # Fuzzy matching settings
 FUZZY_THRESHOLD = 90  # Fuzzy matching threshold in %
