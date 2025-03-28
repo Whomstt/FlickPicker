@@ -26,13 +26,13 @@ OLLAMA_URL = "http://ollama:11434/api"
 EMBEDDING_MODEL = "nomic-embed-text"
 
 # FAISS and embedding parameters
-NPROBE = 8  # Number of clusters to be searched
-NLIST = 64  # Number of clusters to be stored
+NPROBE = 64  # Number of clusters to be searched
+NLIST = 512  # Number of clusters to be stored
 N_TOP_MATCHES = 5  # Number of top matches to return
-SEARCH_INCREMENT = 256  # Increment for searching more results
-MAX_RESULTS = 1024  # Maximum number of search results
+SEARCH_INCREMENT = 1024  # Increment for searching more results
+MAX_RESULTS = 4096  # Maximum number of search results
 M = 16  # Number of subquantizers
-NBITS = 6  # Number of bits per subquantizer
+NBITS = 8  # Number of bits per subquantizer
 PROMPT_WEIGHT = 0.7  # Weight for prompt embedding
 NAME_WEIGHT = 0.3  # Weight for actor / director names embedding
 
@@ -42,7 +42,7 @@ FUZZY_THRESHOLD = 95  # Fuzzy matching threshold in %
 # Settings for TMDB API
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")  # API key from environment variables
-TMDB_NUM_FILMS = 64  # Number of films to fetch per year
+TMDB_NUM_FILMS = 256  # Number of films to fetch per year
 TMDB_RATE_LIMIT = 50  # TMDB rate limit 50 requests per second
 TMDB_RATE_LIMIT_WINDOW = 1  # Rate limit window in seconds
 TMDB_TOTAL_PAGES = 500  # Total number of pages available
