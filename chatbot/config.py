@@ -26,8 +26,8 @@ OLLAMA_URL = "http://ollama:11434/api"
 EMBEDDING_MODEL = "nomic-embed-text"
 
 # FAISS and embedding parameters
-NPROBE = 64  # Number of clusters to be searched
-NLIST = 512  # Number of clusters to be stored
+NPROBE = 32  # Number of clusters to be searched
+NLIST = 256  # Number of clusters to be stored
 N_TOP_MATCHES = 5  # Number of top matches to return
 SEARCH_INCREMENT = 1024  # Increment for searching more results
 MAX_RESULTS = 4096  # Maximum number of search results
