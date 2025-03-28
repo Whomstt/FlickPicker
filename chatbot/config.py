@@ -37,12 +37,12 @@ PROMPT_WEIGHT = 0.7  # Weight for prompt embedding
 NAME_WEIGHT = 0.3  # Weight for actor / director names embedding
 
 # Fuzzy matching settings
-FUZZY_THRESHOLD = 90  # Fuzzy matching threshold in %
+FUZZY_THRESHOLD = 95  # Fuzzy matching threshold in %
 
 # Settings for TMDB API
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")  # API key from environment variables
-TMDB_NUM_FILMS = 4096  # Number of films to fetch
+TMDB_NUM_FILMS = 64  # Number of films to fetch per year
 TMDB_RATE_LIMIT = 50  # TMDB rate limit 50 requests per second
 TMDB_RATE_LIMIT_WINDOW = 1  # Rate limit window in seconds
 TMDB_TOTAL_PAGES = 500  # Total number of pages available

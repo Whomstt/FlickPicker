@@ -73,127 +73,156 @@ def extract_unique_names(films):
 
 
 async def fetch_and_save_films():
-    """Fetch film data, process it, and save to a JSON file asynchronously."""
+    """
+    Fetch film data per year using the TMDB discover endpoint, process it,
+    and save to a JSON file asynchronously.
+    """
     global cancel_fetch
-    unique_films_dict = {}
-    page = 1
-    total_pages = TMDB_TOTAL_PAGES
+
+    all_films = []  # List to hold all films
+    films_by_year = {}  # Dictionary to hold films by year
+    all_film_keys = set()  # Track film keys across all years
+
+    # List of years to search for
+    years = list(range(1962, 2026))
 
     async with aiohttp.ClientSession() as session:
         semaphore = asyncio.Semaphore(TMDB_RATE_LIMIT)
-        while len(unique_films_dict) < TMDB_NUM_FILMS:
-            # Check cancellation flag on each loop iteration
-            if cancel_fetch:
-                logging.info("Film fetching cancelled by user")
-                break
+        # Loop through each year
+        for year in years:
+            unique_films_dict = {}
+            page = 1
+            logging.info(f"Fetching films for the year {year}...")
+            while len(unique_films_dict) < TMDB_NUM_FILMS:
+                if cancel_fetch:
+                    logging.info("Film fetching cancelled by user")
+                    break
 
-            logging.info(f"Fetching films from page {page}...")
-            url = f"{TMDB_BASE_URL}/movie/popular"
-            params = {"api_key": TMDB_API_KEY, "page": page}
-            try:
-                async with session.get(url, params=params, timeout=10) as response:
-                    if response.status == 400:
-                        logging.error(
-                            f"Page {page} returned 400. Skipping to the next page."
-                        )
-                        page += 1
-                        continue
+                logging.info(f"Year {year}: Fetching page {page}...")
+                url = f"{TMDB_BASE_URL}/discover/movie"
+                params = {
+                    "api_key": TMDB_API_KEY,
+                    "primary_release_year": year,
+                    "page": page,
+                }
+                try:
+                    async with session.get(url, params=params, timeout=10) as response:
+                        if response.status == 400:
+                            logging.error(
+                                f"Year {year}, page {page} returned 400. Skipping to next page."
+                            )
+                            page += 1
+                            continue
+                        response.raise_for_status()
 
-                    response.raise_for_status()
-                    data = await response.json()
-
-                    results = data.get("results", [])
-                    if not results:
-                        logging.warning("No more films available to fetch.")
-                        break
-            except Exception as e:
-                logging.error(f"Error fetching films from page {page}: {e}")
-                page += 1
-                continue
-
-            # Create tasks to fetch film details concurrently
-            tasks = [
-                rate_limited_fetch(session, film["id"], semaphore) for film in results
-            ]
-            page_results = await asyncio.gather(*tasks)
-
-            new_films = 0
-            for result in page_results:
-                if result is None:
+                        data = await response.json()
+                        results = data.get("results", [])
+                        if not results:
+                            logging.warning(
+                                f"No more films available for year {year} on page {page}."
+                            )
+                            break
+                except Exception as e:
+                    logging.error(
+                        f"Error fetching films for year {year}, page {page}: {e}"
+                    )
+                    page += 1
                     continue
 
-                details = result.get("details", {})
-                credits = result.get("credits", {})
-                keywords = result.get("keywords", [])
-
-                # Extract key fields
-                main_actors = [actor["name"] for actor in credits.get("cast", [])[:5]]
-                directors = [
-                    member["name"]
-                    for member in credits.get("crew", [])
-                    if member["job"] == "Director"
+                # Create tasks to fetch film details concurrently
+                tasks = [
+                    rate_limited_fetch(session, film["id"], semaphore)
+                    for film in results
                 ]
+                page_results = await asyncio.gather(*tasks)
 
-                film_data = {
-                    "title": details.get("title"),
-                    "genres": [genre["name"] for genre in details.get("genres", [])],
-                    "overview": details.get("overview"),
-                    "tagline": details.get("tagline"),
-                    "keywords": keywords,
-                    "directors": directors,
-                    "main_actors": main_actors,
-                    "runtime": details.get("runtime"),
-                    "release_date": details.get("release_date"),
-                    "poster_image": (
-                        f"https://image.tmdb.org/t/p/w500{details.get('poster_path')}"
-                        if details.get("poster_path")
-                        else None
-                    ),
-                }
-                # Remove empty or invalid fields
-                cleaned_film_data = {
-                    key: (
-                        [item for item in value if item != ""]
-                        if isinstance(value, list)
-                        else value
+                new_films = 0
+                for result in page_results:
+                    if result is None:
+                        continue
+                    details = result.get("details", {})
+                    credits = result.get("credits", {})
+                    keywords = result.get("keywords", [])
+
+                    # Extract key fields
+                    main_actors = [
+                        actor["name"] for actor in credits.get("cast", [])[:5]
+                    ]
+                    directors = [
+                        member["name"]
+                        for member in credits.get("crew", [])
+                        if member["job"] == "Director"
+                    ]
+
+                    film_data = {
+                        "title": details.get("title"),
+                        "genres": [
+                            genre["name"] for genre in details.get("genres", [])
+                        ],
+                        "overview": details.get("overview"),
+                        "tagline": details.get("tagline"),
+                        "keywords": keywords,
+                        "directors": directors,
+                        "main_actors": main_actors,
+                        "runtime": details.get("runtime"),
+                        "release_date": details.get("release_date"),
+                        "poster_image": (
+                            f"https://image.tmdb.org/t/p/w500{details.get('poster_path')}"
+                            if details.get("poster_path")
+                            else None
+                        ),
+                    }
+                    # Remove empty or invalid fields
+                    cleaned_film_data = {
+                        key: (
+                            [item for item in value if item != ""]
+                            if isinstance(value, list)
+                            else value
+                        )
+                        for key, value in film_data.items()
+                        if value not in [None, 0, [], {}, ""]
+                    }
+                    # Use a tuple of title and release_date as the key for duplicate checking
+                    film_key = (
+                        cleaned_film_data.get("title"),
+                        cleaned_film_data.get("release_date"),
                     )
-                    for key, value in film_data.items()
-                    if value not in [None, 0, [], {}, ""]
-                }
-                # Use a tuple of title and release_date as the key for duplicate checking
-                film_key = (
-                    cleaned_film_data.get("title"),
-                    cleaned_film_data.get("release_date"),
+                    # Only add the film if it's not already present globally
+                    if (
+                        film_key not in unique_films_dict
+                        and film_key not in all_film_keys
+                    ):
+                        unique_films_dict[film_key] = cleaned_film_data
+                        all_film_keys.add(film_key)
+                        new_films += 1
+
+                logging.info(
+                    f"Year {year}, page {page}: Found {new_films} new unique films. Total for year: {len(unique_films_dict)}"
                 )
-                if film_key not in unique_films_dict:
-                    unique_films_dict[film_key] = cleaned_film_data
-                    new_films += 1
+                page += 1
+                if page > TMDB_TOTAL_PAGES:
+                    logging.warning(
+                        f"Year {year}: Reached the last available page from TMDB"
+                    )
+                    break
 
-            logging.info(
-                f"Page {page}: Added {new_films} new unique films. Total unique films: {len(unique_films_dict)}"
-            )
-            page += 1
+            # Limit films per year
+            logging.info(f"Year {year}: Cutting down to {TMDB_NUM_FILMS} films.")
+            films_for_year = list(unique_films_dict.values())[:TMDB_NUM_FILMS]
+            all_films.extend(films_for_year)
 
-            if page > total_pages:
-                logging.warning("Reached the last available page from TMDB.")
-                break
-
-    unique_films = list(unique_films_dict.values())
-    if len(unique_films) > TMDB_NUM_FILMS:
-        unique_films = unique_films[:TMDB_NUM_FILMS]
-
-    logging.info(f"Total unique films after deduplication: {len(unique_films)}")
+    logging.info(f"Total films across all years after deduplication: {len(all_films)}")
 
     logging.info(f"Saving film data to {TMDB_OUTPUT_FILE}...")
     try:
         with open(TMDB_OUTPUT_FILE, "w", encoding="utf-8") as f:
-            json.dump(unique_films, f, indent=4, ensure_ascii=False)
+            json.dump(all_films, f, indent=4, ensure_ascii=False)
         logging.info(f"Film data successfully saved to {TMDB_OUTPUT_FILE}.")
     except Exception as e:
         logging.error(f"Error saving film data to {TMDB_OUTPUT_FILE}: {e}")
 
     logging.info("Extracting unique main actors and directors...")
-    unique_actors, unique_directors = extract_unique_names(unique_films)
+    unique_actors, unique_directors = extract_unique_names(all_films)
     actors_directors_data = {
         "unique_main_actors": unique_actors,
         "unique_directors": unique_directors,
