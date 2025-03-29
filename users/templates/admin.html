@@ -44,14 +44,33 @@
             <p class="mt-2">Generating embeddings...</p>
         </div>
     </div>
+
+    <!-- Do Both Section -->
+    <div class="mt-5">
+        <h2 class="display-6">Do Both</h2>
+        <button id="do-both-button" type="button" class="btn btn-warning mt-3">Do Both</button>
+        <button id="cancel-do-both-button" type="button" class="btn btn-danger mt-3" style="display: none;">Cancel</button>
+    </div>
+    <div id="do-both-loading" class="text-center my-4" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Processing both tasks...</p>
+    </div>
 </div>
 
 <script>
-    // -- Fetch Films Logic --
+    let isFetchInProgress = false;
+    let isGenerateInProgress = false;
+
+    // Handle Fetch Films
     document.getElementById("fetch-films-form").addEventListener("submit", function(event) {
-        document.getElementById("fetch-films-loading").style.display = "block";
-        document.getElementById("fetch-films-button").style.display = "none";
-        document.getElementById("cancel-fetch-button").style.display = "inline-block";
+        if (!isFetchInProgress) {
+            isFetchInProgress = true;
+            document.getElementById("fetch-films-loading").style.display = "block";
+            document.getElementById("fetch-films-button").style.display = "none";
+            document.getElementById("cancel-fetch-button").style.display = "inline-block";
+        }
     });
 
     document.getElementById("cancel-fetch-button").addEventListener("click", function() {
@@ -65,6 +84,7 @@
         })
         .then(response => response.json())
         .then(data => {
+            isFetchInProgress = false;
             document.getElementById("fetch-films-loading").style.display = "none";
             document.getElementById("cancel-fetch-button").style.display = "none";
             document.getElementById("fetch-films-button").style.display = "inline-block";
@@ -74,11 +94,14 @@
         });
     });
 
-    // -- Generate Embeddings Logic --
+    // Handle Generate Embeddings
     document.getElementById("generate-embeddings-form").addEventListener("submit", function(event) {
-        document.getElementById("generate-embeddings-loading").style.display = "block";
-        document.getElementById("generate-embeddings-button").style.display = "none";
-        document.getElementById("cancel-generate-button").style.display = "inline-block";
+        if (!isGenerateInProgress) {
+            isGenerateInProgress = true;
+            document.getElementById("generate-embeddings-loading").style.display = "block";
+            document.getElementById("generate-embeddings-button").style.display = "none";
+            document.getElementById("cancel-generate-button").style.display = "inline-block";
+        }
     });
 
     document.getElementById("cancel-generate-button").addEventListener("click", function() {
@@ -92,12 +115,88 @@
         })
         .then(response => response.json())
         .then(data => {
+            isGenerateInProgress = false;
             document.getElementById("generate-embeddings-loading").style.display = "none";
             document.getElementById("cancel-generate-button").style.display = "none";
             document.getElementById("generate-embeddings-button").style.display = "inline-block";
         })
         .catch(error => {
             console.error("Error cancelling embedding generation:", error);
+        });
+    });
+
+    // Handle Do Both
+    document.getElementById("do-both-button").addEventListener("click", function() {
+        document.getElementById("do-both-loading").style.display = "block";
+        document.getElementById("do-both-button").style.display = "none";
+        document.getElementById("cancel-do-both-button").style.display = "inline-block";
+
+        // Trigger Fetch Films first
+        fetch("{% url 'fetch_films' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            // After Fetch Films completes, trigger Generate Embeddings
+            fetch("{% url 'generate_original_embeddings' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("do-both-loading").style.display = "none";
+                document.getElementById("cancel-do-both-button").style.display = "none";
+                document.getElementById("do-both-button").style.display = "inline-block";
+            })
+            .catch(error => {
+                console.error("Error generating embeddings:", error);
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching films:", error);
+        });
+    });
+
+    // Handle Cancel Do Both
+    document.getElementById("cancel-do-both-button").addEventListener("click", function() {
+        // Cancel both tasks
+        Promise.all([
+            fetch("{% url 'cancel_fetch' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({})
+            }),
+            fetch("{% url 'cancel_generate' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({})
+            })
+        ])
+        .then(responses => Promise.all(responses.map(r => r.json())))
+        .then(data => {
+            isFetchInProgress = false;
+            isGenerateInProgress = false;
+            document.getElementById("do-both-loading").style.display = "none";
+            document.getElementById("cancel-do-both-button").style.display = "none";
+            document.getElementById("do-both-button").style.display = "inline-block";
+        })
+        .catch(error => {
+            console.error("Error cancelling both tasks:", error);
         });
     });
 </script>

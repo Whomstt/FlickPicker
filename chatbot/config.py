@@ -36,7 +36,7 @@ NBITS = 8  # Number of bits per subquantizer
 
 PROMPT_WEIGHT = 0.7  # Weight for prompt embedding
 NAME_WEIGHT = 0.3  # Weight for actor / director names embedding
-GENRE_WEIGHT = 0.5  # Weight for genre embedding
+GENRE_WEIGHT = 0.8  # Weight for genre embedding
 
 # Fuzzy matching settings
 NAME_FUZZY_THRESHOLD = 95  # Fuzzy matching threshold for names in %

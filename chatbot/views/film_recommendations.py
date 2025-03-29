@@ -124,6 +124,8 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 "matches": top_matches,
                 "prompt": prompt,
                 "recommendation_time": recommendation_time,
+                "detected_names": detected_names,
+                "detected_genres": detected_genres,
             },
         )
 
