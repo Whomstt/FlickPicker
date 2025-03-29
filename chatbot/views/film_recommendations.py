@@ -116,6 +116,9 @@ class FilmRecommendationsView(BaseEmbeddingView):
         )
         recommendation_time = time.time() - start_time
 
+        detected_names = [name.title() for name in detected_names]
+        detected_genres = [genre.title() for genre in detected_genres]
+
         return await sync_to_async(render)(
             request,
             "chat.html",
@@ -239,20 +242,31 @@ class FilmRecommendationsView(BaseEmbeddingView):
         query_vector=None,
     ):
         """
-        Prepare the top film matches for the user
+        Prepare the top film matches for the user.
         """
 
-        def filter_matches(matches, lower_names):
-            filtered = []
-            for film in matches:
+        def assign_match_flags(film):
+            # Name match flag
+            if detected_names:
+                lower_names = set(detected_names)
                 directors = [director.lower() for director in film.get("directors", [])]
                 actors = [actor.lower() for actor in film.get("main_actors", [])]
-                if any(director in lower_names for director in directors) or any(
-                    actor in lower_names for actor in actors
-                ):
-                    film["filtered_match"] = True
-                    filtered.append(film)
-            return filtered
+                film["name_match"] = any(
+                    director in lower_names for director in directors
+                ) or any(actor in lower_names for actor in actors)
+            else:
+                film["name_match"] = False
+
+            # Genre match flag
+            if detected_genres:
+                lower_genres = set(detected_genres)
+                film["genre_match"] = any(
+                    genre.lower() in lower_genres for genre in film.get("genres", [])
+                )
+            else:
+                film["genre_match"] = False
+
+            return film
 
         # Set to track unique films and prevent duplicates
         unique_films = set()
@@ -273,23 +287,32 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 "cosine_similarity": cosine_sim,
                 "l2_distance": l2_distance,
             }
+            film = assign_match_flags(film)
             matches.append(film)
             unique_films.add(idx)
 
         # Sort matches in descending order
         matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
 
-        # If no detected names, return top matches
-        if not detected_names:
+        # If no detected names or genres, return top matches
+        if not (detected_names or detected_genres):
             return matches[:N_TOP_MATCHES]
 
-        lower_names = set(detected_names)
-        filtered = filter_matches(matches, lower_names)
+        # Determine filtering condition based on detected entities
+        if detected_names and detected_genres:
+            condition = lambda film: film["name_match"] and film["genre_match"]
+        elif detected_names:
+            condition = lambda film: film["name_match"]
+        elif detected_genres:
+            condition = lambda film: film["genre_match"]
+
+        # Filter matches based on the condition
+        filtered = [film for film in matches if condition(film)]
 
         current_k = 0
         unique_filtered_films = set()
 
-        # Expand search
+        # Expand search if necessary
         while current_k < MAX_RESULTS and len(filtered) < N_TOP_MATCHES:
             current_k += SEARCH_INCREMENT
             distances, indices = index.search(query_vector, current_k)
@@ -298,7 +321,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 # Sanitize similarity score
                 cosine_sim = max(min(float(sim), 1.0), 0.0)
 
-                # Skip if film already processed or not unique
+                # Skip if film already processed or not unique in filtered set
                 if idx in unique_films or idx in unique_filtered_films:
                     continue
 
@@ -308,15 +331,9 @@ class FilmRecommendationsView(BaseEmbeddingView):
                     "cosine_similarity": cosine_sim,
                     "l2_distance": l2_distance,
                 }
+                film = assign_match_flags(film)
 
-                # Check name filtering
-                directors = [director.lower() for director in film.get("directors", [])]
-                actors = [actor.lower() for actor in film.get("main_actors", [])]
-
-                if any(director in lower_names for director in directors) or any(
-                    actor in lower_names for actor in actors
-                ):
-                    film["filtered_match"] = True
+                if condition(film):
                     filtered.append(film)
                     unique_filtered_films.add(idx)
 
