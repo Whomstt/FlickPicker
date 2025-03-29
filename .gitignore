@@ -6,8 +6,9 @@ __pycache__
 db.sqlite3
 media
 
-# Json files #
+# Embeddings and JSON #
 *.json
+*.npy
 
 # Ollama
 ollamadata/
