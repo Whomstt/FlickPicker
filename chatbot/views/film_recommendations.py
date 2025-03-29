@@ -195,6 +195,18 @@ class FilmRecommendationsView(BaseEmbeddingView):
         except (IOError, json.JSONDecodeError):
             return []
 
+        # Map alternative genre names to match their canonical form
+        genre_alternatives = {
+            "scifi": "science fiction",
+            "sci-fi": "science fiction",
+            "sci fi": "science fiction",
+            "rom": "romantic",
+            "com": "comedy",
+            "doc": "documentary",
+            "historical": "history",
+            "musical": "music",
+        }
+
         detected_genres = set()
 
         def regex_match(genre, text):
@@ -211,6 +223,9 @@ class FilmRecommendationsView(BaseEmbeddingView):
             ):
                 detected_genres.add(genre.lower())
 
+        for alternative, genre in genre_alternatives.items():
+            if alternative.lower() in prompt.lower():
+                detected_genres.add(genre.lower())
         return list(detected_genres)
 
     def prepare_top_matches(
