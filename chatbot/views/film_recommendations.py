@@ -20,7 +20,9 @@ from chatbot.config import (
     TEMPERATURE,
     PROMPT_WEIGHT,
     NAME_WEIGHT,
-    FUZZY_THRESHOLD,
+    GENRE_WEIGHT,
+    NAME_FUZZY_THRESHOLD,
+    GENRE_FUZZY_THRESHOLD,
 )
 
 
@@ -45,12 +47,19 @@ class FilmRecommendationsView(BaseEmbeddingView):
         detected_names = self.find_names_in_prompt(prompt)
         if detected_names:
             print("Detected names in prompt: " + ", ".join(detected_names))
+        detected_genres = self.find_genres_in_prompt(prompt)
+        if detected_genres:
+            print("Detected genres in prompt: " + ", ".join(detected_genres))
 
         # Clean the prompt by removing detected names
         clean_prompt = prompt
         for name in detected_names:
             clean_prompt = re.sub(
                 rf"\b{re.escape(name)}\b", "", clean_prompt, flags=re.IGNORECASE
+            ).strip()
+        for genre in detected_genres:
+            clean_prompt = re.sub(
+                rf"\b{re.escape(genre)}\b", "", clean_prompt, flags=re.IGNORECASE
             ).strip()
 
         data, embeddings, index = self.load_cache()
@@ -73,13 +82,20 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 names_embedding = await self.fetch_embedding(
                     names_str, session, service="nomic"
                 )
-                # Weighted sum of embeddings
-                combined_embedding = (
-                    PROMPT_WEIGHT * prompt_embedding + NAME_WEIGHT * names_embedding
+            # Get the genre embedding if detected
+            if detected_genres:
+                genres_str = ", ".join(detected_genres)
+                genres_embedding = await self.fetch_embedding(
+                    genres_str, session, service="nomic"
                 )
-                query_vector = combined_embedding.reshape(1, -1)
-            else:
-                query_vector = prompt_embedding.reshape(1, -1)
+
+            # Weighted sum of embeddings
+            combined_embedding = PROMPT_WEIGHT * prompt_embedding
+            if detected_names:
+                combined_embedding += NAME_WEIGHT * names_embedding
+            if detected_genres:
+                combined_embedding += GENRE_WEIGHT * genres_embedding
+            query_vector = combined_embedding.reshape(1, -1)
 
         # Normalize the query vector using FAISS
         faiss.normalize_L2(query_vector)
@@ -87,7 +103,13 @@ class FilmRecommendationsView(BaseEmbeddingView):
         # Search for top matches
         distances, indices = index.search(query_vector, N_TOP_MATCHES)
         top_matches = self.prepare_top_matches(
-            data, distances, indices, detected_names, index, query_vector
+            data,
+            distances,
+            indices,
+            detected_names,
+            detected_genres,
+            index,
+            query_vector,
         )
         explanation = await self.generate_recommendation_explanation(
             prompt, top_matches
@@ -105,7 +127,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
             },
         )
 
-    def sliding_window_fuzzy(self, prompt, candidate, FUZZY_THRESHOLD):
+    def sliding_window_fuzzy(self, prompt, candidate, threshold):
         """Slide window over prompt and search fuzzy match"""
         prompt = prompt.lower()
         candidate = candidate.lower()
@@ -121,13 +143,11 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 return True
             # Use a fuzzy ratio for partial matches
             score = fuzz.ratio(candidate, window)
-            if score >= FUZZY_THRESHOLD:
+            if score >= threshold:
                 return True
         return False
 
-    def find_names_in_prompt(
-        self, prompt, json_path="actors_directors.json", FUZZY_THRESHOLD=90
-    ):
+    def find_names_in_prompt(self, prompt, json_path="actors_directors.json"):
         """
         Detect candidate names in user's prompt
         """
@@ -148,16 +168,48 @@ class FilmRecommendationsView(BaseEmbeddingView):
             if regex_match(name, prompt):
                 detected_names.add(name.lower())
             # If exact match fails we use fuzzy matching
-            elif self.sliding_window_fuzzy(prompt, name, FUZZY_THRESHOLD):
+            elif self.sliding_window_fuzzy(
+                prompt, name, threshold=NAME_FUZZY_THRESHOLD
+            ):
                 detected_names.add(name.lower())
 
         for name in data.get("unique_directors", []):
             if regex_match(name, prompt):
                 detected_names.add(name.lower())
-            elif self.sliding_window_fuzzy(prompt, name, FUZZY_THRESHOLD):
+            elif self.sliding_window_fuzzy(
+                prompt, name, threshold=NAME_FUZZY_THRESHOLD
+            ):
                 detected_names.add(name.lower())
 
         return list(detected_names)
+
+    def find_genres_in_prompt(self, prompt, json_path="genres.json"):
+        """
+        Detect candidate genres in user's prompt
+        """
+        try:
+            with open(json_path, "r") as f:
+                data = json.load(f)
+        except (IOError, json.JSONDecodeError):
+            return []
+
+        detected_genres = set()
+
+        def regex_match(genre, text):
+            pattern = r"\b" + re.escape(genre) + r"\b"
+            return re.search(pattern, text, re.IGNORECASE) is not None
+
+        for genre in data.get("unique_genres", []):
+            # Try exact match first
+            if regex_match(genre, prompt):
+                detected_genres.add(genre.lower())
+            # If exact match fails we use fuzzy matching
+            elif self.sliding_window_fuzzy(
+                prompt, genre, threshold=GENRE_FUZZY_THRESHOLD
+            ):
+                detected_genres.add(genre.lower())
+
+        return list(detected_genres)
 
     def prepare_top_matches(
         self,
@@ -165,6 +217,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
         distances,
         indices,
         detected_names=None,
+        detected_genres=None,
         index=None,
         query_vector=None,
     ):

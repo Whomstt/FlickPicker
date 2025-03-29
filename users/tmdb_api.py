@@ -72,6 +72,16 @@ def extract_unique_names(films):
     return sorted(unique_actors), sorted(unique_directors)
 
 
+def extract_unique_genres(films):
+    """Extract and return sorted list of unique genres."""
+    unique_genres = set()
+    for film in films:
+        genres = film.get("genres", [])
+        for genre in genres:
+            unique_genres.add(genre.lower())
+    return sorted(unique_genres)
+
+
 async def fetch_and_save_films():
     """
     Fetch film data per year using the TMDB discover endpoint, process it,
@@ -239,6 +249,16 @@ async def fetch_and_save_films():
         logging.error(
             f"Error saving actors and directors to {actors_directors_file}: {e}"
         )
+    logging.info("Extracting unique genres...")
+    unique_genres = extract_unique_genres(all_films)
+    genres_data = {"unique_genres": unique_genres}
+    genres_file = "genres.json"
+    try:
+        with open(genres_file, "w", encoding="utf-8") as f:
+            json.dump(genres_data, f, indent=4, ensure_ascii=False)
+        logging.info(f"Genres successfully saved to {genres_file}.")
+    except Exception as e:
+        logging.error(f"Error saving genres to {genres_file}: {e}")
 
     # Reset cancellation flag
     cancel_fetch = False

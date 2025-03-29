@@ -33,11 +33,14 @@ SEARCH_INCREMENT = 1024  # Increment for searching more results
 MAX_RESULTS = 4096  # Maximum number of search results
 M = 16  # Number of subquantizers
 NBITS = 8  # Number of bits per subquantizer
+
 PROMPT_WEIGHT = 0.7  # Weight for prompt embedding
 NAME_WEIGHT = 0.3  # Weight for actor / director names embedding
+GENRE_WEIGHT = 0.5  # Weight for genre embedding
 
 # Fuzzy matching settings
-FUZZY_THRESHOLD = 95  # Fuzzy matching threshold in %
+NAME_FUZZY_THRESHOLD = 95  # Fuzzy matching threshold for names in %
+GENRE_FUZZY_THRESHOLD = 80  # Fuzzy matching threshold for genres in %
 
 # Settings for TMDB API
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
