@@ -9,11 +9,14 @@
 
     {% if messages %}
         {% for message in messages %}
-            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
-                {{ message }}
-            </div>
+            {% if message.tags != 'success' %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+            {% endif %}
         {% endfor %}
     {% endif %}
+
 
     <form method="POST" class="mb-4 col-7 mx-auto" id="recommendation-form">
         {% csrf_token %}
