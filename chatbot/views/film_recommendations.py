@@ -206,6 +206,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
             "rom": "romantic",
             "com": "comedy",
             "doc": "documentary",
+            "historic": "history",
             "historical": "history",
             "musical": "music",
         }
