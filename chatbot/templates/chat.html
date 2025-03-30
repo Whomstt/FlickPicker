@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="container">
-    <h2 class="display-4 text-center my-5">Film Recommendation Assistant</h2>
+    <h2 class="display-4 text-center my-5">RAG-Enhanced <br> Film Recommendation Assistant</h2>
 
     {% if messages %}
         {% for message in messages %}
@@ -15,11 +15,11 @@
         {% endfor %}
     {% endif %}
 
-    <form method="POST" class="mb-4" id="recommendation-form">
+    <form method="POST" class="mb-4 col-7 mx-auto" id="recommendation-form">
         {% csrf_token %}
         <div class="mb-3">
             <label for="prompt" class="form-label">Enter a prompt of a film you would like to watch:</label>
-            <textarea id="prompt" name="prompt" rows="4" class="form-control" placeholder="I want a science fiction film about space exploration..."></textarea>
+            <textarea id="prompt" name="prompt" rows="4" class="form-control" placeholder="I want a sci-fi film about space exploration..."></textarea>
         </div>
         <button type="submit" class="btn btn-primary w-100" id="submit-button">Get Recommendations</button>
     </form>

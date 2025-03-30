@@ -17,6 +17,7 @@
     <style>
         html, body {
             height: 100%;
+            background-color: #f0f0f0;
         }
     </style>
 </head>
@@ -24,7 +25,10 @@
     <header class="bg-dark text-white p-3">
         <div class="container">
             <h1>
-                <a href="/" class="text-white text-decoration-none">FlickPicker</a>
+                <a href="/" class="text-white text-decoration-none">
+                    <img src="{% static 'logo/flickpicker_logo.png' %}" alt="FlickPicker Logo" class="d-inline-block align-middle rounded-circle" style="height: 40px; width: 40px;">
+                    FlickPicker
+                </a>
             </h1>
             <nav>
                 <a href="/" class="text-white me-4">Home</a>
