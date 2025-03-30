@@ -9,6 +9,9 @@ env:
   AZURE_CONTAINER_REGISTRY: flickpicker
   CONTAINER_APP_NAME: flickpicker
   RESOURCE_GROUP: FlickPicker
+  STORAGE_ACCOUNT_NAME: flickpickerstorage
+  STORAGE_CONTAINER_NAME: data-files
+  MOUNT_PATH: /
 
 jobs:
   build-and-deploy:
@@ -16,7 +19,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -39,21 +42,31 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Upload JSON Files to Azure Blob Storage
-        uses: bacongobbler/azure-blob-storage-upload@main
-        with:
-          source_dir: .
-          container_name: data-files
-          connection_string: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
-          extra_args: '--pattern *.json'
-          overwrite: 'true'
+      - name: Retrieve STORAGE_ACCOUNT_KEY from Key Vault
+        run: |
+          STORAGE_ACCOUNT_KEY=$(az keyvault secret show --vault-name flickpickerkeys --name storage-account-key --query value -o tsv)
+          echo "STORAGE_ACCOUNT_KEY=$STORAGE_ACCOUNT_KEY" >> $GITHUB_ENV
 
       - name: Deploy to Azure Container Apps via CLI
         run: |
+          # First, create or update the storage mount
+          az containerapp env storage set \
+            --name ${{ env.CONTAINER_APP_NAME }}-env \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --storage-name blobstorage \
+            --azure-file-account-name ${{ env.STORAGE_ACCOUNT_NAME }} \
+            --azure-file-account-key ${{ env.STORAGE_ACCOUNT_KEY }} \
+            --azure-file-share-name ${{ env.STORAGE_CONTAINER_NAME }} \
+            --access-mode ReadWrite
+
+          # Then update the container app with the storage mount and other settings
           az containerapp update \
             --name ${{ env.CONTAINER_APP_NAME }} \
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }} \
+            --mount-type azure-file \
+            --mount-name blobstorage \
+            --mount-path ${{ env.MOUNT_PATH }} \
             --set-env-vars ASPNETCORE_ENVIRONMENT=Development \
               DJANGO_ADMIN_PASSWORD=${{ secrets.DJANGO_ADMIN_PASSWORD }} \
               GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
@@ -66,4 +79,6 @@ jobs:
               PGUSER=${{ secrets.PGUSER }} \
               PGPASSWORD=${{ secrets.PGPASSWORD }} \
               PGHOST=${{ secrets.PGHOST }} \
-              PGPORT=${{ secrets.PGPORT }}
+              PGPORT=${{ secrets.PGPORT }} \
+              AZURE_STORAGE_CONNECTION_STRING=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }} \
+              AZURE_STORAGE_CONTAINER_NAME=${{ env.STORAGE_CONTAINER_NAME }}
