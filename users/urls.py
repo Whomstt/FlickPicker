@@ -30,4 +30,5 @@ urlpatterns = [
         staff_member_required(cancel_generate_view),
         name="cancel_generate",
     ),
+    path("download_all_files/", views.download_all_files, name="download_all_files"),
 ]

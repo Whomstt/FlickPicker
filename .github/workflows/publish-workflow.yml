@@ -61,6 +61,7 @@ jobs:
               PGPASSWORD=${{ secrets.PGPASSWORD }} \
               PGHOST=${{ secrets.PGHOST }} \
               PGPORT=${{ secrets.PGPORT }} \
+              AZURE_STORAGE_CONNECTION_STRING=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }} \
               STORAGE_ACCOUNT_NAME=${{ env.STORAGE_ACCOUNT_NAME }} \
               BLOB_CONTAINER_NAME=${{ env.BLOB_CONTAINER_NAME }} \
               AZURE_STORAGE_USE_MANAGED_IDENTITY=true
