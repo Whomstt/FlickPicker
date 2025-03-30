@@ -9,6 +9,8 @@ env:
   AZURE_CONTAINER_REGISTRY: flickpicker
   CONTAINER_APP_NAME: flickpicker
   RESOURCE_GROUP: FlickPicker
+  STORAGE_ACCOUNT_NAME: flickpickerstorage
+  BLOB_CONTAINER_NAME: data-files
 
 jobs:
   build-and-deploy:
@@ -45,7 +47,8 @@ jobs:
             --name ${{ env.CONTAINER_APP_NAME }} \
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }} \
-            --set-env-vars ASPNETCORE_ENVIRONMENT=Development \
+            --set-env-vars \
+              ASPNETCORE_ENVIRONMENT=Development \
               DJANGO_ADMIN_PASSWORD=${{ secrets.DJANGO_ADMIN_PASSWORD }} \
               GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
               GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
@@ -57,4 +60,7 @@ jobs:
               PGUSER=${{ secrets.PGUSER }} \
               PGPASSWORD=${{ secrets.PGPASSWORD }} \
               PGHOST=${{ secrets.PGHOST }} \
-              PGPORT=${{ secrets.PGPORT }}
+              PGPORT=${{ secrets.PGPORT }} \
+              STORAGE_ACCOUNT_NAME=${{ env.STORAGE_ACCOUNT_NAME }} \
+              BLOB_CONTAINER_NAME=${{ env.BLOB_CONTAINER_NAME }} \
+              AZURE_STORAGE_USE_MANAGED_IDENTITY=true
