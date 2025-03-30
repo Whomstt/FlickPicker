@@ -9,8 +9,6 @@ env:
   AZURE_CONTAINER_REGISTRY: flickpicker
   CONTAINER_APP_NAME: flickpicker
   RESOURCE_GROUP: FlickPicker
-  STORAGE_ACCOUNT_NAME: flickpickerstorage
-  BLOB_CONTAINER_NAME: data-files
 
 jobs:
   build-and-deploy:
@@ -61,6 +59,3 @@ jobs:
               PGPASSWORD=${{ secrets.PGPASSWORD }} \
               PGHOST=${{ secrets.PGHOST }} \
               PGPORT=${{ secrets.PGPORT }} \
-              STORAGE_ACCOUNT_NAME=${{ env.STORAGE_ACCOUNT_NAME }} \
-              BLOB_CONTAINER_NAME=${{ env.BLOB_CONTAINER_NAME }} \
-              AZURE_STORAGE_USE_MANAGED_IDENTITY=true
