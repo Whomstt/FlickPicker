@@ -98,20 +98,26 @@ class BaseEmbeddingView(View):
 
     def load_cache(self):
         """
-        Load the data, embeddings, and index from the cache directory.
+        Load the data and index from the cache directory
         """
-        required_files = [
-            os.path.join(TMDB_OUTPUT_FILE),
-            os.path.join(CACHE_DIR, "film_embeddings.npy"),
-            FAISS_INDEX_PATH,
-        ]
-        if not all(os.path.exists(p) for p in required_files):
+        data_path = os.path.join(TMDB_OUTPUT_FILE)
+        index_path = FAISS_INDEX_PATH
+        embeddings_path = os.path.join(CACHE_DIR, "film_embeddings.npy")
+
+        # Check for required files (data and index)
+        if not (os.path.exists(data_path) and os.path.exists(index_path)):
             return None, None, None
 
-        with open(required_files[0], "r") as f:
+        with open(data_path, "r") as f:
             data = json.load(f)
-        embeddings = np.load(required_files[1])
-        index = faiss.read_index(required_files[2])
+        index = faiss.read_index(index_path)
+
+        # Load embeddings if available; otherwise, set to None
+        if os.path.exists(embeddings_path):
+            embeddings = np.load(embeddings_path)
+        else:
+            embeddings = None
+
         return data, embeddings, index
 
     def json_to_text(self, item):
