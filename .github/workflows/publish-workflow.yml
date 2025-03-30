@@ -42,11 +42,6 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Retrieve STORAGE_ACCOUNT_KEY from Key Vault
-        run: |
-          STORAGE_ACCOUNT_KEY=$(az keyvault secret show --vault-name flickpickerkeys --name storage-account-key --query value -o tsv)
-          echo "STORAGE_ACCOUNT_KEY=$STORAGE_ACCOUNT_KEY" >> $GITHUB_ENV
-
       - name: Deploy to Azure Container Apps via CLI
         run: |
           # First, create or update the storage mount
@@ -55,7 +50,7 @@ jobs:
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --storage-name blobstorage \
             --azure-file-account-name ${{ env.STORAGE_ACCOUNT_NAME }} \
-            --azure-file-account-key ${{ env.STORAGE_ACCOUNT_KEY }} \
+            --azure-file-account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} \
             --azure-file-share-name ${{ env.STORAGE_CONTAINER_NAME }} \
             --access-mode ReadWrite
 
