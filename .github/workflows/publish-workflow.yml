@@ -43,15 +43,15 @@ jobs:
         run: |
           az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} \
                                  --container-name data-files \
-                                 --file ./actors_directors.json \
+                                 --file ../../actors_directors.json \
                                  --name actors_directors.json
           az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} \
                                  --container-name data-files \
-                                 --file ./films_data.json \
+                                 --file ../../films_data.json \
                                  --name films_data.json
           az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} \
                                  --container-name data-files \
-                                 --file ./genres.json \
+                                 --file ../../genres.json \
                                  --name genres.json
         env:
           AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
