@@ -42,8 +42,16 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy to Azure Container Apps via CLI
+      - name: Create volume and deploy to Azure Container Apps via CLI
         run: |
+          az containerapp volume create \
+            --name flickpicker-volume \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --container-app ${{ env.CONTAINER_APP_NAME }} \
+            --azure-file-share-name ${{ env.FILE_SHARE_NAME }} \
+            --azure-storage-account-name ${{ env.STORAGE_ACCOUNT_NAME }} \
+            --azure-storage-account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+
           az containerapp update \
             --name ${{ env.CONTAINER_APP_NAME }} \
             --resource-group ${{ env.RESOURCE_GROUP }} \
@@ -62,7 +70,4 @@ jobs:
               PGPASSWORD=${{ secrets.PGPASSWORD }} \
               PGHOST=${{ secrets.PGHOST }} \
               PGPORT=${{ secrets.PGPORT }} \
-            --azure-file-share-name ${{ env.FILE_SHARE_NAME }} \
-            --azure-storage-account-name ${{ env.STORAGE_ACCOUNT_NAME }} \
-            --azure-storage-account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} \
-            --mount-path /mnt/data
+            --volume name=flickpicker-volume mount-path=/mnt/data
