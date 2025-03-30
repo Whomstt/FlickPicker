@@ -12,7 +12,6 @@ WORKDIR /code
 COPY requirements.txt /code/
 RUN apt-get update && apt-get install git -y && apt-get install curl -y
 RUN pip install --no-cache-dir -r requirements.txt
-RUN python -m spacy download en_core_web_sm
 
 # Copy project files
 COPY . /code/
