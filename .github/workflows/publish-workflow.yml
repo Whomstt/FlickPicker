@@ -9,6 +9,9 @@ env:
   AZURE_CONTAINER_REGISTRY: flickpicker
   CONTAINER_APP_NAME: flickpicker
   RESOURCE_GROUP: FlickPicker
+  STORAGE_ACCOUNT_NAME: flickpickerstorage
+  FILE_SHARE_NAME: flickpickerfileshare
+  STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
 
 jobs:
   build-and-deploy:
@@ -59,3 +62,7 @@ jobs:
               PGPASSWORD=${{ secrets.PGPASSWORD }} \
               PGHOST=${{ secrets.PGHOST }} \
               PGPORT=${{ secrets.PGPORT }} \
+            --azure-file-share-name ${{ env.FILE_SHARE_NAME }} \
+            --azure-storage-account-name ${{ env.STORAGE_ACCOUNT_NAME }} \
+            --azure-storage-account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} \
+            --mount-path /mnt/data
