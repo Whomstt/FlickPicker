@@ -11,5 +11,3 @@ ollama==0.4.7
 faiss-cpu==1.10.0
 whitenoise==6.9.0
 RapidFuzz==3.12.2
-azure-identity==1.21.0
-azure-storage-blob==12.25.1

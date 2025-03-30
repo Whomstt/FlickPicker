@@ -9,13 +9,11 @@ env:
   AZURE_CONTAINER_REGISTRY: flickpicker
   CONTAINER_APP_NAME: flickpicker
   RESOURCE_GROUP: FlickPicker
-  STORAGE_ACCOUNT_NAME: flickpickerstorage
-  FILE_SHARE_NAME: flickpickerfileshare
-  STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -41,19 +39,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Configure Azure Container App storage
-        run: |
-          # First, add the storage to the Container App Environment
-          az containerapp env storage set \
-            --name flickpicker-env \
-            --resource-group ${{ env.RESOURCE_GROUP }} \
-            --storage-name flickpicker-volume \
-            --access-mode ReadWrite \
-            --azure-file-account-name ${{ env.STORAGE_ACCOUNT_NAME }} \
-            --azure-file-account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} \
-            --azure-file-share-name ${{ env.FILE_SHARE_NAME }}
-
-      - name: Deploy to Azure Container App with volume mount
+      - name: Deploy to Azure Container Apps via CLI
         run: |
           az containerapp update \
             --name ${{ env.CONTAINER_APP_NAME }} \
@@ -73,4 +59,3 @@ jobs:
               PGPASSWORD=${{ secrets.PGPASSWORD }} \
               PGHOST=${{ secrets.PGHOST }} \
               PGPORT=${{ secrets.PGPORT }} \
-            --volume-mount name=flickpicker-volume mount-path=/mnt/data
