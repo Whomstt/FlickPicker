@@ -38,20 +38,17 @@ class FilmRecommendationsView(BaseEmbeddingView):
         return await sync_to_async(render)(request, "chat.html")
 
     async def post(self, request, *args, **kwargs):
-        start_time = time.time()
+        start_time = time.perf_counter()
         prompt = request.POST.get("prompt", "").strip()
         if not prompt:
             messages.error(request, "Please enter a prompt.")
             return await sync_to_async(redirect)("film_recommendations")
 
+        # Detect names and genres
         detected_names = self.find_names_in_prompt(prompt)
-        if detected_names:
-            print("Detected names in prompt: " + ", ".join(detected_names))
         detected_genres = self.find_genres_in_prompt(prompt)
-        if detected_genres:
-            print("Detected genres in prompt: " + ", ".join(detected_genres))
 
-        # Clean the prompt by removing detected names
+        # Clean the prompt by removing detected names and genres
         clean_prompt = prompt
         for name in detected_names:
             clean_prompt = re.sub(
@@ -70,23 +67,44 @@ class FilmRecommendationsView(BaseEmbeddingView):
         if isinstance(index, faiss.IndexIVF):
             index.nprobe = NPROBE
 
-        # Generate the query embedding using a weighted sum approach
+        time_breakdown = {}  # Dictionary to store timing for each event
+
+        # Record time after entity detection and prompt cleaning
+        time_breakdown["Entity Detection & Cleaning"] = time.perf_counter() - start_time
+
         async with aiohttp.ClientSession() as session:
             # Get the embedding for the cleaned prompt
+            embed_prompt_start = time.perf_counter()
             prompt_embedding = await self.fetch_embedding(
                 clean_prompt, session, service="nomic"
             )
+            embed_prompt_end = time.perf_counter()
+            time_breakdown["Prompt Embedding (Nomic Embed - Atlas API)"] = (
+                embed_prompt_end - embed_prompt_start
+            )
+
             # Get the names embedding if detected
             if detected_names:
                 names_str = ", ".join(detected_names)
+                embed_names_start = time.perf_counter()
                 names_embedding = await self.fetch_embedding(
                     names_str, session, service="nomic"
                 )
+                embed_names_end = time.perf_counter()
+                time_breakdown["Names Embedding (Nomic Embed - Atlas API)"] = (
+                    embed_names_end - embed_names_start
+                )
+
             # Get the genre embedding if detected
             if detected_genres:
                 genres_str = ", ".join(detected_genres)
+                embed_genres_start = time.perf_counter()
                 genres_embedding = await self.fetch_embedding(
                     genres_str, session, service="nomic"
+                )
+                embed_genres_end = time.perf_counter()
+                time_breakdown["Genres Embedding (Nomic Embed - Atlas API)"] = (
+                    embed_genres_end - embed_genres_start
                 )
 
             # Weighted sum of embeddings
@@ -100,8 +118,12 @@ class FilmRecommendationsView(BaseEmbeddingView):
         # Normalize the query vector using FAISS
         faiss.normalize_L2(query_vector)
 
-        # Search for top matches
+        # FAISS Search
+        faiss_search_start = time.perf_counter()
         distances, indices = index.search(query_vector, N_TOP_MATCHES)
+        faiss_search_end = time.perf_counter()
+        time_breakdown["FAISS Search"] = faiss_search_end - faiss_search_start
+
         top_matches = self.prepare_top_matches(
             data,
             distances,
@@ -111,13 +133,22 @@ class FilmRecommendationsView(BaseEmbeddingView):
             index,
             query_vector,
         )
+
+        # GPT-4o-mini Explanation
+        explanation_start = time.perf_counter()
         explanation = await self.generate_recommendation_explanation(
             prompt, top_matches
         )
-        recommendation_time = time.time() - start_time
+        explanation_end = time.perf_counter()
+        time_breakdown["Explanation Generation (GPT-4o-mini - OpenAI API)"] = (
+            explanation_end - explanation_start
+        )
 
+        # Format names and genres
         detected_names = [name.title() for name in detected_names]
         detected_genres = [genre.title() for genre in detected_genres]
+
+        time_breakdown["Total Time"] = time.perf_counter() - start_time
 
         return await sync_to_async(render)(
             request,
@@ -126,7 +157,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 "response": explanation,
                 "matches": top_matches,
                 "prompt": prompt,
-                "recommendation_time": recommendation_time,
+                "time_breakdown": time_breakdown,
                 "detected_names": detected_names,
                 "detected_genres": detected_genres,
             },

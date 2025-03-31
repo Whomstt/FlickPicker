@@ -42,33 +42,6 @@
                 <p>{{ prompt }}</p>
             </div>
         </div>
-        
-        {% if recommendation_time %}
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3>Processing Time</h3>
-                </div>
-                <div class="card-body">
-                    <p>The recommendation was generated in {{ recommendation_time|floatformat:2 }} seconds.</p>
-                </div>
-            </div>
-        {% endif %}
-        
-        {% if detected_names or detected_genres %}
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3>Detected Entities</h3>
-                </div>
-                <div class="card-body">
-                    {% if detected_names %}
-                        <p><strong>Names:</strong> {{ detected_names|join:", " }}</p>
-                    {% endif %}
-                    {% if detected_genres %}
-                        <p><strong>Genres:</strong> {{ detected_genres|join:", " }}</p>
-                    {% endif %}
-                </div>
-            </div>
-        {% endif %}
 
         <div class="card mb-4">
             <div class="card-header">
@@ -146,6 +119,36 @@
                 </blockquote>
             </div>
         </div>
+        {% if time_breakdown %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Time Breakdown</h3>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        {% for key, value in time_breakdown.items %}
+                            <li><strong>{{ key }}:</strong> {{ value|floatformat:5 }} seconds</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+    
+        {% if detected_names or detected_genres %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Detected Entities</h3>
+                </div>
+                <div class="card-body">
+                    {% if detected_names %}
+                        <p><strong>Names:</strong> {{ detected_names|join:", " }}</p>
+                    {% endif %}
+                    {% if detected_genres %}
+                        <p><strong>Genres:</strong> {{ detected_genres|join:", " }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
     {% endif %}
 </div>
 
