@@ -29,12 +29,12 @@ EMBEDDING_MODEL = "nomic-embed-text"
 NPROBE = 128  # Number of clusters to be searched
 NLIST = 1024  # Number of clusters to be stored
 N_TOP_MATCHES = 5  # Number of top matches to return
-SEARCH_INCREMENT = 4096  # Increment for searching more results
-MAX_RESULTS = 16384  # Maximum number of search results
+SEARCH_INCREMENT = 16384  # Increment for searching more results
+MAX_RESULTS = 65536  # Maximum number of search results
 M = 16  # Number of subquantizers
 NBITS = 8  # Number of bits per subquantizer
 
-PROMPT_WEIGHT = 0.7  # Weight for prompt embedding
+PROMPT_WEIGHT = 1  # Weight for prompt embedding
 NAME_WEIGHT = 0.6  # Weight for actor / director names embedding
 GENRE_WEIGHT = 0.4  # Weight for genre embedding
 

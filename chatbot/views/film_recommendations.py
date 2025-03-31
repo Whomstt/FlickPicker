@@ -31,6 +31,8 @@ from chatbot.entity_recognition import (
     find_genres_in_prompt,
 )
 
+from chatbot.prepare_top_matches import prepare_top_matches
+
 
 class FilmRecommendationsView(BaseEmbeddingView):
     """
@@ -44,12 +46,15 @@ class FilmRecommendationsView(BaseEmbeddingView):
         return await sync_to_async(render)(request, "chat.html")
 
     async def post(self, request, *args, **kwargs):
+        time_breakdown = {}  # Dictionary to store timing for each event
         start_time = time.perf_counter()
+
         prompt = request.POST.get("prompt", "").strip()
         if not prompt:
             messages.error(request, "Please enter a prompt.")
             return await sync_to_async(redirect)("film_recommendations")
 
+        entity_detection_start = time.perf_counter()
         # Detect names and genres
         detected_names = find_names_in_prompt(prompt)
         if detected_names:
@@ -69,18 +74,10 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 rf"\b{re.escape(genre)}\b", "", clean_prompt, flags=re.IGNORECASE
             ).strip()
 
-        data, embeddings, index = self.load_cache()
-        if data is None:
-            messages.error(request, "Embeddings not found. Please generate them first.")
-            return await sync_to_async(redirect)("film_recommendations")
-
-        if isinstance(index, faiss.IndexIVF):
-            index.nprobe = NPROBE
-
-        time_breakdown = {}  # Dictionary to store timing for each event
-
-        # Record time after entity detection and prompt cleaning
-        time_breakdown["Entity Detection & Cleaning"] = time.perf_counter() - start_time
+        entity_detection_end = time.perf_counter()
+        time_breakdown = {
+            "Entity Detection & Cleaning": entity_detection_end - entity_detection_start
+        }
 
         async with aiohttp.ClientSession() as session:
             # Get the embedding for the cleaned prompt
@@ -128,11 +125,25 @@ class FilmRecommendationsView(BaseEmbeddingView):
         # Normalize the query vector using FAISS
         faiss.normalize_L2(query_vector)
 
+        # Load FAISS Index
+        load_faiss_start = time.perf_counter()
+
+        data, embeddings, index = self.load_cache()
+        if data is None:
+            messages.error(request, "Embeddings not found. Please generate them first.")
+            return await sync_to_async(redirect)("film_recommendations")
+
+        if isinstance(index, faiss.IndexIVF):
+            index.nprobe = NPROBE
+
+        load_faiss_end = time.perf_counter()
+        time_breakdown["Load FAISS Index"] = load_faiss_end - load_faiss_start
+
         # FAISS Search
         faiss_search_start = time.perf_counter()
         distances, indices = index.search(query_vector, N_TOP_MATCHES)
 
-        top_matches = self.prepare_top_matches(
+        top_matches = prepare_top_matches(
             data,
             distances,
             indices,
@@ -172,129 +183,6 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 "detected_genres": detected_genres,
             },
         )
-
-    def prepare_top_matches(
-        self,
-        data,
-        distances,
-        indices,
-        detected_names=None,
-        detected_genres=None,
-        index=None,
-        query_vector=None,
-    ):
-        """
-        Prepare the top film matches for the user.
-        """
-
-        def assign_match_flags(film):
-            # Name match flag
-            if detected_names:
-                lower_names = set(detected_names)
-                directors = [director.lower() for director in film.get("directors", [])]
-                actors = [actor.lower() for actor in film.get("main_actors", [])]
-                film["name_match"] = any(
-                    director in lower_names for director in directors
-                ) or any(actor in lower_names for actor in actors)
-            else:
-                film["name_match"] = False
-
-            # Genre match flag
-            if detected_genres:
-                lower_genres = set(detected_genres)
-                film["genre_match"] = any(
-                    genre.lower() in lower_genres for genre in film.get("genres", [])
-                )
-            else:
-                film["genre_match"] = False
-
-            return film
-
-        # Set to track unique films and prevent duplicates
-        unique_films = set()
-        matches = []
-
-        # Process initial FAISS search results
-        for sim, idx in zip(distances[0], indices[0]):
-            # Sanitize similarity score
-            cosine_sim = max(min(float(sim), 1.0), 0.0)
-
-            # Skip if film already processed
-            if idx in unique_films:
-                continue
-
-            l2_distance = (2 - 2 * cosine_sim) ** 0.5
-            film = {
-                **data[idx],
-                "cosine_similarity": cosine_sim,
-                "l2_distance": l2_distance,
-            }
-            film = assign_match_flags(film)
-            matches.append(film)
-            unique_films.add(idx)
-
-        # Sort matches in descending order
-        matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
-
-        # If no detected names or genres, return top matches
-        if not (detected_names or detected_genres):
-            return matches[:N_TOP_MATCHES]
-
-        # Determine filtering condition based on detected entities
-        if detected_names and detected_genres:
-            condition = lambda film: film["name_match"] and film["genre_match"]
-        elif detected_names:
-            condition = lambda film: film["name_match"]
-        elif detected_genres:
-            condition = lambda film: film["genre_match"]
-
-        # Filter matches based on the condition
-        filtered = [film for film in matches if condition(film)]
-
-        current_k = 0
-        unique_filtered_films = set()
-
-        # Expand search if necessary
-        while current_k < MAX_RESULTS and len(filtered) < N_TOP_MATCHES:
-            current_k += SEARCH_INCREMENT
-            distances, indices = index.search(query_vector, current_k)
-
-            for sim, idx in zip(distances[0], indices[0]):
-                # Sanitize similarity score
-                cosine_sim = max(min(float(sim), 1.0), 0.0)
-
-                # Skip if film already processed or not unique in filtered set
-                if idx in unique_films or idx in unique_filtered_films:
-                    continue
-
-                l2_distance = (2 - 2 * cosine_sim) ** 0.5
-                film = {
-                    **data[idx],
-                    "cosine_similarity": cosine_sim,
-                    "l2_distance": l2_distance,
-                }
-                film = assign_match_flags(film)
-
-                if condition(film):
-                    filtered.append(film)
-                    unique_filtered_films.add(idx)
-
-                unique_films.add(idx)
-
-            # Sort and truncate to prevent excessive growth
-            filtered.sort(key=lambda x: x["cosine_similarity"], reverse=True)
-            filtered = filtered[:MAX_RESULTS]
-
-        # Supplement with best unfiltered matches
-        supplement = [m for m in matches if m not in filtered]
-        supplement.sort(key=lambda x: x["cosine_similarity"], reverse=True)
-
-        # Final match selection
-        if len(filtered) >= N_TOP_MATCHES:
-            return filtered[:N_TOP_MATCHES]
-        else:
-            remaining_needed = N_TOP_MATCHES - len(filtered)
-            return filtered + supplement[:remaining_needed]
 
     async def generate_recommendation_explanation(self, prompt, top_matches):
         """

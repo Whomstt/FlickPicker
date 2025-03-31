@@ -9,17 +9,6 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 
 from chatbot.config import (
-    NPROBE,
-    N_TOP_MATCHES,
-    OPENAI_API_URL,
-    OPENAI_MODEL,
-    SEARCH_INCREMENT,
-    MAX_RESULTS,
-    MAX_TOKENS,
-    TEMPERATURE,
-    PROMPT_WEIGHT,
-    NAME_WEIGHT,
-    GENRE_WEIGHT,
     NAME_FUZZY_THRESHOLD,
     GENRE_FUZZY_THRESHOLD,
 )
