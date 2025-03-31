@@ -1,10 +1,5 @@
 import json
-import re
 from rapidfuzz import fuzz
-import time
-import faiss
-import aiohttp
-from asgiref.sync import sync_to_async
 from django.shortcuts import render, redirect
 from django.contrib import messages
 
@@ -14,71 +9,48 @@ from chatbot.config import (
 )
 
 
-def sliding_window_fuzzy(prompt, candidate, threshold):
-    """Slide window over prompt and search fuzzy match"""
-    prompt = prompt.lower()
-    candidate = candidate.lower()
-    prompt_words = prompt.split()
-    candidate_words = candidate.split()
-    window_size = len(candidate_words)
-
-    # Slide over prompt tokens
-    for i in range(len(prompt_words) - window_size + 1):
-        window = " ".join(prompt_words[i : i + window_size])
-        # Require an exact match first
-        if window == candidate:
-            return True
-        # Use a fuzzy ratio for partial matches
-        score = fuzz.ratio(candidate, window)
-        if score >= threshold:
-            return True
-    return False
+def load_json(json_path):
+    try:
+        with open(json_path, "r") as f:
+            return json.load(f)
+    except (IOError, json.JSONDecodeError):
+        return {}
 
 
 def find_names_in_prompt(prompt, json_path="actors_directors.json"):
     """
-    Detect candidate names in user's prompt
+    Detect candidate names in user's prompt using RapidFuzz fuzzy matching
     """
-    try:
-        with open(json_path, "r") as f:
-            data = json.load(f)
-    except (IOError, json.JSONDecodeError):
-        return []
-
+    data = load_json(json_path)
     detected_names = set()
+    prompt_lower = prompt.lower()
 
-    def regex_match(name, text):
-        pattern = r"\b" + re.escape(name) + r"\b"
-        return re.search(pattern, text, re.IGNORECASE) is not None
-
-    for name in data.get("unique_main_actors", []):
-        # Try exact match first
-        if regex_match(name, prompt):
+    # Combine the lists for a single loop over candidates
+    candidate_names = data.get("unique_main_actors", []) + data.get(
+        "unique_directors", []
+    )
+    for name in candidate_names:
+        # Use partial_ratio to allow matching on parts of the prompt
+        score = fuzz.partial_ratio(name.lower(), prompt_lower)
+        if score >= NAME_FUZZY_THRESHOLD:
             detected_names.add(name.lower())
-        # If exact match fails we use fuzzy matching
-        elif sliding_window_fuzzy(prompt, name, threshold=NAME_FUZZY_THRESHOLD):
-            detected_names.add(name.lower())
-
-    for name in data.get("unique_directors", []):
-        if regex_match(name, prompt):
-            detected_names.add(name.lower())
-        elif sliding_window_fuzzy(prompt, name, threshold=NAME_FUZZY_THRESHOLD):
-            detected_names.add(name.lower())
-
     return list(detected_names)
 
 
 def find_genres_in_prompt(prompt, json_path="genres.json"):
     """
-    Detect candidate genres in user's prompt
+    Detect candidate genres in user's prompt using RapidFuzz fuzzy matching
     """
-    try:
-        with open(json_path, "r") as f:
-            data = json.load(f)
-    except (IOError, json.JSONDecodeError):
-        return []
+    data = load_json(json_path)
+    detected_genres = set()
+    prompt_lower = prompt.lower()
 
-    # Map alternative genre names to match their canonical form
+    for genre in data.get("unique_genres", []):
+        score = fuzz.partial_ratio(genre.lower(), prompt_lower)
+        if score >= GENRE_FUZZY_THRESHOLD:
+            detected_genres.add(genre.lower())
+
+    # Map alternative genre names to canonical forms
     genre_alternatives = {
         "scifi": "science fiction",
         "sci-fi": "science fiction",
@@ -90,22 +62,8 @@ def find_genres_in_prompt(prompt, json_path="genres.json"):
         "historical": "history",
         "musical": "music",
     }
-
-    detected_genres = set()
-
-    def regex_match(genre, text):
-        pattern = r"\b" + re.escape(genre) + r"\b"
-        return re.search(pattern, text, re.IGNORECASE) is not None
-
-    for genre in data.get("unique_genres", []):
-        # Try exact match first
-        if regex_match(genre, prompt):
-            detected_genres.add(genre.lower())
-        # If exact match fails we use fuzzy matching
-        elif sliding_window_fuzzy(prompt, genre, threshold=GENRE_FUZZY_THRESHOLD):
-            detected_genres.add(genre.lower())
-
-    for alternative, genre in genre_alternatives.items():
-        if alternative.lower() in prompt.lower():
-            detected_genres.add(genre.lower())
+    for alternative, canonical in genre_alternatives.items():
+        score = fuzz.partial_ratio(alternative.lower(), prompt_lower)
+        if score >= GENRE_FUZZY_THRESHOLD:
+            detected_genres.add(canonical.lower())
     return list(detected_genres)

@@ -14,19 +14,14 @@ from chatbot.config import (
     N_TOP_MATCHES,
     OPENAI_API_URL,
     OPENAI_MODEL,
-    SEARCH_INCREMENT,
-    MAX_RESULTS,
     MAX_TOKENS,
     TEMPERATURE,
     PROMPT_WEIGHT,
     NAME_WEIGHT,
     GENRE_WEIGHT,
-    NAME_FUZZY_THRESHOLD,
-    GENRE_FUZZY_THRESHOLD,
 )
 
 from chatbot.entity_recognition import (
-    sliding_window_fuzzy,
     find_names_in_prompt,
     find_genres_in_prompt,
 )
