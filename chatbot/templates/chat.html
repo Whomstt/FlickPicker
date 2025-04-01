@@ -9,11 +9,9 @@
 
     {% if messages %}
         {% for message in messages %}
-            {% if message.tags != 'success' %}
-                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
-                    {{ message }}
-                </div>
-            {% endif %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
         {% endfor %}
     {% endif %}
 
@@ -28,12 +26,12 @@
 
     <div id="loading-indicator" class="text-center my-4" style="display: none;">
         <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+            <span class="visually-hidden">Loading recommendations...</span>
         </div>
         <p class="mt-2">Fetching recommendations...</p>
     </div>
 
-    {% if response %}
+    {% if matches %}
         <div class="card mb-4">
             <div class="card-header">
                 <h3>Your Prompt</h3>
@@ -49,73 +47,57 @@
             </div>
             <div class="card-body">
                 {% for match in matches %}
-                    <div class="mb-3 p-3 border rounded">
+                    <div class="mb-3 p-3 border rounded film-entry">
                         <h4>
                             {{ match.title }}
-                            {% if match.name_match %}
-                                <span class="badge bg-success ms-2">Name Match</span>
-                            {% endif %}
-                            {% if match.genre_match %}
-                                <span class="badge bg-info ms-2">Genre Match</span>
-                            {% endif %}
+                            {% if match.name_match %}<span class="badge bg-success ms-2">Name Match</span>{% endif %}
+                            {% if match.genre_match %}<span class="badge bg-info ms-2">Genre Match</span>{% endif %}
                         </h4>
                         <div class="row">
                             {% if match.poster_image %}
-                            <div class="col-md-4">
-                                <img src="{{ match.poster_image }}" alt="{{ match.title }} poster" class="img-fluid rounded">
-                            </div>
-                            <div class="col-md-8">
+                                <div class="col-md-4">
+                                    <img src="{{ match.poster_image }}" alt="{{ match.title }} poster" class="img-fluid rounded">
+                                </div>
+                                <div class="col-md-8">
                             {% else %}
-                            <div class="col-md-12">
+                                <div class="col-md-12">
                             {% endif %}
-                                {% if match.genres %}
-                                <p><strong>Genres:</strong> {{ match.genres|join:", " }}</p>
-                                {% endif %}
-                                {% if match.overview %}
-                                    <p><strong>Overview:</strong> {{ match.overview }}</p>
-                                {% endif %}
-                                {% if match.directors %}
-                                    <p><strong>Directors:</strong> {{ match.directors|join:", " }}</p>
-                                {% endif %}
-                                {% if match.main_actors %}
-                                    <p><strong>Main Actors:</strong> {{ match.main_actors|join:", " }}</p>
-                                {% endif %}
-                                {% if match.runtime %}
-                                    <p><strong>Runtime:</strong> {{ match.runtime }}</p>
-                                {% endif %}
-                                {% if match.release_date %}
-                                    <p><strong>Release Date:</strong> {{ match.release_date }}</p>
-                                {% endif %}
-                                {% if match.tagline %}
-                                    <p><strong>Tagline:</strong> {{ match.tagline }}</p>
-                                {% endif %}
-                                {% if match.keywords %}
-                                    <p><strong>Keywords:</strong> {{ match.keywords|join:", " }}</p>
-                                {% endif %}
-                                <p class="text-muted">
-                                    <small>
-                                        Cosine Similarity: {{ match.cosine_similarity|floatformat:4 }}
-                                    </small>
-                                </p>
-                                <p class="text-muted">
-                                    <small>
-                                        L2 Distance: {{ match.l2_distance|floatformat:4 }}
-                                    </small>
-                                </p>
-                            </div>
+                                    {% if match.genres %}<p><strong>Genres:</strong> {{ match.genres|join:", " }}</p>{% endif %}
+                                    {% if match.overview %}<p><strong>Overview:</strong> {{ match.overview }}</p>{% endif %}
+                                    {% if match.directors %}<p><strong>Directors:</strong> {{ match.directors|join:", " }}</p>{% endif %}
+                                    {% if match.main_actors %}<p><strong>Main Actors:</strong> {{ match.main_actors|join:", " }}</p>{% endif %}
+                                    {% if match.runtime %}<p><strong>Runtime:</strong> {{ match.runtime }}</p>{% endif %}
+                                    {% if match.release_date %}<p><strong>Release Date:</strong> {{ match.release_date }}</p>{% endif %}
+                                    {% if match.tagline %}<p><strong>Tagline:</strong> {{ match.tagline }}</p>{% endif %}
+                                    {% if match.keywords %}<p><strong>Keywords:</strong> {{ match.keywords|join:", " }}</p>{% endif %}
+                                    <p class="text-muted">
+                                        <small>Cosine Similarity: {{ match.cosine_similarity|floatformat:4 }}</small>
+                                    </p>
+                                    <p class="text-muted">
+                                        <small>L2 Distance: {{ match.l2_distance|floatformat:4 }}</small>
+                                    </p>
+                                </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
         </div>
-        <div class="card mb-4 border-primary">
+
+        <div id="explanation-loading" class="text-center my-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading explanation...</span>
+            </div>
+            <p class="mt-2">Loading explanation...</p>
+        </div>
+
+        <div id="explanation-container" class="card mb-4 border-primary" style="display: none;">
             <div class="card-header bg-dark text-white">
-                <h3 class="mb-0">Recommendation Explanation</h3>
+                <h3>Recommendation Explanation</h3>
             </div>
             <div class="card-body">
                 <blockquote class="blockquote mb-0">
-                    <p class="mb-0">{{ response|linebreaks }}</p>
-                    <footer class="blockquote-footer mt-3">Recommendation Explanation generated using GPT-4o mini</footer>
+                    <p id="explanation-text"></p>
+                    <footer class="blockquote-footer mt-3">Explanation powered by GPT-4o mini</footer>
                 </blockquote>
             </div>
         </div>
@@ -153,20 +135,65 @@
 </div>
 
 <script>
-    document.getElementById("prompt").addEventListener("keydown", function (event) {
+    const form = document.getElementById("recommendation-form");
+    const submitButton = document.getElementById("submit-button");
+    const loadingIndicator = document.getElementById("loading-indicator");
+    const explanationContainer = document.getElementById("explanation-container");
+    const explanationLoading = document.getElementById("explanation-loading");
+    const explanationText = document.getElementById("explanation-text");
+
+    form.addEventListener("submit", function () {
+        loadingIndicator.style.display = "block";
+        submitButton.disabled = true;
+    });
+
+    form.addEventListener("keydown", function (event) {
         if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
-            showLoadingIndicator();
-            document.getElementById("recommendation-form").submit();
+            submitButton.click();
         }
     });
-    document.getElementById("recommendation-form").addEventListener("submit", function () {
-        showLoadingIndicator();
-    });
-    function showLoadingIndicator() {
-        document.getElementById("loading-indicator").style.display = "block";
-        document.getElementById("submit-button").disabled = true;
-    }
+
+    const getFilmsText = () => [...document.querySelectorAll(".film-entry")]
+        .map(entry => entry.innerText)
+        .join("\n\n");
+
+    const getCSRFToken = () => document.cookie
+        .split(";")
+        .map(cookie => cookie.trim().split("="))
+        .find(([name]) => name === "csrftoken")?.[1];
+
+    const loadExplanation = async () => {
+        if (!document.querySelector(".film-entry")) return;
+
+        const prompt = "{{ prompt|escapejs }}";
+        const filmsText = getFilmsText();
+        const csrfToken = getCSRFToken();
+
+        try {
+            const response = await fetch("{% url 'film_explanation' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                body: JSON.stringify({ prompt, films_text: filmsText })
+            });
+
+            const data = await response.json();
+            explanationText.innerHTML = data.explanation
+                ? data.explanation.split(/\n\s*\n/).map(para => `<p>${para.trim()}</p>`).join("<br><br>")
+                : "<p>No explanation available.</p>";
+            explanationContainer.style.display = "block";
+        } catch (error) {
+            explanationText.innerHTML = "<p>Error loading explanation.</p>";
+            explanationContainer.style.display = "block";
+        } finally {
+            explanationLoading.style.display = "none";
+        }
+    };
+
+    document.addEventListener("DOMContentLoaded", loadExplanation);
 </script>
 
 {% endblock %}
