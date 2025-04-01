@@ -19,22 +19,30 @@ def load_json(json_path):
 
 def find_names_in_prompt(prompt, json_path="actors_directors.json"):
     """
-    Detect candidate names in user's prompt using RapidFuzz fuzzy matching
+    Detect candidate names in user's prompt using RapidFuzz fuzzy matching and filter out substrings.
     """
     data = load_json(json_path)
     detected_names = set()
     prompt_lower = prompt.lower()
 
-    # Combine the lists for a single loop over candidates
     candidate_names = data.get("unique_main_actors", []) + data.get(
         "unique_directors", []
     )
     for name in candidate_names:
-        # Use partial_ratio to allow matching on parts of the prompt
         score = fuzz.partial_ratio(name.lower(), prompt_lower)
         if score >= NAME_FUZZY_THRESHOLD:
-            detected_names.add(name.lower())
-    return list(detected_names)
+            detected_names.add(name)  # Store original name with correct casing
+
+    # Filter out shorter names that are substrings of longer names
+    sorted_names = sorted(detected_names, key=lambda x: len(x), reverse=True)
+    filtered_names = []
+    for name in sorted_names:
+        name_lower = name.lower()
+        # Check against all already added names
+        if not any(name_lower in existing.lower() for existing in filtered_names):
+            filtered_names.append(name)
+
+    return filtered_names
 
 
 def find_genres_in_prompt(prompt, json_path="genres.json"):
