@@ -74,7 +74,7 @@
                                         <small>Cosine Similarity: {{ match.cosine_similarity|floatformat:4 }}</small>
                                     </p>
                                     <p class="text-muted">
-                                        <small>L2 Distance: {{ match.l2_distance|floatformat:4 }}</small>
+                                        <small>Euclidean Distance: {{ match.l2_distance|floatformat:4 }}</small>
                                     </p>
                                 </div>
                         </div>
@@ -109,7 +109,7 @@
                 <div class="card-body">
                     <ul>
                         {% for key, value in time_breakdown.items %}
-                            <li><strong>{{ key }}:</strong> {{ value|floatformat:5 }} seconds</li>
+                            <li><strong>{{ key }}:</strong> {{ value|floatformat:3 }} seconds</li>
                         {% endfor %}
                     </ul>
                 </div>
