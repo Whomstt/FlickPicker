@@ -69,11 +69,17 @@ class FilmRecommendationsView(BaseEmbeddingView):
             entity_detection_end - entity_detection_start
         )
 
-        embeddings_start = time.perf_counter()
-
-        # Prepare the embedding tasks
-        embedding_tasks = []
+        # Create task results containers
         embedding_results = {"prompt": None, "names": None, "genres": None}
+        faiss_results = {"data": None, "embeddings": None, "index": None}
+
+        # Start FAISS loading task
+        faiss_load_task = asyncio.create_task(self.load_faiss_async(faiss_results))
+        faiss_load_start = time.perf_counter()
+
+        # Prepare and run embedding tasks
+        embeddings_start = time.perf_counter()
+        embedding_tasks = []
 
         async with aiohttp.ClientSession() as session:
             # Add prompt embedding task
@@ -121,16 +127,22 @@ class FilmRecommendationsView(BaseEmbeddingView):
         # Normalize the query vector using FAISS
         faiss.normalize_L2(query_vector)
 
-        # Load FAISS Index
-        load_faiss_start = time.perf_counter()
-        data, embeddings, index = self.load_cache()
+        # Wait for FAISS loading task to complete if it hasn't already
+        await faiss_load_task
+        faiss_load_end = time.perf_counter()
+        time_breakdown["Load FAISS Index"] = faiss_load_end - faiss_load_start
+
+        # Extract FAISS results
+        data = faiss_results["data"]
+        embeddings = faiss_results["embeddings"]
+        index = faiss_results["index"]
+
         if data is None:
             messages.error(request, "Embeddings not found. Please generate them first.")
             return await sync_to_async(redirect)("film_recommendations")
+
         if isinstance(index, faiss.IndexIVF):
             index.nprobe = NPROBE
-        load_faiss_end = time.perf_counter()
-        time_breakdown["Load FAISS Index"] = load_faiss_end - load_faiss_start
 
         # FAISS Search
         faiss_search_start = time.perf_counter()
@@ -150,9 +162,11 @@ class FilmRecommendationsView(BaseEmbeddingView):
         # Format names and genres
         detected_names = [name.title() for name in detected_names]
         detected_genres = [genre.title() for genre in detected_genres]
-        time_breakdown["Total Time"] = time.perf_counter() - start_time
+        time_breakdown["Total Time (Tasks are concurrent)"] = (
+            time.perf_counter() - start_time
+        )
 
-        # Render the page with matches; explanation will be loaded asynchronously via JS.
+        # Render the page with matches
         return await sync_to_async(render)(
             request,
             "chat.html",
@@ -165,10 +179,20 @@ class FilmRecommendationsView(BaseEmbeddingView):
             },
         )
 
-    # Helper method to create an embedding task and store the result
+    # Create an embedding task and store the result
     async def fetch_embedding_task(self, text, session, key, results_dict):
         """
         Fetch embedding for text and store it in results_dict under the given key
         """
         embedding = await self.fetch_embedding(text, session, service="nomic")
         results_dict[key] = embedding
+
+    # Load FAISS index asynchronously
+    async def load_faiss_async(self, results_dict):
+        """
+        Load FAISS index asynchronously and store results in the provided dictionary
+        """
+        data, embeddings, index = await sync_to_async(self.load_cache)()
+        results_dict["data"] = data
+        results_dict["embeddings"] = embeddings
+        results_dict["index"] = index
