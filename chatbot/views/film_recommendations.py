@@ -5,6 +5,7 @@ import aiohttp
 from asgiref.sync import sync_to_async
 from django.shortcuts import render, redirect
 from django.contrib import messages
+import asyncio
 
 from .base_embedding import BaseEmbeddingView
 from chatbot.config import (
@@ -68,48 +69,54 @@ class FilmRecommendationsView(BaseEmbeddingView):
             entity_detection_end - entity_detection_start
         )
 
+        embeddings_start = time.perf_counter()
+
+        # Prepare the embedding tasks
+        embedding_tasks = []
+        embedding_results = {"prompt": None, "names": None, "genres": None}
+
         async with aiohttp.ClientSession() as session:
-            # Get the embedding for the cleaned prompt
-            embed_prompt_start = time.perf_counter()
-            prompt_embedding = await self.fetch_embedding(
-                clean_prompt, session, service="nomic"
-            )
-            embed_prompt_end = time.perf_counter()
-            time_breakdown["Prompt Embedding (Nomic Embed - Atlas API)"] = (
-                embed_prompt_end - embed_prompt_start
+            # Add prompt embedding task
+            embedding_tasks.append(
+                self.fetch_embedding_task(
+                    clean_prompt, session, "prompt", embedding_results
+                )
             )
 
-            # Get the names embedding if detected
+            # Add names embedding task if names detected
             if detected_names:
                 names_str = ", ".join(detected_names)
-                embed_names_start = time.perf_counter()
-                names_embedding = await self.fetch_embedding(
-                    names_str, session, service="nomic"
-                )
-                embed_names_end = time.perf_counter()
-                time_breakdown["Names Embedding (Nomic Embed - Atlas API)"] = (
-                    embed_names_end - embed_names_start
+                embedding_tasks.append(
+                    self.fetch_embedding_task(
+                        names_str, session, "names", embedding_results
+                    )
                 )
 
-            # Get the genre embedding if detected
+            # Add genres embedding task if genres detected
             if detected_genres:
                 genres_str = ", ".join(detected_genres)
-                embed_genres_start = time.perf_counter()
-                genres_embedding = await self.fetch_embedding(
-                    genres_str, session, service="nomic"
-                )
-                embed_genres_end = time.perf_counter()
-                time_breakdown["Genres Embedding (Nomic Embed - Atlas API)"] = (
-                    embed_genres_end - embed_genres_start
+                embedding_tasks.append(
+                    self.fetch_embedding_task(
+                        genres_str, session, "genres", embedding_results
+                    )
                 )
 
-            # Weighted sum of embeddings
-            combined_embedding = PROMPT_WEIGHT * prompt_embedding
-            if detected_names:
-                combined_embedding += NAME_WEIGHT * names_embedding
-            if detected_genres:
-                combined_embedding += GENRE_WEIGHT * genres_embedding
-            query_vector = combined_embedding.reshape(1, -1)
+            # Wait for all embedding tasks to complete
+            await asyncio.gather(*embedding_tasks)
+
+        embeddings_end = time.perf_counter()
+        time_breakdown["Embeddings Generation (Nomic Embed - Atlas API)"] = (
+            embeddings_end - embeddings_start
+        )
+
+        # Weighted sum of embeddings
+        combined_embedding = PROMPT_WEIGHT * embedding_results["prompt"]
+        if detected_names and embedding_results["names"] is not None:
+            combined_embedding += NAME_WEIGHT * embedding_results["names"]
+        if detected_genres and embedding_results["genres"] is not None:
+            combined_embedding += GENRE_WEIGHT * embedding_results["genres"]
+
+        query_vector = combined_embedding.reshape(1, -1)
 
         # Normalize the query vector using FAISS
         faiss.normalize_L2(query_vector)
@@ -157,3 +164,11 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 "detected_genres": detected_genres,
             },
         )
+
+    # Helper method to create an embedding task and store the result
+    async def fetch_embedding_task(self, text, session, key, results_dict):
+        """
+        Fetch embedding for text and store it in results_dict under the given key
+        """
+        embedding = await self.fetch_embedding(text, session, service="nomic")
+        results_dict[key] = embedding
