@@ -109,27 +109,30 @@ def find_genres_in_prompt(prompt, json_path="genres.json"):
 
         # Higher threshold for shorter genres
         adjusted_threshold = GENRE_FUZZY_THRESHOLD + max(0, 6 - len(genre_lower)) * 5
-
         if score >= adjusted_threshold:
             detected_genres.add(genre_lower)
 
-    # Check for alternatives
+    # Check for alternative genres (e.g. "romcom" mapping to "romantic, comedy")
     for alternative, canonical in genre_alternatives.items():
-        # Simple boundary check for alternatives
+
+        # Split the canonical genres by comma and strip whitespace
+        canonicals = [c.strip() for c in canonical.split(",")]
+
         if f" {alternative.lower()} " in prompt_with_boundaries:
-            detected_genres.add(canonical.lower())
+            for c in canonicals:
+                detected_genres.add(c.lower())
             continue
 
-        # For alternatives at the start or end of the prompt
         if prompt_lower.startswith(f"{alternative.lower()} ") or prompt_lower.endswith(
             f" {alternative.lower()}"
         ):
-            detected_genres.add(canonical.lower())
+            for c in canonicals:
+                detected_genres.add(c.lower())
             continue
 
-        # Only use fuzzy matching if necessary
         score = fuzz.ratio(alternative.lower(), prompt_lower)
         if score >= GENRE_FUZZY_THRESHOLD:
-            detected_genres.add(canonical.lower())
+            for c in canonicals:
+                detected_genres.add(c.lower())
 
     return list(detected_genres)
