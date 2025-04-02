@@ -1,0 +1,11 @@
+{
+    "scifi": "science fiction",
+    "sci-fi": "science fiction",
+    "sci fi": "science fiction",
+    "rom": "romantic",
+    "com": "comedy",
+    "doc": "documentary",
+    "historic": "history",
+    "historical": "history",
+    "musical": "music"
+}

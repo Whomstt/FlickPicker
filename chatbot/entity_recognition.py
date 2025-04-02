@@ -22,14 +22,14 @@ def find_names_in_prompt(prompt, json_path="actors_directors.json"):
     """
     Detect candidate names in user's prompt
     """
-    data = load_json(json_path)
+    names_data = load_json(json_path)
     detected_names = set()
     prompt_lower = prompt.lower()
 
     # Add word boundary markers to the prompt for more accurate matching
     prompt_with_boundaries = f" {prompt_lower} "
 
-    candidate_names = data.get("unique_main_actors", []) + data.get(
+    candidate_names = names_data.get("unique_main_actors", []) + names_data.get(
         "unique_directors", []
     )
 
@@ -77,14 +77,15 @@ def find_genres_in_prompt(prompt, json_path="genres.json"):
     """
     Detect candidate genres in user's prompt
     """
-    data = load_json(json_path)
+    genres_data = load_json(json_path)
+    genre_alternatives = load_json("genre_alternatives.json")
     detected_genres = set()
     prompt_lower = prompt.lower()
 
     # Add word boundary markers to the prompt
     prompt_with_boundaries = f" {prompt_lower} "
 
-    for genre in data.get("unique_genres", []):
+    for genre in genres_data.get("unique_genres", []):
         genre_lower = genre.lower()
 
         # Skip very short genres
@@ -112,19 +113,7 @@ def find_genres_in_prompt(prompt, json_path="genres.json"):
         if score >= adjusted_threshold:
             detected_genres.add(genre_lower)
 
-    # Map alternative genre names to canonical forms
-    genre_alternatives = {
-        "scifi": "science fiction",
-        "sci-fi": "science fiction",
-        "sci fi": "science fiction",
-        "rom": "romantic",
-        "com": "comedy",
-        "doc": "documentary",
-        "historic": "history",
-        "historical": "history",
-        "musical": "music",
-    }
-
+    # Check for alternatives
     for alternative, canonical in genre_alternatives.items():
         # Simple boundary check for alternatives
         if f" {alternative.lower()} " in prompt_with_boundaries:
