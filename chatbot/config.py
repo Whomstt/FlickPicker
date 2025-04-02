@@ -32,9 +32,9 @@ M = 16  # Number of subquantizers
 NBITS = 8  # Number of bits per subquantizer
 
 N_TOP_MATCHES = 5  # Number of top matches to return
-SEARCH_INCREMENT = 16384  # Increment for searching more results
+SEARCH_INCREMENT = 8192  # Increment for searching more results
 MAX_RESULTS = 65536  # Maximum number of search results
-NPROBE_INCREMENT = 256  # Increment for nprobe
+NPROBE_INCREMENT = 128  # Increment for nprobe
 
 PROMPT_WEIGHT = 1  # Weight for prompt embedding
 NAME_WEIGHT = 0.6  # Weight for actor / director names embedding

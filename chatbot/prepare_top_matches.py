@@ -13,6 +13,7 @@ from chatbot.config import (
     SEARCH_INCREMENT,
     MAX_RESULTS,
     NPROBE_INCREMENT,
+    NPROBE,
 )
 
 
@@ -26,7 +27,7 @@ def prepare_top_matches(
     query_vector=None,
 ):
     """
-    Prepare the top film matches for the user.
+    Prepare the top film matches for the user
     """
 
     def assign_match_flags(film):
@@ -93,32 +94,43 @@ def prepare_top_matches(
     # Filter matches based on the condition
     filtered = [film for film in matches if condition(film)]
 
-    current_k = 0
-    current_nprobe = 0
-    unique_filtered_films = set()
+    initial_k = len(indices[0])
+    current_k = initial_k - 5
+    previous_nprobe = NPROBE  # Default starting nprobe
+    if hasattr(index, "nprobe"):
+        previous_nprobe = index.nprobe
 
     # Expand search if necessary
     while current_k < MAX_RESULTS and len(filtered) < N_TOP_MATCHES:
-        current_k += SEARCH_INCREMENT
-        print(f"Searching for {current_k} results...")
+        # Increase search parameters
+        next_k = current_k + SEARCH_INCREMENT
 
-        # Increase nprobe
-        current_nprobe += NPROBE_INCREMENT
+        # For the first expansion, use the same nprobe value
+        # Then we increase by NPROBE_INCREMENT
+        if current_k == initial_k - 5:
+            next_nprobe = previous_nprobe
+        else:
+            next_nprobe = previous_nprobe + NPROBE_INCREMENT
+
+        print(f"Expanding search: k={next_k}, nprobe={next_nprobe}")
+
+        # Set nprobe for next search
         if hasattr(index, "nprobe"):
-            index.nprobe = current_nprobe
-            print(f"nprobe set to {index.nprobe}")
+            index.nprobe = next_nprobe
 
-        distances, indices = index.search(query_vector, current_k)
+        # Run the new search
+        new_distances, new_indices = index.search(query_vector, next_k)
 
-        for sim, idx in zip(distances[0], indices[0]):
-            # Sanitize similarity score
-            cosine_sim = max(min(float(sim), 1.0), 0.0)
-
-            # Skip if film already processed or not unique in filtered set
-            if idx in unique_films or idx in unique_filtered_films:
+        # Process only new results (indices not seen in previous searches)
+        for sim, idx in zip(new_distances[0][current_k:], new_indices[0][current_k:]):
+            # Skip if already processed
+            if idx in unique_films:
                 continue
 
+            # Sanitize similarity score
+            cosine_sim = max(min(float(sim), 1.0), 0.0)
             l2_distance = (2 - 2 * cosine_sim) ** 0.5
+
             film = {
                 **data[idx],
                 "cosine_similarity": cosine_sim,
@@ -126,15 +138,24 @@ def prepare_top_matches(
             }
             film = assign_match_flags(film)
 
-            if condition(film):
-                filtered.append(film)
-                unique_filtered_films.add(idx)
-
+            # Add to matches and check filtering condition
+            matches.append(film)
             unique_films.add(idx)
 
-        # Sort and truncate to prevent excessive growth
+            if condition(film):
+                filtered.append(film)
+
+        # Update for next iteration
+        current_k = next_k
+        previous_nprobe = next_nprobe
+
+        # Sort and limit filtered results
         filtered.sort(key=lambda x: x["cosine_similarity"], reverse=True)
         filtered = filtered[:MAX_RESULTS]
+
+        # Break if we've reached MAX_RESULTS in total search
+        if current_k >= MAX_RESULTS:
+            break
 
     # Supplement with best unfiltered matches
     supplement = [m for m in matches if m not in filtered]
