@@ -12,6 +12,7 @@ from chatbot.config import (
     N_TOP_MATCHES,
     SEARCH_INCREMENT,
     MAX_RESULTS,
+    NPROBE_INCREMENT,
 )
 
 
@@ -93,11 +94,20 @@ def prepare_top_matches(
     filtered = [film for film in matches if condition(film)]
 
     current_k = 0
+    current_nprobe = 0
     unique_filtered_films = set()
 
     # Expand search if necessary
     while current_k < MAX_RESULTS and len(filtered) < N_TOP_MATCHES:
         current_k += SEARCH_INCREMENT
+        print(f"Searching for {current_k} results...")
+
+        # Increase nprobe
+        current_nprobe += NPROBE_INCREMENT
+        if hasattr(index, "nprobe"):
+            index.nprobe = current_nprobe
+            print(f"nprobe set to {index.nprobe}")
+
         distances, indices = index.search(query_vector, current_k)
 
         for sim, idx in zip(distances[0], indices[0]):

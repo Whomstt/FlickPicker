@@ -28,11 +28,13 @@ EMBEDDING_MODEL = "nomic-embed-text"
 # FAISS and embedding parameters
 NPROBE = 128  # Number of clusters to be searched
 NLIST = 1024  # Number of clusters to be stored
+M = 16  # Number of subquantizers
+NBITS = 8  # Number of bits per subquantizer
+
 N_TOP_MATCHES = 5  # Number of top matches to return
 SEARCH_INCREMENT = 16384  # Increment for searching more results
 MAX_RESULTS = 65536  # Maximum number of search results
-M = 16  # Number of subquantizers
-NBITS = 8  # Number of bits per subquantizer
+NPROBE_INCREMENT = 256  # Increment for nprobe
 
 PROMPT_WEIGHT = 1  # Weight for prompt embedding
 NAME_WEIGHT = 0.6  # Weight for actor / director names embedding
