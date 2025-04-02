@@ -41,8 +41,8 @@ NAME_WEIGHT = 0.6  # Weight for actor / director names embedding
 GENRE_WEIGHT = 0.4  # Weight for genre embedding
 
 # Fuzzy matching settings
-NAME_FUZZY_THRESHOLD = 95  # Fuzzy matching threshold for names in %
-GENRE_FUZZY_THRESHOLD = 95  # Fuzzy matching threshold for genres in %
+NAME_FUZZY_THRESHOLD = 90  # Fuzzy matching threshold for names in %
+GENRE_FUZZY_THRESHOLD = 80  # Fuzzy matching threshold for genres in %
 
 # Settings for TMDB API
 TMDB_BASE_URL = "https://api.themoviedb.org/3"

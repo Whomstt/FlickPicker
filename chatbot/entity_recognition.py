@@ -1,4 +1,5 @@
 import json
+import re
 from rapidfuzz import fuzz
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -19,19 +20,46 @@ def load_json(json_path):
 
 def find_names_in_prompt(prompt, json_path="actors_directors.json"):
     """
-    Detect candidate names in user's prompt using RapidFuzz fuzzy matching and filter out substrings.
+    Detect candidate names in user's prompt
     """
     data = load_json(json_path)
     detected_names = set()
     prompt_lower = prompt.lower()
 
+    # Add word boundary markers to the prompt for more accurate matching
+    prompt_with_boundaries = f" {prompt_lower} "
+
     candidate_names = data.get("unique_main_actors", []) + data.get(
         "unique_directors", []
     )
+
     for name in candidate_names:
-        score = fuzz.partial_ratio(name.lower(), prompt_lower)
-        if score >= NAME_FUZZY_THRESHOLD:
-            detected_names.add(name)  # Store original name with correct casing
+        name_lower = name.lower()
+
+        # Skip very short names
+        if len(name_lower) < 4:
+            continue
+
+        # Word boundary check
+        if f" {name_lower} " in prompt_with_boundaries:
+            detected_names.add(name)
+            continue
+
+        # For partial names that might be at the start or end of the prompt
+        if prompt_lower.startswith(f"{name_lower} ") or prompt_lower.endswith(
+            f" {name_lower}"
+        ):
+            detected_names.add(name)
+            continue
+
+        # Only if the above checks fail, use fuzzy matching
+        score = fuzz.partial_ratio(name_lower, prompt_lower)
+
+        # Higher threshold for shorter names to avoid false positives
+        adjusted_threshold = NAME_FUZZY_THRESHOLD + max(0, 8 - len(name_lower)) * 5
+
+        if score >= adjusted_threshold:
+            detected_names.add(name)
 
     # Filter out shorter names that are substrings of longer names
     sorted_names = sorted(detected_names, key=lambda x: len(x), reverse=True)
@@ -47,16 +75,42 @@ def find_names_in_prompt(prompt, json_path="actors_directors.json"):
 
 def find_genres_in_prompt(prompt, json_path="genres.json"):
     """
-    Detect candidate genres in user's prompt using RapidFuzz fuzzy matching
+    Detect candidate genres in user's prompt
     """
     data = load_json(json_path)
     detected_genres = set()
     prompt_lower = prompt.lower()
 
+    # Add word boundary markers to the prompt
+    prompt_with_boundaries = f" {prompt_lower} "
+
     for genre in data.get("unique_genres", []):
-        score = fuzz.partial_ratio(genre.lower(), prompt_lower)
-        if score >= GENRE_FUZZY_THRESHOLD:
-            detected_genres.add(genre.lower())
+        genre_lower = genre.lower()
+
+        # Skip very short genres
+        if len(genre_lower) < 3:
+            continue
+
+        # Word boundary check
+        if f" {genre_lower} " in prompt_with_boundaries:
+            detected_genres.add(genre_lower)
+            continue
+
+        # For genres that might be at the start or end of the prompt
+        if prompt_lower.startswith(f"{genre_lower} ") or prompt_lower.endswith(
+            f" {genre_lower}"
+        ):
+            detected_genres.add(genre_lower)
+            continue
+
+        # Only if the above checks fail, use fuzzy matching
+        score = fuzz.partial_ratio(genre_lower, prompt_lower)
+
+        # Higher threshold for shorter genres
+        adjusted_threshold = GENRE_FUZZY_THRESHOLD + max(0, 6 - len(genre_lower)) * 5
+
+        if score >= adjusted_threshold:
+            detected_genres.add(genre_lower)
 
     # Map alternative genre names to canonical forms
     genre_alternatives = {
@@ -70,8 +124,23 @@ def find_genres_in_prompt(prompt, json_path="genres.json"):
         "historical": "history",
         "musical": "music",
     }
+
     for alternative, canonical in genre_alternatives.items():
+        # Simple boundary check for alternatives
+        if f" {alternative.lower()} " in prompt_with_boundaries:
+            detected_genres.add(canonical.lower())
+            continue
+
+        # For alternatives at the start or end of the prompt
+        if prompt_lower.startswith(f"{alternative.lower()} ") or prompt_lower.endswith(
+            f" {alternative.lower()}"
+        ):
+            detected_genres.add(canonical.lower())
+            continue
+
+        # Only use fuzzy matching if necessary
         score = fuzz.partial_ratio(alternative.lower(), prompt_lower)
         if score >= GENRE_FUZZY_THRESHOLD:
             detected_genres.add(canonical.lower())
+
     return list(detected_genres)
