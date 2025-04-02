@@ -53,7 +53,7 @@ def find_names_in_prompt(prompt, json_path="actors_directors.json"):
             continue
 
         # Only if the above checks fail, use fuzzy matching
-        score = fuzz.partial_ratio(name_lower, prompt_lower)
+        score = fuzz.ratio(name_lower, prompt_lower)
 
         # Higher threshold for shorter names to avoid false positives
         adjusted_threshold = NAME_FUZZY_THRESHOLD + max(0, 8 - len(name_lower)) * 5
@@ -105,7 +105,7 @@ def find_genres_in_prompt(prompt, json_path="genres.json"):
             continue
 
         # Only if the above checks fail, use fuzzy matching
-        score = fuzz.partial_ratio(genre_lower, prompt_lower)
+        score = fuzz.ratio(genre_lower, prompt_lower)
 
         # Higher threshold for shorter genres
         adjusted_threshold = GENRE_FUZZY_THRESHOLD + max(0, 6 - len(genre_lower)) * 5
@@ -128,7 +128,7 @@ def find_genres_in_prompt(prompt, json_path="genres.json"):
             continue
 
         # Only use fuzzy matching if necessary
-        score = fuzz.partial_ratio(alternative.lower(), prompt_lower)
+        score = fuzz.ratio(alternative.lower(), prompt_lower)
         if score >= GENRE_FUZZY_THRESHOLD:
             detected_genres.add(canonical.lower())
 

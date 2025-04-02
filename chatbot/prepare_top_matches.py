@@ -33,7 +33,7 @@ def prepare_top_matches(
     def assign_match_flags(film):
         # Name match flag
         if detected_names:
-            lower_names = set(detected_names)
+            lower_names = set(name.lower() for name in detected_names)
             directors = [director.lower() for director in film.get("directors", [])]
             actors = [actor.lower() for actor in film.get("main_actors", [])]
             film["name_match"] = any(
@@ -44,7 +44,7 @@ def prepare_top_matches(
 
         # Genre match flag
         if detected_genres:
-            lower_genres = set(detected_genres)
+            lower_genres = set(genre.lower() for genre in detected_genres)
             film["genre_match"] = any(
                 genre.lower() in lower_genres for genre in film.get("genres", [])
             )
