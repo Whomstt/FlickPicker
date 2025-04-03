@@ -82,6 +82,26 @@ def extract_unique_genres(films):
     return sorted(unique_genres)
 
 
+def extract_unique_titles(films):
+    """Extract and return a sorted list of unique film titles."""
+    unique_titles = set()
+    for film in films:
+        title = film.get("title")
+        if title:
+            unique_titles.add(title.lower().strip())
+    return sorted(unique_titles)
+
+
+def extract_unique_keywords(films):
+    """Extract and return a sorted list of unique keywords across all films."""
+    unique_keywords = set()
+    for film in films:
+        keywords = film.get("keywords", [])
+        for keyword in keywords:
+            unique_keywords.add(keyword.lower().strip())
+    return sorted(unique_keywords)
+
+
 async def fetch_and_save_films():
     """
     Fetch film data per year using the TMDB discover endpoint, process it,
@@ -259,6 +279,28 @@ async def fetch_and_save_films():
         logging.info(f"Genres successfully saved to {genres_file}.")
     except Exception as e:
         logging.error(f"Error saving genres to {genres_file}: {e}")
+
+    logging.info("Extracting unique titles...")
+    unique_titles = extract_unique_titles(all_films)
+    titles_data = {"unique_titles": unique_titles}
+    titles_file = "titles.json"
+    try:
+        with open(titles_file, "w", encoding="utf-8") as f:
+            json.dump(titles_data, f, indent=4, ensure_ascii=False)
+        logging.info(f"Titles successfully saved to {titles_file}.")
+    except Exception as e:
+        logging.error(f"Error saving titles to {titles_file}: {e}")
+
+    logging.info("Extracting unique keywords...")
+    unique_keywords = extract_unique_keywords(all_films)
+    keywords_data = {"unique_keywords": unique_keywords}
+    keywords_file = "keywords.json"
+    try:
+        with open(keywords_file, "w", encoding="utf-8") as f:
+            json.dump(keywords_data, f, indent=4, ensure_ascii=False)
+        logging.info(f"Keywords successfully saved to {keywords_file}.")
+    except Exception as e:
+        logging.error(f"Error saving keywords to {keywords_file}: {e}")
 
     # Reset cancellation flag
     cancel_fetch = False

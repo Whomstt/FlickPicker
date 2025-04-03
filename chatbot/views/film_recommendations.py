@@ -14,13 +14,15 @@ from chatbot.config import (
     PROMPT_WEIGHT,
     NAME_WEIGHT,
     GENRE_WEIGHT,
+    KEYWORD_WEIGHT,
+    TITLE_WEIGHT,
 )
-
 from chatbot.entity_recognition import (
     find_names_in_prompt,
     find_genres_in_prompt,
+    find_keywords_in_prompt,
+    find_titles_in_prompt,
 )
-
 from chatbot.prepare_top_matches import prepare_top_matches
 
 
@@ -45,23 +47,27 @@ class FilmRecommendationsView(BaseEmbeddingView):
             return await sync_to_async(redirect)("film_recommendations")
 
         entity_detection_start = time.perf_counter()
-        # Detect names and genres
+        # Detect names, genres, keywords, and titles in the prompt
         detected_names = find_names_in_prompt(prompt)
         if detected_names:
-            print(f"Detected names in prompt: " + ", ".join(detected_names))
+            print("Detected names in prompt: " + ", ".join(detected_names))
         detected_genres = find_genres_in_prompt(prompt)
         if detected_genres:
-            print(f"Detected genres in prompt: " + ", ".join(detected_genres))
+            print("Detected genres in prompt: " + ", ".join(detected_genres))
+        detected_keywords = find_keywords_in_prompt(prompt)
+        if detected_keywords:
+            print("Detected keywords in prompt: " + ", ".join(detected_keywords))
+        detected_titles = find_titles_in_prompt(prompt)
+        if detected_titles:
+            print("Detected titles in prompt: " + ", ".join(detected_titles))
 
-        # Clean the prompt by removing detected names and genres
+        # Clean the prompt by removing detected names, genres, keywords, and titles
         clean_prompt = prompt
-        for name in detected_names:
+        for entity in (
+            detected_names + detected_genres + detected_keywords + detected_titles
+        ):
             clean_prompt = re.sub(
-                rf"\b{re.escape(name)}\b", "", clean_prompt, flags=re.IGNORECASE
-            ).strip()
-        for genre in detected_genres:
-            clean_prompt = re.sub(
-                rf"\b{re.escape(genre)}\b", "", clean_prompt, flags=re.IGNORECASE
+                rf"\b{re.escape(entity)}\b", "", clean_prompt, flags=re.IGNORECASE
             ).strip()
 
         entity_detection_end = time.perf_counter()
@@ -70,7 +76,13 @@ class FilmRecommendationsView(BaseEmbeddingView):
         )
 
         # Create task results containers
-        embedding_results = {"prompt": None, "names": None, "genres": None}
+        embedding_results = {
+            "prompt": None,
+            "names": None,
+            "genres": None,
+            "keywords": None,
+            "titles": None,
+        }
         faiss_results = {"data": None, "embeddings": None, "index": None}
 
         # Start FAISS loading task
@@ -107,6 +119,24 @@ class FilmRecommendationsView(BaseEmbeddingView):
                     )
                 )
 
+            # Add keywords embedding task if keywords detected
+            if detected_keywords:
+                keywords_str = ", ".join(detected_keywords)
+                embedding_tasks.append(
+                    self.fetch_embedding_task(
+                        keywords_str, session, "keywords", embedding_results
+                    )
+                )
+
+            # Add titles embedding task if titles detected
+            if detected_titles:
+                titles_str = ", ".join(detected_titles)
+                embedding_tasks.append(
+                    self.fetch_embedding_task(
+                        titles_str, session, "titles", embedding_results
+                    )
+                )
+
             # Wait for all embedding tasks to complete
             await asyncio.gather(*embedding_tasks)
 
@@ -121,6 +151,10 @@ class FilmRecommendationsView(BaseEmbeddingView):
             combined_embedding += NAME_WEIGHT * embedding_results["names"]
         if detected_genres and embedding_results["genres"] is not None:
             combined_embedding += GENRE_WEIGHT * embedding_results["genres"]
+        if detected_keywords and embedding_results["keywords"] is not None:
+            combined_embedding += KEYWORD_WEIGHT * embedding_results["keywords"]
+        if detected_titles and embedding_results["titles"] is not None:
+            combined_embedding += TITLE_WEIGHT * embedding_results["titles"]
 
         query_vector = combined_embedding.reshape(1, -1)
 
@@ -153,20 +187,24 @@ class FilmRecommendationsView(BaseEmbeddingView):
             indices,
             detected_names,
             detected_genres,
+            detected_keywords,
+            detected_titles,
             index,
             query_vector,
         )
         faiss_search_end = time.perf_counter()
         time_breakdown["FAISS Search"] = faiss_search_end - faiss_search_start
 
-        # Format names and genres
+        # Format names, genres, keywords, and titles for display
         detected_names = [name.title() for name in detected_names]
         detected_genres = [genre.title() for genre in detected_genres]
+        detected_keywords = [keyword.title() for keyword in detected_keywords]
+        detected_titles = [title.title() for title in detected_titles]
         time_breakdown["Total Time (Tasks are concurrent)"] = (
             time.perf_counter() - start_time
         )
 
-        # Render the page with matches
+        # Render the page with matches and detected entities
         return await sync_to_async(render)(
             request,
             "chat.html",
@@ -176,6 +214,8 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 "time_breakdown": time_breakdown,
                 "detected_names": detected_names,
                 "detected_genres": detected_genres,
+                "detected_keywords": detected_keywords,
+                "detected_titles": detected_titles,
             },
         )
 

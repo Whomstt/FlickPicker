@@ -23,6 +23,8 @@ def prepare_top_matches(
     indices,
     detected_names=None,
     detected_genres=None,
+    detected_keywords=None,
+    detected_titles=None,
     index=None,
     query_vector=None,
 ):
@@ -51,6 +53,22 @@ def prepare_top_matches(
         else:
             film["genre_match"] = False
 
+        # Keyword match flag
+        if detected_keywords:
+            lower_keywords = set(keyword.lower() for keyword in detected_keywords)
+            film["keyword_match"] = any(
+                keword.lower() in lower_keywords for keword in film.get("keywords", [])
+            )
+        else:
+            film["keyword_match"] = False
+
+        # Title match flag
+        if detected_titles:
+            lower_titles = set(title.lower() for title in detected_titles)
+            film["title_match"] = film.get("title", "").lower() in lower_titles
+        else:
+            film["title_match"] = False
+
         return film
 
     # Set to track unique films and prevent duplicates
@@ -76,20 +94,24 @@ def prepare_top_matches(
         matches.append(film)
         unique_films.add(idx)
 
-    # Sort matches in descending order
+    # Sort matches in descending order of similarity
     matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
 
-    # If no detected names or genres, return top matches
-    if not (detected_names or detected_genres):
+    # If no detected entities, return top matches directly
+    if not (detected_names or detected_genres or detected_keywords or detected_titles):
         return matches[:N_TOP_MATCHES]
 
-    # Determine filtering condition based on detected entities
-    if detected_names and detected_genres:
-        condition = lambda film: film["name_match"] and film["genre_match"]
-    elif detected_names:
-        condition = lambda film: film["name_match"]
-    elif detected_genres:
-        condition = lambda film: film["genre_match"]
+    # Define filtering condition based on detected entities
+    def condition(film):
+        if detected_names and not film["name_match"]:
+            return False
+        if detected_genres and not film["genre_match"]:
+            return False
+        if detected_keywords and not film["keyword_match"]:
+            return False
+        if detected_titles and not film["title_match"]:
+            return False
+        return True
 
     # Filter matches based on the condition
     filtered = [film for film in matches if condition(film)]
@@ -105,8 +127,7 @@ def prepare_top_matches(
         # Increase search parameters
         next_k = current_k + SEARCH_INCREMENT
 
-        # For the first expansion, use the same nprobe value
-        # Then we increase by NPROBE_INCREMENT
+        # For the first expansion, use the same nprobe value; then increase it
         if current_k == initial_k - 5:
             next_nprobe = previous_nprobe
         else:
@@ -161,7 +182,7 @@ def prepare_top_matches(
     supplement = [m for m in matches if m not in filtered]
     supplement.sort(key=lambda x: x["cosine_similarity"], reverse=True)
 
-    # Final match selection
+    # Final match selection: if filtered matches are enough, return them; otherwise we supplement
     if len(filtered) >= N_TOP_MATCHES:
         return filtered[:N_TOP_MATCHES]
     else:

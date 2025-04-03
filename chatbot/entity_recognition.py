@@ -7,6 +7,8 @@ from django.contrib import messages
 from chatbot.config import (
     NAME_FUZZY_THRESHOLD,
     GENRE_FUZZY_THRESHOLD,
+    TITLE_FUZZY_THRESHOLD,
+    KEYWORD_FUZZY_THRESHOLD,
 )
 
 
@@ -136,3 +138,97 @@ def find_genres_in_prompt(prompt, json_path="genres.json"):
                 detected_genres.add(c.lower())
 
     return list(detected_genres)
+
+
+def find_titles_in_prompt(prompt, json_path="titles.json"):
+    """
+    Detect candidate film titles in the user's prompt
+    """
+    titles_data = load_json(json_path)
+    detected_titles = set()
+    prompt_lower = prompt.lower()
+    prompt_with_boundaries = f" {prompt_lower} "
+    candidate_titles = titles_data.get("unique_titles", [])
+
+    for title in candidate_titles:
+        title_lower = title.lower()
+
+        # Skip very short titles
+        if len(title_lower) < 3:
+            continue
+
+        # Word boundary check
+        if f" {title_lower} " in prompt_with_boundaries:
+            detected_titles.add(title)
+            continue
+
+        # Check for titles at the start or end of the prompt
+        if prompt_lower.startswith(f"{title_lower} ") or prompt_lower.endswith(
+            f" {title_lower}"
+        ):
+            detected_titles.add(title)
+            continue
+
+        # Use fuzzy matching if above checks don't catch a direct match
+        score = fuzz.ratio(title_lower, prompt_lower)
+        adjusted_threshold = TITLE_FUZZY_THRESHOLD + max(0, 8 - len(title_lower)) * 5
+        if score >= adjusted_threshold:
+            detected_titles.add(title)
+
+    # Filter out shorter titles that are substrings of longer detected titles
+    sorted_titles = sorted(detected_titles, key=lambda x: len(x), reverse=True)
+    filtered_titles = []
+    for title in sorted_titles:
+        title_lower = title.lower()
+        if not any(title_lower in existing.lower() for existing in filtered_titles):
+            filtered_titles.append(title)
+
+    return filtered_titles
+
+
+def find_keywords_in_prompt(prompt, json_path="keywords.json"):
+    """
+    Detect candidate keywords in the user's prompt
+    """
+    keywords_data = load_json(json_path)
+    detected_keywords = set()
+    prompt_lower = prompt.lower()
+    prompt_with_boundaries = f" {prompt_lower} "
+    candidate_keywords = keywords_data.get("unique_keywords", [])
+
+    for keyword in candidate_keywords:
+        keyword_lower = keyword.lower()
+
+        # Skip very short keywords
+        if len(keyword_lower) < 3:
+            continue
+
+        # Word boundary check
+        if f" {keyword_lower} " in prompt_with_boundaries:
+            detected_keywords.add(keyword)
+            continue
+
+        # Check for keywords at the start or end of the prompt
+        if prompt_lower.startswith(f"{keyword_lower} ") or prompt_lower.endswith(
+            f" {keyword_lower}"
+        ):
+            detected_keywords.add(keyword)
+            continue
+
+        # Use fuzzy matching if direct boundary checks do not match
+        score = fuzz.ratio(keyword_lower, prompt_lower)
+        adjusted_threshold = (
+            KEYWORD_FUZZY_THRESHOLD + max(0, 6 - len(keyword_lower)) * 5
+        )
+        if score >= adjusted_threshold:
+            detected_keywords.add(keyword)
+
+    # Filter out shorter keywords that are substrings of longer ones
+    sorted_keywords = sorted(detected_keywords, key=lambda x: len(x), reverse=True)
+    filtered_keywords = []
+    for keyword in sorted_keywords:
+        keyword_lower = keyword.lower()
+        if not any(keyword_lower in existing.lower() for existing in filtered_keywords):
+            filtered_keywords.append(keyword)
+
+    return filtered_keywords
