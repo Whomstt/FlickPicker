@@ -57,7 +57,8 @@ def prepare_top_matches(
         if detected_keywords:
             lower_keywords = set(keyword.lower() for keyword in detected_keywords)
             film["keyword_match"] = any(
-                keword.lower() in lower_keywords for keword in film.get("keywords", [])
+                keyword.lower() in lower_keywords
+                for keyword in film.get("keywords", [])
             )
         else:
             film["keyword_match"] = False
@@ -142,8 +143,8 @@ def prepare_top_matches(
         # Run the new search
         new_distances, new_indices = index.search(query_vector, next_k)
 
-        # Process only new results (indices not seen in previous searches)
-        for sim, idx in zip(new_distances[0][current_k:], new_indices[0][current_k:]):
+        # Process all results up to next_k
+        for sim, idx in zip(new_distances[0][:next_k], new_indices[0][:next_k]):
             # Skip if already processed
             if idx in unique_films:
                 continue
