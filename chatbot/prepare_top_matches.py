@@ -104,15 +104,13 @@ def prepare_top_matches(
 
     # Define filtering condition based on detected entities
     def condition(film):
-        if detected_names and not film["name_match"]:
-            return False
-        if detected_genres and not film["genre_match"]:
-            return False
-        if detected_keywords and not film["keyword_match"]:
-            return False
-        if detected_titles and not film["title_match"]:
-            return False
-        return True
+        if detected_names and detected_genres:
+            return film["name_match"] and film["genre_match"]
+        elif detected_names:
+            return film["name_match"]
+        elif detected_genres:
+            return film["genre_match"]
+        return False
 
     # Filter matches based on the condition
     filtered = [film for film in matches if condition(film)]
