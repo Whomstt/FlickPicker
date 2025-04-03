@@ -50,10 +50,10 @@
                     <div class="mb-3 p-3 border rounded film-entry">
                         <h4>
                             {{ match.title }}
-                            {% if match.name_match %}<span class="badge bg-success ms-2">Name Match</span>{% endif %}
-                            {% if match.genre_match %}<span class="badge bg-info ms-2">Genre Match</span>{% endif %}
-                            {% if match.keyword_match %}<span class="badge bg-warning ms-2">Keyword Match</span>{% endif %}
                             {% if match.title_match %}<span class="badge bg-danger ms-2">Title Match</span>{% endif %}
+                            {% if match.genre_match %}<span class="badge bg-info ms-2">Genre Match</span>{% endif %}
+                            {% if match.name_match %}<span class="badge bg-success ms-2">Name Match</span>{% endif %}
+                            {% if match.keyword_match %}<span class="badge bg-warning ms-2">Keyword Match</span>{% endif %}
                         </h4>
                         <div class="row">
                             {% if match.poster_image %}
