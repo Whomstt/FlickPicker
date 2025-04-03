@@ -4,6 +4,10 @@ from chatbot.views.generate_embeddings import (
     GenerateOriginalEmbeddingsView,
     cancel_generate_view,
 )
+from chatbot.views.regenerate_index import (
+    RegenerateFaissIndexView,
+    cancel_regenerate_index_view,
+)
 from django.contrib.admin.views.decorators import staff_member_required
 from .tmdb_api import cancel_fetch_view
 
@@ -29,5 +33,15 @@ urlpatterns = [
         "cancel-generate/",
         staff_member_required(cancel_generate_view),
         name="cancel_generate",
+    ),
+    path(
+        "regenerate-faiss-index/",
+        staff_member_required(RegenerateFaissIndexView.as_view()),
+        name="regenerate_faiss_index",
+    ),
+    path(
+        "cancel-regenerate-index/",
+        staff_member_required(cancel_regenerate_index_view),
+        name="cancel_regenerate_index",
     ),
 ]
