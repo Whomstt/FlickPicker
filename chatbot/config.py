@@ -37,7 +37,7 @@ MAX_RESULTS = 65536  # Maximum number of search results
 NPROBE_INCREMENT = 32  # Increment for nprobe
 
 # Weights for different embeddings
-PROMPT_WEIGHT = 0.5  # Clean prompt (after entities removed)
+PROMPT_WEIGHT = 0.2  # Clean prompt (after entities removed)
 NAME_WEIGHT = 1.0  # Actors and directors
 GENRE_WEIGHT = 1.2  # Film genres
 KEYWORD_WEIGHT = 0.8  # Thematic keywords
