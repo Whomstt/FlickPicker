@@ -173,11 +173,16 @@ def find_genres_in_prompt(prompt, json_path="genres.json"):
     return list(detected_genres)
 
 
-def find_titles_in_prompt(prompt, json_path="titles.json"):
+def find_titles_in_prompt(
+    prompt, json_path="titles.json", bizarre_titles_path="bizarre_titles.json"
+):
     """
     Detect candidate film titles in the user's prompt
     """
     titles_data = load_json(json_path)
+    bizarre_titles_data = load_json(bizarre_titles_path)
+    bizarre_titles = bizarre_titles_data.get("bizarre_titles", [])
+
     detected_titles = set()
     prompt_lower = prompt.lower()
     prompt_with_boundaries = f" {prompt_lower} "
@@ -185,6 +190,10 @@ def find_titles_in_prompt(prompt, json_path="titles.json"):
 
     for title in candidate_titles:
         title_lower = title.lower()
+
+        # Skip titles that are in the bizarre_titles list
+        if title_lower in bizarre_titles:
+            continue
 
         # Skip very short titles
         if len(title_lower) < 3:
@@ -219,11 +228,15 @@ def find_titles_in_prompt(prompt, json_path="titles.json"):
     return filtered_titles
 
 
-def find_keywords_in_prompt(prompt, json_path="keywords.json"):
+def find_keywords_in_prompt(
+    prompt, json_path="keywords.json", bizarre_keywords_path="bizarre_keywords.json"
+):
     """
     Detect candidate keywords in the user's prompt
     """
     keywords_data = load_json(json_path)
+    bizarre_keywords_data = load_json(bizarre_keywords_path)
+    bizarre_keywords = bizarre_keywords_data.get("bizarre_keywords", [])
     detected_keywords = set()
     prompt_lower = prompt.lower()
     prompt_with_boundaries = f" {prompt_lower} "
@@ -231,6 +244,10 @@ def find_keywords_in_prompt(prompt, json_path="keywords.json"):
 
     for keyword in candidate_keywords:
         keyword_lower = keyword.lower()
+
+        # Skip keywords that are in the bizarre_keywords list
+        if keyword_lower in bizarre_keywords:
+            continue
 
         # Skip very short keywords
         if len(keyword_lower) < 3:
