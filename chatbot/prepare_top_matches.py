@@ -78,13 +78,11 @@ def prepare_top_matches(
 
     # Process initial FAISS search results
     for sim, idx in zip(distances[0], indices[0]):
-        # Sanitize similarity score
         cosine_sim = max(min(float(sim), 1.0), 0.0)
+        # Skip exact match error
         if cosine_sim == 1.0:
-            # Skip exact match error
             continue
 
-        # Skip if film already processed
         if idx in unique_films:
             continue
 
@@ -98,14 +96,11 @@ def prepare_top_matches(
         matches.append(film)
         unique_films.add(idx)
 
-    # Sort matches in descending order of similarity
-    matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
-
-    # If no detected entities, return top matches directly
-    if not (detected_names or detected_genres or detected_keywords or detected_titles):
+    # If no entities for names or genres were detected we return the top N matches
+    if not (detected_names or detected_genres):
         return matches[:N_TOP_MATCHES]
 
-    # Define filtering condition based on detected entities
+    # If both names and genres are detected we require both matches
     def condition(film):
         if detected_names and detected_genres:
             return film["name_match"] and film["genre_match"]
@@ -115,18 +110,18 @@ def prepare_top_matches(
             return film["genre_match"]
         return False
 
-    # Filter matches based on the condition
     filtered = [film for film in matches if condition(film)]
+    filtered.sort(key=lambda x: x["cosine_similarity"], reverse=True)
+    filtered = filtered[:N_TOP_MATCHES]
 
+    # Only expand if the filtered results (with matching names/genres) are not filled
     initial_k = len(indices[0])
     current_k = initial_k - 5
     previous_nprobe = NPROBE  # Default starting nprobe
     if hasattr(index, "nprobe"):
         previous_nprobe = index.nprobe
 
-    # Expand search if necessary
     while current_k < MAX_RESULTS and len(filtered) < N_TOP_MATCHES:
-        # Increase search parameters
         next_k = current_k + SEARCH_INCREMENT
 
         # For the first expansion, use the same nprobe value; then increase it
@@ -137,59 +132,43 @@ def prepare_top_matches(
 
         print(f"Expanding search: k={next_k}, nprobe={next_nprobe}")
 
-        # Set nprobe for next search
         if hasattr(index, "nprobe"):
             index.nprobe = next_nprobe
 
-        # Run the new search
         new_distances, new_indices = index.search(query_vector, next_k)
 
-        # Process all results up to next_k
         for sim, idx in zip(new_distances[0][:next_k], new_indices[0][:next_k]):
-            # Skip if already processed
             if idx in unique_films:
                 continue
 
-            # Sanitize similarity score
             cosine_sim = max(min(float(sim), 1.0), 0.0)
+            # Skip exact match error
             if cosine_sim == 1.0:
-                # Skip exact match error
                 continue
-            l2_distance = (2 - 2 * cosine_sim) ** 0.5
 
+            l2_distance = (2 - 2 * cosine_sim) ** 0.5
             film = {
                 **data[idx],
                 "cosine_similarity": cosine_sim,
                 "l2_distance": l2_distance,
             }
             film = assign_match_flags(film)
-
-            # Add to matches and check filtering condition
             matches.append(film)
             unique_films.add(idx)
 
             if condition(film):
                 filtered.append(film)
 
-        # Update for next iteration
+        # Update search parameters for the next iteration
         current_k = next_k
         previous_nprobe = next_nprobe
 
-        # Sort and limit filtered results
+        # Sort and restrict filtered results
         filtered.sort(key=lambda x: x["cosine_similarity"], reverse=True)
-        filtered = filtered[:MAX_RESULTS]
+        filtered = filtered[:N_TOP_MATCHES]
 
-        # Break if we've reached MAX_RESULTS in total search
         if current_k >= MAX_RESULTS:
             break
 
-    # Supplement with best unfiltered matches
-    supplement = [m for m in matches if m not in filtered]
-    supplement.sort(key=lambda x: x["cosine_similarity"], reverse=True)
-
-    # Final match selection: if filtered matches are enough, return them; otherwise we supplement
-    if len(filtered) >= N_TOP_MATCHES:
-        return filtered[:N_TOP_MATCHES]
-    else:
-        remaining_needed = N_TOP_MATCHES - len(filtered)
-        return filtered + supplement[:remaining_needed]
+    # Return only films that pass the matching condition
+    return filtered[:N_TOP_MATCHES]
