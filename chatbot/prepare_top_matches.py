@@ -149,6 +149,9 @@ def prepare_top_matches(
 
             # Sanitize similarity score
             cosine_sim = max(min(float(sim), 1.0), 0.0)
+            if cosine_sim == 1.0:
+                # Skip exact match error
+                continue
             l2_distance = (2 - 2 * cosine_sim) ** 0.5
 
             film = {
