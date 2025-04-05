@@ -98,6 +98,7 @@ def prepare_top_matches(
 
     # If no entities for names or genres were detected we return the top N matches
     if not (detected_names or detected_genres):
+        matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
         return matches[:N_TOP_MATCHES]
 
     # If both names and genres are detected we require both matches

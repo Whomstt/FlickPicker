@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 
 from chatbot.config import (
+    PROMPT_FUZZY_THRESHOLD,
     NAME_FUZZY_THRESHOLD,
     GENRE_FUZZY_THRESHOLD,
     TITLE_FUZZY_THRESHOLD,
@@ -18,6 +19,38 @@ def load_json(json_path):
             return json.load(f)
     except (IOError, json.JSONDecodeError):
         return {}
+
+
+def clean_prompt_with_fuzzy(prompt, detected_entities):
+    """
+    Remove all instances of detected entities from the prompt,
+    including partial matches above the fuzzy threshold
+    """
+    cleaned_prompt = prompt
+
+    # Sort entities by length (descending) to handle longer entities first
+    # This prevents issues where parts of longer entities remain after removal
+    sorted_entities = sorted(detected_entities, key=len, reverse=True)
+
+    for entity in sorted_entities:
+        # Create a pattern that matches the entity with word boundaries
+        pattern = r"\b" + re.escape(entity) + r"\b"
+        cleaned_prompt = re.sub(pattern, "", cleaned_prompt, flags=re.IGNORECASE)
+
+        # Also check for fuzzy matches
+        words = cleaned_prompt.split()
+        cleaned_words = []
+
+        for word in words:
+            if fuzz.ratio(word.lower(), entity.lower()) < PROMPT_FUZZY_THRESHOLD:
+                cleaned_words.append(word)
+
+        cleaned_prompt = " ".join(cleaned_words)
+
+    # Clean up any extra spaces
+    cleaned_prompt = re.sub(r"\s+", " ", cleaned_prompt).strip()
+
+    return cleaned_prompt
 
 
 def find_names_in_prompt(prompt, json_path="actors_directors.json"):

@@ -22,6 +22,7 @@ from chatbot.entity_recognition import (
     find_genres_in_prompt,
     find_keywords_in_prompt,
     find_titles_in_prompt,
+    clean_prompt_with_fuzzy,
 )
 from chatbot.prepare_top_matches import prepare_top_matches
 
@@ -46,6 +47,8 @@ class FilmRecommendationsView(BaseEmbeddingView):
             messages.error(request, "Please enter a prompt.")
             return await sync_to_async(redirect)("film_recommendations")
 
+        print(f"Prompt: {prompt}")
+
         entity_detection_start = time.perf_counter()
         # Detect names, genres, keywords, and titles in the prompt
         detected_names = find_names_in_prompt(prompt)
@@ -61,14 +64,14 @@ class FilmRecommendationsView(BaseEmbeddingView):
         if detected_titles:
             print("Detected titles in prompt: " + ", ".join(detected_titles))
 
-        # Clean the prompt by removing detected names, genres, keywords, and titles
-        clean_prompt = prompt
-        for entity in (
-            detected_names + detected_genres + detected_keywords + detected_titles
-        ):
-            clean_prompt = re.sub(
-                rf"\b{re.escape(entity)}\b", "", clean_prompt, flags=re.IGNORECASE
-            ).strip()
+        if detected_names or detected_genres or detected_keywords or detected_titles:
+            all_entities = (
+                detected_names + detected_genres + detected_keywords + detected_titles
+            )
+            clean_prompt = clean_prompt_with_fuzzy(prompt, all_entities)
+            print(f"Cleaned prompt: {clean_prompt}")
+        else:
+            clean_prompt = prompt
 
         entity_detection_end = time.perf_counter()
         time_breakdown["Entity Detection & Cleaning"] = (
@@ -145,16 +148,23 @@ class FilmRecommendationsView(BaseEmbeddingView):
             embeddings_end - embeddings_start
         )
 
-        # Weighted sum of embeddings
-        combined_embedding = PROMPT_WEIGHT * embedding_results["prompt"]
-        if detected_names and embedding_results["names"] is not None:
-            combined_embedding += NAME_WEIGHT * embedding_results["names"]
-        if detected_genres and embedding_results["genres"] is not None:
-            combined_embedding += GENRE_WEIGHT * embedding_results["genres"]
-        if detected_keywords and embedding_results["keywords"] is not None:
-            combined_embedding += KEYWORD_WEIGHT * embedding_results["keywords"]
-        if detected_titles and embedding_results["titles"] is not None:
-            combined_embedding += TITLE_WEIGHT * embedding_results["titles"]
+        prompt_weight = PROMPT_WEIGHT
+        # If any entities are detected, compute a weighted sum
+        if detected_names or detected_genres or detected_keywords or detected_titles:
+            if not clean_prompt:
+                prompt_weight = 0
+            combined_embedding = prompt_weight * embedding_results["prompt"]
+            if detected_names and embedding_results["names"] is not None:
+                combined_embedding += NAME_WEIGHT * embedding_results["names"]
+            if detected_genres and embedding_results["genres"] is not None:
+                combined_embedding += GENRE_WEIGHT * embedding_results["genres"]
+            if detected_keywords and embedding_results["keywords"] is not None:
+                combined_embedding += KEYWORD_WEIGHT * embedding_results["keywords"]
+            if detected_titles and embedding_results["titles"] is not None:
+                combined_embedding += TITLE_WEIGHT * embedding_results["titles"]
+        else:
+            # No entities were detected, so just use the prompt embedding
+            combined_embedding = embedding_results["prompt"]
 
         query_vector = combined_embedding.reshape(1, -1)
 

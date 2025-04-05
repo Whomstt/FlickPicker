@@ -36,13 +36,15 @@ SEARCH_INCREMENT = 8192  # Increment for searching more results
 MAX_RESULTS = 65536  # Maximum number of search results
 NPROBE_INCREMENT = 32  # Increment for nprobe
 
-PROMPT_WEIGHT = 1  # Weight for prompt embedding
-NAME_WEIGHT = 0.6  # Weight for actor / director names embedding
-GENRE_WEIGHT = 0.4  # Weight for genre embedding
-TITLE_WEIGHT = 0.4  # Weight for title embedding
-KEYWORD_WEIGHT = 0.4  # Weight for keyword embedding
+# Weights for different embeddings
+PROMPT_WEIGHT = 0.5  # Clean prompt (after entities removed)
+NAME_WEIGHT = 1.0  # Actors and directors
+GENRE_WEIGHT = 1.2  # Film genres
+KEYWORD_WEIGHT = 0.8  # Thematic keywords
+TITLE_WEIGHT = 1.5  # Film titles
 
 # Fuzzy matching settings
+PROMPT_FUZZY_THRESHOLD = 80  # Threshold for prompt matching
 NAME_FUZZY_THRESHOLD = 90  # Fuzzy matching threshold for names in %
 GENRE_FUZZY_THRESHOLD = 80  # Fuzzy matching threshold for genres in %
 TITLE_FUZZY_THRESHOLD = 90  # Fuzzy matching threshold for titles in %
