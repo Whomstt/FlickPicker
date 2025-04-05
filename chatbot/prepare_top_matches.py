@@ -80,6 +80,9 @@ def prepare_top_matches(
     for sim, idx in zip(distances[0], indices[0]):
         # Sanitize similarity score
         cosine_sim = max(min(float(sim), 1.0), 0.0)
+        if cosine_sim == 1.0:
+            # Skip exact match error
+            continue
 
         # Skip if film already processed
         if idx in unique_films:
