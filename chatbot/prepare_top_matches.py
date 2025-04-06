@@ -74,6 +74,19 @@ def prepare_top_matches(
         else:
             film["title_match"] = False
 
+        # Runtime match flag
+        if detected_runtime:
+            runtime_category = detected_runtime[0].lower()
+            runtime_val = int(film.get("runtime", 0))
+            if runtime_val <= 90:
+                film["runtime_match"] = runtime_category == "short"
+            elif runtime_val <= 120:
+                film["runtime_match"] = runtime_category == "medium"
+            else:
+                film["runtime_match"] = runtime_category == "long"
+        else:
+            film["runtime_match"] = None
+
         # Return the film with the match flags
         return film
 
@@ -102,18 +115,20 @@ def prepare_top_matches(
         unique_films.add(idx)
 
     # If no entities for names or genres were detected we return the top N matches
-    if not (detected_names or detected_genres):
+    if not (detected_names or detected_genres or detected_runtime):
         matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
         return matches[:N_TOP_MATCHES]
 
     # If both names and genres are detected we require both matches
     def condition(film):
-        if detected_names and detected_genres:
-            return film["name_match"] and film["genre_match"]
+        if detected_names and detected_genres and detected_runtime:
+            return film["name_match"] and film["genre_match"] and film["runtime_match"]
         elif detected_names:
             return film["name_match"]
         elif detected_genres:
             return film["genre_match"]
+        elif detected_runtime:
+            return film["runtime_match"]
         return False
 
     filtered = [film for film in matches if condition(film)]

@@ -107,6 +107,8 @@ class FilmRecommendationsView(BaseEmbeddingView):
             "genres": None,
             "keywords": None,
             "titles": None,
+            "release": None,
+            "runtime": None,
         }
         faiss_results = {"data": None, "embeddings": None, "index": None}
 
@@ -190,7 +192,14 @@ class FilmRecommendationsView(BaseEmbeddingView):
 
         prompt_weight = PROMPT_WEIGHT
         # If any entities are detected, compute a weighted sum
-        if detected_names or detected_genres or detected_keywords or detected_titles:
+        if (
+            detected_names
+            or detected_genres
+            or detected_keywords
+            or detected_titles
+            or detected_release
+            or detected_runtime
+        ):
             if not clean_prompt:
                 prompt_weight = 0
             combined_embedding = prompt_weight * embedding_results["prompt"]
@@ -243,8 +252,8 @@ class FilmRecommendationsView(BaseEmbeddingView):
             detected_genres,
             detected_keywords,
             detected_titles,
-            detected_release,
             detected_runtime,
+            detected_release,
             index,
             query_vector,
         )
