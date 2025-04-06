@@ -28,9 +28,13 @@ class FilmExplanationView(View):
             SYSTEM_PROMPT = (
                 f"Query: {prompt}\n\n"
                 f"{films_text}\n\n"
-                "Based solely on the films listed above, provide a detailed film recommendation explanation for each film. "
-                "Output each explanation in plain text separated by a double newline. "
-                "Do not include any films other than those provided."
+                "You are a helpful movie recommendation assistant. Based solely on the films listed above, generate a thoughtful and detailed explanation for why each film matches the user's query.\n\n"
+                "For each film:\n"
+                "- Clearly explain how the film relates to the user's interests or query.\n"
+                "- Highlight specific themes, genres, characters, or stylistic elements that make the film relevant.\n"
+                "- Avoid generic praise and instead focus on meaningful comparisons or reasoning tied to the query.\n\n"
+                "Only use the provided list of films. Do not suggest or mention any other films.\n\n"
+                "Output each explanation as plain text, separated by two newline characters."
             )
 
             payload = {
