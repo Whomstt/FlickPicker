@@ -77,17 +77,44 @@ def prepare_top_matches(
         # Runtime match flag
         if detected_runtime:
             runtime_category = detected_runtime[0].lower()
-            runtime_val = int(film.get("runtime", 0))
-            if runtime_val <= 90:
-                film["runtime_match"] = runtime_category == "short"
-            elif runtime_val <= 120:
-                film["runtime_match"] = runtime_category == "medium"
-            else:
-                film["runtime_match"] = runtime_category == "long"
+            runtime_raw = film.get("runtime")
+            try:
+                runtime_val = int(runtime_raw)
+                if runtime_val <= 90:
+                    film["runtime_match"] = runtime_category == "short"
+                elif runtime_val <= 120:
+                    film["runtime_match"] = runtime_category == "medium"
+                else:
+                    film["runtime_match"] = runtime_category == "long"
+            except (ValueError, TypeError):
+                # If runtime is missing or not convertible, default to False.
+                film["runtime_match"] = False
         else:
-            film["runtime_match"] = None
+            film["runtime_match"] = False
 
-        # Return the film with the match flags
+        # Release date match flag
+        if detected_release:
+            release_category = detected_release[0].lower()
+            release_val = film.get("release_date")
+            if release_val:
+                match = re.match(r"(\d{4})", release_val)
+                if match:
+                    year = int(match.group(1))
+                    current_year = datetime.now().year
+                    age = current_year - year
+                    if age < 2:
+                        film["release_match"] = release_category == "new"
+                    elif age < 15:
+                        film["release_match"] = release_category == "modern"
+                    else:
+                        film["release_match"] = release_category == "old"
+                else:
+                    film["release_match"] = False
+            else:
+                film["release_match"] = False
+        else:
+            film["release_match"] = False
+
         return film
 
     # Set to track unique films and prevent duplicates
@@ -115,21 +142,22 @@ def prepare_top_matches(
         unique_films.add(idx)
 
     # If no entities for names or genres were detected we return the top N matches
-    if not (detected_names or detected_genres or detected_runtime):
+    if not (detected_names or detected_genres or detected_runtime or detected_release):
         matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
         return matches[:N_TOP_MATCHES]
 
     # If both names and genres are detected we require both matches
     def condition(film):
-        if detected_names and detected_genres and detected_runtime:
-            return film["name_match"] and film["genre_match"] and film["runtime_match"]
-        elif detected_names:
-            return film["name_match"]
-        elif detected_genres:
-            return film["genre_match"]
-        elif detected_runtime:
-            return film["runtime_match"]
-        return False
+        checks = []
+        if detected_names:
+            checks.append(film["name_match"])
+        if detected_genres:
+            checks.append(film["genre_match"])
+        if detected_runtime:
+            checks.append(film["runtime_match"])
+        if detected_release:
+            checks.append(film["release_match"])
+        return all(checks)
 
     filtered = [film for film in matches if condition(film)]
     filtered.sort(key=lambda x: x["cosine_similarity"], reverse=True)

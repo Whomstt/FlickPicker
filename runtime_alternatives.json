@@ -7,14 +7,15 @@
     "compact": "short",
     "one hour": "short",
     "1 hour": "short",
+    "under 90 minutes": "short",
     
     "standard length": "medium",
     "normal runtime": "medium",
     "feature length": "medium",
     "two hour": "medium",
     "2 hours": "medium",
+    "under 2 hours": "medium",
     
-    "epic": "long",
     "over two hours": "long",
     "lengthy": "long",
     "long haul": "long",
