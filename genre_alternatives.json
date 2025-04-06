@@ -9,5 +9,7 @@
     "doc": "documentary",
     "historic": "history",
     "historical": "history",
-    "musical": "music"
+    "musical": "music",
+    "wild west": "western",
+    "wildwest": "western"
 }
