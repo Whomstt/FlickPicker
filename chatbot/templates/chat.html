@@ -137,10 +137,10 @@
                         <p><strong>Titles:</strong> {{ detected_titles|join:", " }}</p>
                     {% endif %}
                     {% if detected_runtime %}
-                        <p><strong>Runtime:</strong> {{ detected_runtime }}</p>
+                        <p><strong>Runtime:</strong> {{ detected_runtime|join:", " }}</p>
                     {% endif %}
                     {% if detected_release %}
-                        <p><strong>Release Date:</strong> {{ detected_release }}</p>
+                        <p><strong>Release Date:</strong> {{ detected_release|join:", " }}</p>
                     {% endif %}
                 </div>
             </div>
