@@ -1,7 +1,7 @@
 {
     "unique_runtimes": [
         "short",
-        "average",
+        "medium",
         "long"
     ]
 }

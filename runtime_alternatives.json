@@ -8,11 +8,11 @@
     "one hour": "short",
     "1 hour": "short",
     
-    "standard length": "average",
-    "normal runtime": "average",
-    "feature length": "average",
-    "two hour": "average",
-    "2 hours": "average",
+    "standard length": "medium",
+    "normal runtime": "medium",
+    "feature length": "medium",
+    "two hour": "medium",
+    "2 hours": "medium",
     
     "epic": "long",
     "over two hours": "long",

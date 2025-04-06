@@ -193,7 +193,7 @@ class BaseEmbeddingView(View):
                         if runtime <= 90:
                             cleaned_value = "short"
                         elif runtime <= 120:
-                            cleaned_value = "average"
+                            cleaned_value = "medium"
                         else:
                             cleaned_value = "long"
                     except Exception:
