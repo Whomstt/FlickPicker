@@ -10,6 +10,8 @@ from chatbot.config import (
     GENRE_FUZZY_THRESHOLD,
     TITLE_FUZZY_THRESHOLD,
     KEYWORD_FUZZY_THRESHOLD,
+    RUNTIME_FUZZY_THRESHOLD,
+    RELEASE_FUZZY_THRESHOLD,
 )
 
 
@@ -282,3 +284,129 @@ def find_keywords_in_prompt(
             filtered_keywords.append(keyword)
 
     return filtered_keywords
+
+
+def find_release_in_prompt(prompt, json_path="releases.json"):
+    """
+    Detect candidate releases in user's prompt
+    """
+    releases_data = load_json(json_path)
+    release_alternatives = load_json("release_alternatives.json")
+    detected_releases = set()
+    prompt_lower = prompt.lower()
+
+    # Add word boundary markers to the prompt
+    prompt_with_boundaries = f" {prompt_lower} "
+
+    # Check direct matches from releases_data
+    for release in releases_data.get("unique_releases", []):
+        release_lower = release.lower()
+
+        # Skip very short releases
+        if len(release_lower) < 3:
+            continue
+
+        # Word boundary check
+        if f" {release_lower} " in prompt_with_boundaries:
+            detected_releases.add(release_lower)
+            continue
+
+        # For releases that might be at the start or end of the prompt
+        if prompt_lower.startswith(f"{release_lower} ") or prompt_lower.endswith(
+            f" {release_lower}"
+        ):
+            detected_releases.add(release_lower)
+            continue
+
+        # Fuzzy matching with the defined threshold
+        score = fuzz.ratio(release_lower, prompt_lower)
+        if score >= RELEASE_FUZZY_THRESHOLD:
+            detected_releases.add(release_lower)
+
+    # Check for alternative releases
+    for alternative, canonical in release_alternatives.items():
+        # Split the canonical releases by comma and strip whitespace
+        canonicals = [c.strip() for c in canonical.split(",")]
+        alternative_lower = alternative.lower()
+
+        if f" {alternative_lower} " in prompt_with_boundaries:
+            for c in canonicals:
+                detected_releases.add(c.lower())
+            continue
+
+        if prompt_lower.startswith(f"{alternative_lower} ") or prompt_lower.endswith(
+            f" {alternative_lower}"
+        ):
+            for c in canonicals:
+                detected_releases.add(c.lower())
+            continue
+
+        score = fuzz.ratio(alternative_lower, prompt_lower)
+        if score >= RELEASE_FUZZY_THRESHOLD:
+            for c in canonicals:
+                detected_releases.add(c.lower())
+
+    return list(detected_releases)
+
+
+def find_runtime_in_prompt(prompt, json_path="runtimes.json"):
+    """
+    Detect candidate runtimes in user's prompt
+    """
+    runtimes_data = load_json(json_path)
+    runtime_alternatives = load_json("runtime_alternatives.json")
+    detected_runtimes = set()
+    prompt_lower = prompt.lower()
+
+    # Add word boundary markers to the prompt
+    prompt_with_boundaries = f" {prompt_lower} "
+
+    # Check direct matches from runtimes_data
+    for runtime in runtimes_data.get("unique_runtimes", []):
+        runtime_lower = runtime.lower()
+
+        # Skip very short runtimes
+        if len(runtime_lower) < 3:
+            continue
+
+        # Word boundary check
+        if f" {runtime_lower} " in prompt_with_boundaries:
+            detected_runtimes.add(runtime_lower)
+            continue
+
+        # For runtimes that might be at the start or end of the prompt
+        if prompt_lower.startswith(f"{runtime_lower} ") or prompt_lower.endswith(
+            f" {runtime_lower}"
+        ):
+            detected_runtimes.add(runtime_lower)
+            continue
+
+        # Fuzzy matching with the defined threshold
+        score = fuzz.ratio(runtime_lower, prompt_lower)
+        if score >= RUNTIME_FUZZY_THRESHOLD:
+            detected_runtimes.add(runtime_lower)
+
+    # Check for alternative runtimes
+    for alternative, canonical in runtime_alternatives.items():
+        # Split the canonical runtimes by comma and strip whitespace
+        canonicals = [c.strip() for c in canonical.split(",")]
+        alternative_lower = alternative.lower()
+
+        if f" {alternative_lower} " in prompt_with_boundaries:
+            for c in canonicals:
+                detected_runtimes.add(c.lower())
+            continue
+
+        if prompt_lower.startswith(f"{alternative_lower} ") or prompt_lower.endswith(
+            f" {alternative_lower}"
+        ):
+            for c in canonicals:
+                detected_runtimes.add(c.lower())
+            continue
+
+        score = fuzz.ratio(alternative_lower, prompt_lower)
+        if score >= RUNTIME_FUZZY_THRESHOLD:
+            for c in canonicals:
+                detected_runtimes.add(c.lower())
+
+    return list(detected_runtimes)

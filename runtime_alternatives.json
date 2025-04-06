@@ -1,0 +1,23 @@
+{
+    "quick watch": "short",
+    "short film": "short",
+    "bite-sized": "short",
+    "under an hour": "short",
+    "brief": "short",
+    "compact": "short",
+    "one hour": "short",
+    "1 hour": "short",
+    
+    "standard length": "average",
+    "normal runtime": "average",
+    "feature length": "average",
+    "two hour": "average",
+    "2 hours": "average",
+    
+    "epic": "long",
+    "over two hours": "long",
+    "lengthy": "long",
+    "long haul": "long",
+    "three hours": "long",
+    "3 hours": "long"
+}

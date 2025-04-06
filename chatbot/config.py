@@ -42,6 +42,8 @@ NAME_WEIGHT = 1.0  # Actors and directors
 GENRE_WEIGHT = 1.2  # Film genres
 KEYWORD_WEIGHT = 0.8  # Thematic keywords
 TITLE_WEIGHT = 1.5  # Film titles
+RUNTIME_WEIGHT = 0.1  # Film runtime
+RELEASE_WEIGHT = 0.1  # Film release date
 
 # Fuzzy matching settings
 PROMPT_FUZZY_THRESHOLD = 80  # Threshold for prompt matching
@@ -49,6 +51,8 @@ NAME_FUZZY_THRESHOLD = 90  # Fuzzy matching threshold for names in %
 GENRE_FUZZY_THRESHOLD = 80  # Fuzzy matching threshold for genres in %
 TITLE_FUZZY_THRESHOLD = 90  # Fuzzy matching threshold for titles in %
 KEYWORD_FUZZY_THRESHOLD = 90  # Fuzzy matching threshold for keywords in %
+RUNTIME_FUZZY_THRESHOLD = 90  # Fuzzy matching threshold for runtime in %
+RELEASE_FUZZY_THRESHOLD = 90  # Fuzzy matching threshold for release date in %
 
 # Settings for TMDB API
 TMDB_BASE_URL = "https://api.themoviedb.org/3"

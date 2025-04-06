@@ -16,6 +16,8 @@ from chatbot.config import (
     GENRE_WEIGHT,
     KEYWORD_WEIGHT,
     TITLE_WEIGHT,
+    RUNTIME_WEIGHT,
+    RELEASE_WEIGHT,
 )
 from chatbot.entity_recognition import (
     find_names_in_prompt,
@@ -23,6 +25,8 @@ from chatbot.entity_recognition import (
     find_keywords_in_prompt,
     find_titles_in_prompt,
     clean_prompt_with_fuzzy,
+    find_release_in_prompt,
+    find_runtime_in_prompt,
 )
 from chatbot.prepare_top_matches import prepare_top_matches
 
@@ -63,10 +67,28 @@ class FilmRecommendationsView(BaseEmbeddingView):
         detected_titles = find_titles_in_prompt(prompt)
         if detected_titles:
             print("Detected titles in prompt: " + ", ".join(detected_titles))
+        detected_release = find_release_in_prompt(prompt)
+        if detected_release:
+            print("Detected release date in prompt: " + ", ".join(detected_release))
+        detected_runtime = find_runtime_in_prompt(prompt)
+        if detected_runtime:
+            print("Detected runtime in prompt: " + ", ".join(detected_runtime))
 
-        if detected_names or detected_genres or detected_keywords or detected_titles:
+        if (
+            detected_names
+            or detected_genres
+            or detected_keywords
+            or detected_titles
+            or detected_release
+            or detected_runtime
+        ):
             all_entities = (
-                detected_names + detected_genres + detected_keywords + detected_titles
+                detected_names
+                + detected_genres
+                + detected_keywords
+                + detected_titles
+                + detected_release
+                + detected_runtime
             )
             clean_prompt = clean_prompt_with_fuzzy(prompt, all_entities)
             print(f"Cleaned prompt: {clean_prompt}")
@@ -140,6 +162,24 @@ class FilmRecommendationsView(BaseEmbeddingView):
                     )
                 )
 
+            # Add release date embedding task if detected
+            if detected_release:
+                release_str = ", ".join(detected_release)
+                embedding_tasks.append(
+                    self.fetch_embedding_task(
+                        release_str, session, "release", embedding_results
+                    )
+                )
+
+            # Add runtime embedding task if detected
+            if detected_runtime:
+                runtime_str = ", ".join(detected_runtime)
+                embedding_tasks.append(
+                    self.fetch_embedding_task(
+                        runtime_str, session, "runtime", embedding_results
+                    )
+                )
+
             # Wait for all embedding tasks to complete
             await asyncio.gather(*embedding_tasks)
 
@@ -162,6 +202,10 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 combined_embedding += KEYWORD_WEIGHT * embedding_results["keywords"]
             if detected_titles and embedding_results["titles"] is not None:
                 combined_embedding += TITLE_WEIGHT * embedding_results["titles"]
+            if detected_release and embedding_results["release"] is not None:
+                combined_embedding += RELEASE_WEIGHT * embedding_results["release"]
+            if detected_runtime and embedding_results["runtime"] is not None:
+                combined_embedding += RUNTIME_WEIGHT * embedding_results["runtime"]
         else:
             # No entities were detected, so just use the prompt embedding
             combined_embedding = embedding_results["prompt"]
@@ -199,6 +243,8 @@ class FilmRecommendationsView(BaseEmbeddingView):
             detected_genres,
             detected_keywords,
             detected_titles,
+            detected_release,
+            detected_runtime,
             index,
             query_vector,
         )
@@ -210,6 +256,8 @@ class FilmRecommendationsView(BaseEmbeddingView):
         detected_genres = [genre.title() for genre in detected_genres]
         detected_keywords = [keyword.title() for keyword in detected_keywords]
         detected_titles = [title.title() for title in detected_titles]
+        detected_release = [release.title() for release in detected_release]
+        detected_runtime = [runtime.title() for runtime in detected_runtime]
         time_breakdown["Total Time (Tasks are concurrent)"] = (
             time.perf_counter() - start_time
         )
@@ -226,6 +274,8 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 "detected_genres": detected_genres,
                 "detected_keywords": detected_keywords,
                 "detected_titles": detected_titles,
+                "detected_release": detected_release,
+                "detected_runtime": detected_runtime,
             },
         )
 

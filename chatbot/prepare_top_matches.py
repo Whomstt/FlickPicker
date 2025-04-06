@@ -7,6 +7,7 @@ import aiohttp
 from asgiref.sync import sync_to_async
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from datetime import datetime
 
 from chatbot.config import (
     N_TOP_MATCHES,
@@ -25,6 +26,8 @@ def prepare_top_matches(
     detected_genres=None,
     detected_keywords=None,
     detected_titles=None,
+    detected_runtime=None,
+    detected_release=None,
     index=None,
     query_vector=None,
 ):
@@ -33,6 +36,7 @@ def prepare_top_matches(
     """
 
     def assign_match_flags(film):
+
         # Name match flag
         if detected_names:
             lower_names = set(name.lower() for name in detected_names)
@@ -70,6 +74,7 @@ def prepare_top_matches(
         else:
             film["title_match"] = False
 
+        # Return the film with the match flags
         return film
 
     # Set to track unique films and prevent duplicates

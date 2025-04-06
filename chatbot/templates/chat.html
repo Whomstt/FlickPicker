@@ -118,7 +118,7 @@
             </div>
         {% endif %}
 
-        {% if detected_names or detected_genres or detected_keywords or detected_titles %}
+        {% if detected_names or detected_genres or detected_keywords or detected_titles or detected_runtime or detected_release %}
             <div class="card mb-4">
                 <div class="card-header">
                     <h3>Detected Entities</h3>
@@ -135,6 +135,12 @@
                     {% endif %}
                     {% if detected_titles %}
                         <p><strong>Titles:</strong> {{ detected_titles|join:", " }}</p>
+                    {% endif %}
+                    {% if detected_runtime %}
+                        <p><strong>Runtime:</strong> {{ detected_runtime }}</p>
+                    {% endif %}
+                    {% if detected_release %}
+                        <p><strong>Release Date:</strong> {{ detected_release }}</p>
                     {% endif %}
                 </div>
             </div>
