@@ -267,7 +267,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
         detected_titles = [title.title() for title in detected_titles]
         detected_release = [release.title() for release in detected_release]
         detected_runtime = [runtime.title() for runtime in detected_runtime]
-        time_breakdown["Total Time (Tasks are concurrent)"] = (
+        time_breakdown["Total Time (Some tasks are concurrent)"] = (
             time.perf_counter() - start_time
         )
 

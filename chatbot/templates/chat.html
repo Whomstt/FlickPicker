@@ -31,16 +31,16 @@
         <p class="mt-2">Fetching recommendations...</p>
     </div>
 
-    {% if matches %}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h3>Your Prompt</h3>
-            </div>
-            <div class="card-body">
-                <p>{{ prompt }}</p>
-            </div>
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Your Prompt</h3>
         </div>
-
+        <div class="card-body">
+            <p>{{ prompt }}</p>
+        </div>
+    </div>
+    
+    {% if matches %}
         <div class="card mb-4">
             <div class="card-header">
                 <h3>Top Matching Films</h3>
@@ -119,34 +119,38 @@
                 </div>
             </div>
         {% endif %}
-
-        {% if detected_names or detected_genres or detected_keywords or detected_titles or detected_runtime or detected_release %}
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3>Detected Entities</h3>
-                </div>
-                <div class="card-body">
-                    {% if detected_names %}
-                        <p><strong>Names:</strong> {{ detected_names|join:", " }}</p>
-                    {% endif %}
-                    {% if detected_genres %}
-                        <p><strong>Genres:</strong> {{ detected_genres|join:", " }}</p>
-                    {% endif %}
-                    {% if detected_keywords %}
-                        <p><strong>Keywords:</strong> {{ detected_keywords|join:", " }}</p>
-                    {% endif %}
-                    {% if detected_titles %}
-                        <p><strong>Titles:</strong> {{ detected_titles|join:", " }}</p>
-                    {% endif %}
-                    {% if detected_runtime %}
-                        <p><strong>Runtime:</strong> {{ detected_runtime|join:", " }}</p>
-                    {% endif %}
-                    {% if detected_release %}
-                        <p><strong>Release Date:</strong> {{ detected_release|join:", " }}</p>
-                    {% endif %}
-                </div>
+    {% elif prompt %}
+        <div class="alert alert-warning text-center mt-4">
+            <strong>No exact matches found.</strong> Please try rephrasing your prompt or reducing its complexity.
+        </div>
+    {% endif %}
+    
+    {% if detected_names or detected_genres or detected_keywords or detected_titles or detected_runtime or detected_release %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Detected Entities</h3>
             </div>
-        {% endif %}
+            <div class="card-body">
+                {% if detected_names %}
+                    <p><strong>Names:</strong> {{ detected_names|join:", " }}</p>
+                {% endif %}
+                {% if detected_genres %}
+                    <p><strong>Genres:</strong> {{ detected_genres|join:", " }}</p>
+                {% endif %}
+                {% if detected_keywords %}
+                    <p><strong>Keywords:</strong> {{ detected_keywords|join:", " }}</p>
+                {% endif %}
+                {% if detected_titles %}
+                    <p><strong>Titles:</strong> {{ detected_titles|join:", " }}</p>
+                {% endif %}
+                {% if detected_runtime %}
+                    <p><strong>Runtime:</strong> {{ detected_runtime|join:", " }}</p>
+                {% endif %}
+                {% if detected_release %}
+                    <p><strong>Release Date:</strong> {{ detected_release|join:", " }}</p>
+                {% endif %}
+            </div>
+        </div>
     {% endif %}
 </div>
 
