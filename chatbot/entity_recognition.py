@@ -55,7 +55,7 @@ def clean_prompt_with_fuzzy(prompt, detected_entities):
     return cleaned_prompt
 
 
-def find_names_in_prompt(prompt, json_path="actors_directors.json"):
+def find_names_in_prompt(prompt, json_path="filmdata/original/actors_directors.json"):
     """
     Detect candidate names in user's prompt
     """
@@ -110,12 +110,12 @@ def find_names_in_prompt(prompt, json_path="actors_directors.json"):
     return filtered_names
 
 
-def find_genres_in_prompt(prompt, json_path="genres.json"):
+def find_genres_in_prompt(prompt, json_path="filmdata/original/genres.json"):
     """
     Detect candidate genres in user's prompt
     """
     genres_data = load_json(json_path)
-    genre_alternatives = load_json("genre_alternatives.json")
+    genre_alternatives = load_json("filmdata/alternative/genre_alternatives.json")
     detected_genres = set()
     prompt_lower = prompt.lower()
 
@@ -176,7 +176,9 @@ def find_genres_in_prompt(prompt, json_path="genres.json"):
 
 
 def find_titles_in_prompt(
-    prompt, json_path="titles.json", bizarre_titles_path="bizarre_titles.json"
+    prompt,
+    json_path="filmdata/original/titles.json",
+    bizarre_titles_path="filmdata/bizarre/bizarre_titles.json",
 ):
     """
     Detect candidate film titles in the user's prompt
@@ -231,7 +233,9 @@ def find_titles_in_prompt(
 
 
 def find_keywords_in_prompt(
-    prompt, json_path="keywords.json", bizarre_keywords_path="bizarre_keywords.json"
+    prompt,
+    json_path="filmdata/original/keywords.json",
+    bizarre_keywords_path="filmdata/bizarre/bizarre_keywords.json",
 ):
     """
     Detect candidate keywords in the user's prompt
@@ -286,12 +290,12 @@ def find_keywords_in_prompt(
     return filtered_keywords
 
 
-def find_release_in_prompt(prompt, json_path="releases.json"):
+def find_release_in_prompt(prompt, json_path="filmdata/original/releases.json"):
     """
     Detect candidate releases in user's prompt
     """
     releases_data = load_json(json_path)
-    release_alternatives = load_json("release_alternatives.json")
+    release_alternatives = load_json("filmdata/alternative/release_alternatives.json")
     detected_releases = set()
     prompt_lower = prompt.lower()
 
@@ -349,12 +353,12 @@ def find_release_in_prompt(prompt, json_path="releases.json"):
     return list(detected_releases)
 
 
-def find_runtime_in_prompt(prompt, json_path="runtimes.json"):
+def find_runtime_in_prompt(prompt, json_path="filmdata/original/runtimes.json"):
     """
     Detect candidate runtimes in user's prompt
     """
     runtimes_data = load_json(json_path)
-    runtime_alternatives = load_json("runtime_alternatives.json")
+    runtime_alternatives = load_json("filmdata/alternative/runtime_alternatives.json")
     detected_runtimes = set()
     prompt_lower = prompt.lower()
 

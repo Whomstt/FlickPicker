@@ -61,4 +61,4 @@ TMDB_NUM_FILMS = 1024  # Number of films to fetch per year
 TMDB_RATE_LIMIT = 50  # TMDB rate limit 50 requests per second
 TMDB_RATE_LIMIT_WINDOW = 1  # Rate limit window in seconds
 TMDB_TOTAL_PAGES = 500  # Total number of pages available
-TMDB_OUTPUT_FILE = "films_data.json"
+TMDB_OUTPUT_FILE = "filmdata/original/films_data.json"

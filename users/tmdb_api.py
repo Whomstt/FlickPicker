@@ -257,7 +257,7 @@ async def fetch_and_save_films():
         "unique_main_actors": unique_actors,
         "unique_directors": unique_directors,
     }
-    actors_directors_file = "actors_directors.json"
+    actors_directors_file = "filmdata/original/actors_directors.json"
     logging.info(f"Saving actors and directors to {actors_directors_file}...")
     try:
         with open(actors_directors_file, "w", encoding="utf-8") as f:
@@ -272,7 +272,7 @@ async def fetch_and_save_films():
     logging.info("Extracting unique genres...")
     unique_genres = extract_unique_genres(all_films)
     genres_data = {"unique_genres": unique_genres}
-    genres_file = "genres.json"
+    genres_file = "filmdata/original/genres.json"
     try:
         with open(genres_file, "w", encoding="utf-8") as f:
             json.dump(genres_data, f, indent=4, ensure_ascii=False)
@@ -283,7 +283,7 @@ async def fetch_and_save_films():
     logging.info("Extracting unique titles...")
     unique_titles = extract_unique_titles(all_films)
     titles_data = {"unique_titles": unique_titles}
-    titles_file = "titles.json"
+    titles_file = "filmdata/original/titles.json"
     try:
         with open(titles_file, "w", encoding="utf-8") as f:
             json.dump(titles_data, f, indent=4, ensure_ascii=False)
@@ -294,7 +294,7 @@ async def fetch_and_save_films():
     logging.info("Extracting unique keywords...")
     unique_keywords = extract_unique_keywords(all_films)
     keywords_data = {"unique_keywords": unique_keywords}
-    keywords_file = "keywords.json"
+    keywords_file = "filmdata/original/keywords.json"
     try:
         with open(keywords_file, "w", encoding="utf-8") as f:
             json.dump(keywords_data, f, indent=4, ensure_ascii=False)
