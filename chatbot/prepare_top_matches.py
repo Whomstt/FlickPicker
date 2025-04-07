@@ -39,20 +39,43 @@ def prepare_top_matches(
         """
         Assign a sorting priority based on matching detected entities
         """
+        base_priority = 100  # Start with a high number (low priority)
+        bonus_points = 0
+
+        # Calculate bonus points for additional matches
+        if film.get("keyword_match", False):
+            bonus_points += 1
+        if film.get("title_match", False):
+            bonus_points += 1
+        if film.get("runtime_match", False):
+            bonus_points += 1
+        if film.get("release_match", False):
+            bonus_points += 1
+
+        # First bracket: detected names AND detected genres
         if detected_names and detected_genres:
             if film["name_match"] and film["genre_match"]:
-                return 1
+                base_priority = 1
             elif film["name_match"]:
-                return 2
+                base_priority = 2
             elif film["genre_match"]:
-                return 3
+                base_priority = 3
             else:
-                return 4
+                base_priority = 4
+
+        # Second bracket: detected names only
         elif detected_names:
-            return 1 if film["name_match"] else 2
+            base_priority = 1 if film["name_match"] else 2
+
+        # Third bracket: detected genres only
         elif detected_genres:
-            return 1 if film["genre_match"] else 2
-        return 1
+            base_priority = 1 if film["genre_match"] else 2
+
+        # No detected entities
+        else:
+            base_priority = 1
+
+        return base_priority - (bonus_points * 0.1)
 
     def assign_match_flags(film):
         # Name match flag
