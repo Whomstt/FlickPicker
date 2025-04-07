@@ -116,14 +116,25 @@ async def fetch_and_save_films():
     # List of years to search for
     years = list(range(1962, 2026))
 
+    min_year = 1962
+    current_year = 2025
+
     async with aiohttp.ClientSession() as session:
         semaphore = asyncio.Semaphore(TMDB_RATE_LIMIT)
         # Loop through each year
         for year in years:
+            scale = (year - min_year + 1) / (current_year - min_year + 1)
+            num_films_for_year = int(TMDB_NUM_FILMS * scale)
+            if num_films_for_year < 1:
+                num_films_for_year = 1
+            logging.info(
+                f"Year {year}: Adjusted number of films to fetch: {num_films_for_year}"
+            )
+
             unique_films_dict = {}
             page = 1
             logging.info(f"Fetching films for the year {year}...")
-            while len(unique_films_dict) < TMDB_NUM_FILMS:
+            while len(unique_films_dict) < num_films_for_year:
                 if cancel_fetch:
                     logging.info("Film fetching cancelled by user")
                     break
@@ -242,8 +253,8 @@ async def fetch_and_save_films():
                     break
 
             # Limit films per year
-            logging.info(f"Year {year}: Cutting down to {TMDB_NUM_FILMS} films.")
-            films_for_year = list(unique_films_dict.values())[:TMDB_NUM_FILMS]
+            logging.info(f"Year {year}: Cutting down to {num_films_for_year} films.")
+            films_for_year = list(unique_films_dict.values())[:num_films_for_year]
             all_films.extend(films_for_year)
 
     logging.info(f"Total films across all years after deduplication: {len(all_films)}")
