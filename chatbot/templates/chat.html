@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}FlickPicker{% endblock %}
 {% block page_title %} | Recommender{% endblock %}
@@ -21,7 +22,16 @@
             <label for="prompt" class="form-label">Enter a prompt of a film you would like to watch:</label>
             <textarea id="prompt" name="prompt" rows="4" class="form-control" placeholder="I want a sci-fi film about space exploration..."></textarea>
         </div>
-        <button type="submit" class="btn btn-primary w-100" id="submit-button">Get Recommendations</button>
+        <div class="d-flex justify-content-between gap-2 my-3 text-center">
+            <div class="w-50">
+                <button type="submit" class="btn btn-primary w-100" id="submit-button">Get Recommendations</button>
+                <div class="form-text text-muted mt-1">Get tailored film suggestions based on your input</div>
+            </div>
+            <div class="w-50">
+                <button type="button" class="btn btn-success w-100" id="surprise-button">Surprise Me!</button>
+                <div class="form-text text-muted mt-1">Pick a random film prompt for inspiration</div>
+            </div>
+        </div>
     </form>
 
     <div id="loading-indicator" class="text-center my-4" style="display: none;">
@@ -41,7 +51,6 @@
             </div>
         </div>
     {% endif %}
-
 
     {% if matches %}
         <div class="card mb-4">
@@ -164,6 +173,8 @@
     const explanationContainer = document.getElementById("explanation-container");
     const explanationLoading = document.getElementById("explanation-loading");
     const explanationText = document.getElementById("explanation-text");
+    const surpriseButton = document.getElementById("surprise-button");
+    const promptTextArea = document.getElementById("prompt");
 
     form.addEventListener("submit", function () {
         loadingIndicator.style.display = "block";
@@ -174,6 +185,22 @@
         if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
             submitButton.click();
+        }
+    });
+
+    // Fetch random prompt and set it to the text area
+    surpriseButton.addEventListener("click", async function () {
+        try {
+            // Adjust the URL to match where your sample_prompts.json is served
+            const response = await fetch("{% static 'sample_prompts.json' %}");
+            if (!response.ok) throw new Error("Network response was not ok");
+            const prompts = await response.json();
+            if (prompts.length > 0) {
+                const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+                promptTextArea.value = randomPrompt;
+            }
+        } catch (error) {
+            console.error("Error fetching prompts:", error);
         }
     });
 

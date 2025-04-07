@@ -33,6 +33,12 @@
         "historical",
         "musical",
         "wild west",
-        "wildwest"
+        "wildwest",
+        "short",
+        "medium",
+        "long",
+        "new",
+        "modern",
+        "old"
     ]
 }

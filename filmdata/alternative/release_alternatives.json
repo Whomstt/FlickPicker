@@ -7,11 +7,14 @@
     "the newest": "new",
     "the latest": "new",
     "newest": "new",
+    "recently": "new",
     "from the last few years": "modern",
     "contemporary": "modern",
     "up to date": "modern",
     "cutting edge": "modern",
     "from the last decade": "modern",
+    "10s": "modern",
+    "00s": "modern",
     "classic": "old",
     "vintage": "old",
     "retro": "old",
@@ -19,5 +22,10 @@
     "timeless": "old",
     "the oldest": "old",
     "oldest": "old",
-    "from the last century": "old"
+    "from the last century": "old",
+    "noir": "old",
+    "80s": "old",
+    "90s": "old",
+    "70s": "old",
+    "60s": "old"
 }
