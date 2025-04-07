@@ -202,6 +202,11 @@ async def fetch_and_save_films():
                             else None
                         ),
                     }
+                    # Check if runtime exists and is atleast 40 minutes
+                    runtime = film_data.get("runtime")
+                    if runtime is None or runtime < 40:
+                        continue
+
                     # Remove empty or invalid fields
                     cleaned_film_data = {
                         key: (
