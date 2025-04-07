@@ -24,7 +24,6 @@ from chatbot.entity_recognition import (
     find_genres_in_prompt,
     find_keywords_in_prompt,
     find_titles_in_prompt,
-    clean_prompt_with_fuzzy,
     find_release_in_prompt,
     find_runtime_in_prompt,
 )
@@ -90,10 +89,6 @@ class FilmRecommendationsView(BaseEmbeddingView):
                 + detected_release
                 + detected_runtime
             )
-            clean_prompt = clean_prompt_with_fuzzy(prompt, all_entities)
-            print(f"Cleaned prompt: {clean_prompt}")
-        else:
-            clean_prompt = prompt
 
         entity_detection_end = time.perf_counter()
         time_breakdown["Entity Detection & Cleaning"] = (
@@ -123,9 +118,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
         async with aiohttp.ClientSession() as session:
             # Add prompt embedding task
             embedding_tasks.append(
-                self.fetch_embedding_task(
-                    clean_prompt, session, "prompt", embedding_results
-                )
+                self.fetch_embedding_task(prompt, session, "prompt", embedding_results)
             )
 
             # Add names embedding task if names detected
@@ -190,7 +183,6 @@ class FilmRecommendationsView(BaseEmbeddingView):
             embeddings_end - embeddings_start
         )
 
-        prompt_weight = PROMPT_WEIGHT
         # If any entities are detected, compute a weighted sum
         if (
             detected_names
@@ -200,9 +192,7 @@ class FilmRecommendationsView(BaseEmbeddingView):
             or detected_release
             or detected_runtime
         ):
-            if not clean_prompt:
-                prompt_weight = 0
-            combined_embedding = prompt_weight * embedding_results["prompt"]
+            combined_embedding = PROMPT_WEIGHT * embedding_results["prompt"]
             if detected_names and embedding_results["names"] is not None:
                 combined_embedding += NAME_WEIGHT * embedding_results["names"]
             if detected_genres and embedding_results["genres"] is not None:
