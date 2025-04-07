@@ -3,11 +3,21 @@
     "latest": "new",
     "brand new": "new",
     "current": "new",
+    "from the last year": "new",
+    "the newest": "new",
+    "the latest": "new",
+    "newest": "new",
+    "from the last few years": "modern",
     "contemporary": "modern",
     "up to date": "modern",
     "cutting edge": "modern",
+    "from the last decade": "modern",
     "classic": "old",
     "vintage": "old",
     "retro": "old",
-    "nostalgic": "old"
+    "nostalgic": "old",
+    "timeless": "old",
+    "the oldest": "old",
+    "oldest": "old",
+    "from the last century": "old"
 }
