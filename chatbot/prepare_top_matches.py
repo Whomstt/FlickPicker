@@ -87,7 +87,6 @@ def prepare_top_matches(
                 else:
                     film["runtime_match"] = runtime_category == "long"
             except (ValueError, TypeError):
-                # If runtime is missing or not convertible, default to False.
                 film["runtime_match"] = False
         else:
             film["runtime_match"] = False
@@ -142,7 +141,13 @@ def prepare_top_matches(
         unique_films.add(idx)
 
     # If no entities for names or genres were detected we return the top N matches
-    if not (detected_names or detected_genres or detected_runtime or detected_release):
+    if not (
+        detected_names
+        or detected_genres
+        or detected_runtime
+        or detected_release
+        or detected_keywords
+    ):
         matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
         return matches[:N_TOP_MATCHES]
 
@@ -157,6 +162,8 @@ def prepare_top_matches(
             checks.append(film["runtime_match"])
         if detected_release:
             checks.append(film["release_match"])
+        if detected_keywords:
+            checks.append(film["keyword_match"])
         return all(checks)
 
     filtered = [film for film in matches if condition(film)]
