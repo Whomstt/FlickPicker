@@ -35,8 +35,26 @@ def prepare_top_matches(
     Prepare the top film matches for the user
     """
 
-    def assign_match_flags(film):
+    def film_priority(film):
+        """
+        Assign a sorting priority based on matching detected entities
+        """
+        if detected_names and detected_genres:
+            if film["name_match"] and film["genre_match"]:
+                return 1
+            elif film["name_match"]:
+                return 2
+            elif film["genre_match"]:
+                return 3
+            else:
+                return 4
+        elif detected_names:
+            return 1 if film["name_match"] else 2
+        elif detected_genres:
+            return 1 if film["genre_match"] else 2
+        return 1
 
+    def assign_match_flags(film):
         # Name match flag
         if detected_names:
             lower_names = set(name.lower() for name in detected_names)
@@ -140,7 +158,7 @@ def prepare_top_matches(
         matches.append(film)
         unique_films.add(idx)
 
-    # If no entities for names or genres were detected we return the top N matches
+    # If no entities detected return top matches based on cosine similarity
     if not (
         detected_names
         or detected_genres
@@ -151,7 +169,7 @@ def prepare_top_matches(
         matches.sort(key=lambda x: x["cosine_similarity"], reverse=True)
         return matches[:N_TOP_MATCHES]
 
-    # If both names and genres are detected we require both matches
+    # Define condition for films passing all applicable checks
     def condition(film):
         checks = []
         if detected_names:
@@ -166,11 +184,12 @@ def prepare_top_matches(
             checks.append(film["keyword_match"])
         return all(checks)
 
+    # Select films that meet all detected entities
     filtered = [film for film in matches if condition(film)]
     filtered.sort(key=lambda x: x["cosine_similarity"], reverse=True)
     filtered = filtered[:N_TOP_MATCHES]
 
-    # Only expand if the filtered results (with matching names/genres) are not filled
+    # Expand search if needed
     initial_k = len(indices[0])
     current_k = initial_k - 5
     previous_nprobe = NPROBE  # Default starting nprobe
@@ -226,5 +245,64 @@ def prepare_top_matches(
         if current_k >= MAX_RESULTS:
             break
 
-    # Return only films that pass the matching condition
+    # Supplement with films that have at least a name or genre match
+    if len(filtered) < N_TOP_MATCHES:
+        needed = N_TOP_MATCHES - len(filtered)
+        fallback_films = [film for film in matches if film not in filtered]
+
+        fallback_step1 = []  # Both name and genre match
+        fallback_step2 = []  # Only name match
+        fallback_step3 = []  # The rest (either name or genre match)
+
+        # Organize fallback films according to the desired steps
+        for film in fallback_films:
+            if detected_names and detected_genres:
+                if film["name_match"] and film["genre_match"]:
+                    fallback_step1.append(film)
+                elif film["name_match"]:
+                    fallback_step2.append(film)
+                elif film["genre_match"]:
+                    fallback_step3.append(film)
+            elif detected_names:
+                if film["name_match"]:
+                    fallback_step1.append(film)
+            elif detected_genres:
+                if film["genre_match"]:
+                    fallback_step1.append(film)
+
+        # Helper to count additional matching flags (runtime, release, keywords)
+        def count_rest_checks(film):
+            count = 0
+            if detected_runtime and film["runtime_match"]:
+                count += 1
+            if detected_release and film["release_match"]:
+                count += 1
+            if detected_keywords and film["keyword_match"]:
+                count += 1
+            return count
+
+        # Sort each fallback list using the count of additional matches and cosine similarity
+        fallback_step1.sort(
+            key=lambda x: (count_rest_checks(x), x["cosine_similarity"]), reverse=True
+        )
+        filtered.extend(fallback_step1[:needed])
+        needed = N_TOP_MATCHES - len(filtered)
+
+        if needed > 0:
+            fallback_step2.sort(
+                key=lambda x: (count_rest_checks(x), x["cosine_similarity"]),
+                reverse=True,
+            )
+            filtered.extend(fallback_step2[:needed])
+            needed = N_TOP_MATCHES - len(filtered)
+
+        if needed > 0:
+            fallback_step3.sort(
+                key=lambda x: (count_rest_checks(x), x["cosine_similarity"]),
+                reverse=True,
+            )
+            filtered.extend(fallback_step3[:needed])
+
+        filtered.sort(key=lambda x: (film_priority(x), -x["cosine_similarity"]))
+
     return filtered[:N_TOP_MATCHES]
