@@ -121,7 +121,7 @@ def prepare_top_matches(
             runtime_raw = film.get("runtime")
             try:
                 runtime_val = int(runtime_raw)
-                if runtime_val <= 90:
+                if runtime_val < 90:
                     film["runtime_match"] = runtime_category == "short"
                 elif runtime_val <= 120:
                     film["runtime_match"] = runtime_category == "medium"
@@ -180,6 +180,25 @@ def prepare_top_matches(
         film = assign_match_flags(film)
         matches.append(film)
         unique_films.add(idx)
+
+    # # Print the original films found in similarity search before filtering
+    # print("Initial films found in similarity search:\n")
+
+    # fields = [
+    #     ("title", "Title"),
+    #     ("genres", "Genres"),
+    #     ("overview", "Overview"),
+    #     ("directors", "Directors"),
+    #     ("main_actors", "Main Actors"),
+    #     ("runtime", "Runtime"),
+    #     ("release_date", "Release Date"),
+    #     ("keywords", "Keywords"),
+    # ]
+
+    # for idx, film in enumerate(matches[:5], start=1):
+    #     print(f"Film {idx}:")
+    #     print("\n".join(f"{label}: {film.get(key, 'N/A')}" for key, label in fields))
+    #     print()
 
     # If no entities detected return top matches based on cosine similarity
     if not (
