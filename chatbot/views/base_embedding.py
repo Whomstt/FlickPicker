@@ -190,9 +190,9 @@ class BaseEmbeddingView(View):
                 if field == "runtime":
                     try:
                         runtime = int(cleaned_value)
-                        if runtime <= 90:
+                        if runtime < 90:
                             cleaned_value = "short"
-                        elif runtime <= 120:
+                        elif runtime < 120:
                             cleaned_value = "medium"
                         else:
                             cleaned_value = "long"
