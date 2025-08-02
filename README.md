@@ -6,9 +6,9 @@ Deployed at https://flickpicker.site
 
 #### Building a Film Recommender System using Retrieval-Augmented Generation
 
-This project is a film recommender system developed for film enthusiasts who desire personalized and meaningful recommendations. The system takes a user prompt and recommends films that are a close match. RAG addresses the limitations of traditional recommendation systems by tackling the topics of semantic understanding and inclusivity, providing users with a deeper and more personalized experience. The target audience is individuals with diverse tastes and interests, so that both mainstream and niche interests are provided for.
+FlickPicker is an AI-powered film recommender system that delivers personalized, context-aware suggestions based on user prompts. By using Retrieval-Augmented Generation (RAG), it overcomes the limitations of static LLM knowledge by retrieving rich, real-time film data to generate more accurate and relevant recommendations.
 
-The project was envisioned through a combination of research into state-of-the-art machine learning techniques and experimentation through trial and error. The system makes use of Nomic Embed for textual embeddings, FAISS for similarity search, and ChatGPT for explanations. Inspiration was drawn from existing limitations in traditional recommender systems and the potential provided by AI to better align user interests with meaningful, contextually relevant recommendations.
+The system combines Nomic Embed for textual embeddings, FAISS for efficient similarity search, and GPT-4o-mini for a natural language final output. Unlike traditional recommender systems, it supports natural language queries to better capture user intent, making it especially effective for users with niche or evolving tastes.
 
 ### Setup Guide:
 
